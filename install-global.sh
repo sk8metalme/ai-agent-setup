@@ -15,17 +15,11 @@ NC='\033[0m'
 REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
 CLAUDE_DIR="$HOME/.claude"
 
-DRY_RUN=false
 PLAN_MODE=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --dry-run)
-            DRY_RUN=true
-            shift
-            ;;
         --plan)
-            DRY_RUN=true
             PLAN_MODE=true
             shift
             ;;
@@ -40,7 +34,7 @@ PLAN_REPORT=()
 PLAN_DIFFS=()
 
 record_step() {
-    if [[ "$DRY_RUN" == true ]]; then
+    if [[ "$PLAN_MODE" == true ]]; then
         PLAN_REPORT+=("$1")
     fi
 }
@@ -62,7 +56,7 @@ print_diff() {
 
 ensure_dir() {
     local dir=$1
-    if [[ "$DRY_RUN" == true ]]; then
+    if [[ "$PLAN_MODE" == true ]]; then
         record_step "ディレクトリ作成予定: $dir"
     else
         mkdir -p "$dir"
@@ -76,18 +70,26 @@ download_file() {
 
     record_step "$label を $dest に配置"
 
-    if [[ "$DRY_RUN" == true ]]; then
+    if [[ "$PLAN_MODE" == true ]]; then
+        # PLAN_MODE: Download to temp file and show diff
         local tmp
         tmp=$(mktemp)
+        # Ensure temp file is always cleaned up
+        trap "rm -f '$tmp'" EXIT
+        
         if curl -fsSL "$url" -o "$tmp" 2>/dev/null; then
             print_diff "$dest" "$tmp"
             rm -f "$tmp"
+            trap - EXIT  # Remove trap after successful cleanup
         else
             PLAN_DIFFS+=("$label の取得に失敗しました: $url")
+            rm -f "$tmp"
+            trap - EXIT  # Remove trap after cleanup
         fi
         return 0
     fi
 
+    # Real execution: backup and download
     backup_if_exists "$dest"
     curl -fsSL "$url" -o "$dest" 2>/dev/null || {
         echo -e "${RED}❌ $label のダウンロードに失敗しました${NC}"
@@ -116,7 +118,7 @@ backup_if_exists() {
     local file=$1
     if [[ -f "$file" ]]; then
         local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
-        if [[ "$DRY_RUN" == true ]]; then
+        if [[ "$PLAN_MODE" == true ]]; then
             record_step "バックアップ予定: $file -> $backup"
             return
         fi
@@ -249,7 +251,7 @@ echo "📝 メインCLAUDE.mdファイルを作成中..."
 
 record_step "CLAUDE.md を $CLAUDE_DIR/CLAUDE.md に生成"
 
-if [[ "$DRY_RUN" == true ]]; then
+if [[ "$PLAN_MODE" == true ]]; then
     tmp_main=$(mktemp)
     generate_claude_main > "$tmp_main"
     print_diff "$CLAUDE_DIR/CLAUDE.md" "$tmp_main"
@@ -259,7 +261,7 @@ else
     generate_claude_main > "$CLAUDE_DIR/CLAUDE.md"
 fi
 
-if [[ "$DRY_RUN" == true ]]; then
+if [[ "$PLAN_MODE" == true ]]; then
     echo ""
     echo "📝 プランモード: 以下の内容を実行予定です"
     printf ' - %s\n' "${PLAN_REPORT[@]}"
