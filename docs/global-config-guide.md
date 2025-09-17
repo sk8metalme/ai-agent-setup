@@ -34,11 +34,11 @@
 curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 
 # Java + Spring Boot のみ取得したい場合（環境変数で制御）
-LANGUAGE_CHOICE=1 curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=1 bash
 
 # 実行前に差分や影響を確認したい場合
 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh) --plan
-LANGUAGE_CHOICE=1 curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash -s -- --dry-run
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=1 bash -s -- --plan
 ```
 
 ### 方法2: 手動インストール
@@ -95,7 +95,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 # または、Gitで管理している場合
 cd ~/.ai-configs && git pull
 ```
-- 適用前に差分を確認したい場合は `--plan` または `--dry-run` を付与（例: `curl ... | bash -s -- --plan`）。
+- 適用前に差分を確認したい場合は `--plan` を付与（例: `curl ... | bash -s -- --plan`）。
 
 ### 更新の通知
 
