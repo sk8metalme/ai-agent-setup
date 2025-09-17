@@ -1,0 +1,39 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.bak
+.temp/
+
+# Note: AI configuration files should be committed
+# CLAUDE.md
+# .cursorrules
+# AGENTS.md
