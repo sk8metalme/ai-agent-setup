@@ -27,10 +27,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/ma
 # 非対話でインストールする場合（デフォルトを環境変数で指定）
 LANGUAGE_CHOICE=4 \
   curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
+
+# 実行前に影響を確認したい場合
+bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh) --plan
+LANGUAGE_CHOICE=4 \
+  curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash -s -- --dry-run
 ```
 
 - 手動実行時はテキストメニューで選択肢を確認できる対話モードの利用を推奨します。
 - 自動化など非対話で実行する場合は `LANGUAGE_CHOICE=1..4` で言語テンプレートを指定してください（未指定時は自動的に「すべて」を取得）。
+- 実行前に影響をレビューしたい場合は `--plan`（差分表示）または `--dry-run`（ダウンロード予定の一覧）を付与すると、既存環境との違いを可視化できます。
 
 ### プロジェクト設定（Cursor/AGENTS.md用）
 
@@ -41,9 +47,15 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/ma
 # 非対話でインストールする場合
 PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 \
   curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
+
+# 実行前に影響を確認したい場合
+bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh) --plan
+PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 \
+  curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash -s -- --dry-run
 ```
 
 - 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..4` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
+- 実行前の確認には `--plan`（詳細差分）/`--dry-run`（一覧）を併用すると既存ファイルへの影響を把握できます。
 
 ## 🎯 対応言語・フレームワーク
 

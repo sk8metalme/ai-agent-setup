@@ -15,25 +15,108 @@ NC='\033[0m'
 REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
 PROJECT_ROOT="${PROJECT_ROOT:-.}"
 
-# バックアップ関数
+DRY_RUN=false
+PLAN_MODE=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --plan)
+            DRY_RUN=true
+            PLAN_MODE=true
+            shift
+            ;;
+        *)
+            echo "未対応のオプションです: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+PLAN_REPORT=()
+PLAN_DIFFS=()
+
+record_step() {
+    if [[ "$DRY_RUN" == true ]]; then
+        PLAN_REPORT+=("$1")
+    fi
+}
+
+print_diff() {
+    local target=$1
+    local tmp=$2
+    if [[ -f "$target" ]]; then
+        diff_output=$(diff -u "$target" "$tmp" 2>/dev/null || true)
+        if [[ -n "$diff_output" ]]; then
+            PLAN_DIFFS+=("--- $target の差分 ---\n$diff_output")
+        else
+            PLAN_DIFFS+=("$target に変更はありません")
+        fi
+    else
+        PLAN_DIFFS+=("新規作成予定: $target")
+    fi
+}
+
 backup_if_exists() {
     local file=$1
     if [[ -f "$file" ]]; then
         local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+        if [[ "$DRY_RUN" == true ]]; then
+            record_step "バックアップ予定: $file -> $backup"
+            return
+        fi
         echo -e "${YELLOW}📋 既存ファイルをバックアップ: $backup${NC}"
         mv "$file" "$backup"
     fi
 }
 
+ensure_dir() {
+    local dir=$1
+    if [[ "$DRY_RUN" == true ]]; then
+        record_step "ディレクトリ作成予定: $dir"
+    else
+        mkdir -p "$dir"
+    fi
+}
+
+download_file() {
+    local url=$1
+    local dest=$2
+    local label=$3
+
+    record_step "$label を $dest に配置"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        local tmp
+        tmp=$(mktemp)
+        if curl -fsSL "$url" -o "$tmp" 2>/dev/null; then
+            print_diff "$dest" "$tmp"
+            rm -f "$tmp"
+        else
+            PLAN_DIFFS+=("$label の取得に失敗しました: $url")
+        fi
+        return 0
+    fi
+
+    backup_if_exists "$dest"
+    curl -fsSL "$url" -o "$dest" 2>/dev/null || {
+        echo -e "${RED}❌ $label のダウンロードに失敗しました${NC}"
+        exit 1
+    }
+}
+
 # ロゴ表示
 echo -e "${GREEN}"
-cat << 'EOF'
+cat << 'EOF_BANNER'
  _____           _           _     _____             __ _       
 |  _  |___ ___  |_|___ ___ _| |_  |     |___ ___ ___|__|_|___   
 |   __|  _| . | | | -_|  _|  _|  |   --| . |   |  _|  | | . |
 |__|  |_| |___|_| |___|___|_|    |_____|___|_|_|_|  |__|_|_  |
                 |___|                                    |___|
-EOF
+EOF_BANNER
 echo -e "${NC}"
 
 echo "🚀 プロジェクト用設定インストーラー"
@@ -83,34 +166,23 @@ if [[ -z "$lang_choice" ]]; then
     echo "ℹ️  非対話モードまたは未入力のため『すべて』を選択しました (PROJECT_LANGUAGE_CHOICE で変更可能)"
 fi
 
-# Cursor Project Rules のインストール
 install_cursor_rules() {
     echo ""
     echo "📥 Cursor Project Rules をインストール中..."
-    
-    mkdir -p "$PROJECT_ROOT/.cursor/rules"
-    
-    # 基本ルール
-    backup_if_exists "$PROJECT_ROOT/.cursor/rules/general.mdc"
-    curl -fsSL "$REPO_URL/project-config/cursor-rules/general.mdc" \
-        -o "$PROJECT_ROOT/.cursor/rules/general.mdc" 2>/dev/null || {
-        echo -e "${RED}❌ 基本ルールのダウンロードに失敗しました${NC}"
-        return 1
-    }
-    
-    # 言語別ルール
+
+    ensure_dir "$PROJECT_ROOT/.cursor/rules"
+
+    download_file "$REPO_URL/project-config/cursor-rules/general.mdc" \
+        "$PROJECT_ROOT/.cursor/rules/general.mdc" "基本ルール"
+
     download_language_rule() {
         local lang=$1
         local display_name=$2
-
         echo "📥 $display_name ルールをダウンロード中..."
-        backup_if_exists "$PROJECT_ROOT/.cursor/rules/$lang.mdc"
-        curl -fsSL "$REPO_URL/project-config/cursor-rules/$lang.mdc" \
-            -o "$PROJECT_ROOT/.cursor/rules/$lang.mdc" 2>/dev/null || {
-            echo -e "${YELLOW}⚠️  $display_name ルールが見つかりません${NC}"
-        }
+        download_file "$REPO_URL/project-config/cursor-rules/$lang.mdc" \
+            "$PROJECT_ROOT/.cursor/rules/$lang.mdc" "$display_name ルール"
     }
-    
+
     case $lang_choice in
         1)
             download_language_rule "java-spring" "Java Spring Boot"
@@ -131,26 +203,21 @@ install_cursor_rules() {
             return 1
             ;;
     esac
-    
-    echo -e "${GREEN}✅ Cursor Project Rules のインストールが完了しました${NC}"
+
+    if [[ "$DRY_RUN" != true ]]; then
+        echo -e "${GREEN}✅ Cursor Project Rules のインストールが完了しました${NC}"
+    fi
 }
 
-# AGENTS.md のインストール
 install_agents_md() {
     echo ""
     echo "📥 AGENTS.md をインストール中..."
-    
-    backup_if_exists "$PROJECT_ROOT/AGENTS.md"
-    curl -fsSL "$REPO_URL/project-config/AGENTS.md" \
-        -o "$PROJECT_ROOT/AGENTS.md" 2>/dev/null || {
-        echo -e "${RED}❌ AGENTS.mdのダウンロードに失敗しました${NC}"
-        return 1
-    }
-    
-    echo -e "${GREEN}✅ AGENTS.md のインストールが完了しました${NC}"
+    download_file "$REPO_URL/project-config/AGENTS.md" "$PROJECT_ROOT/AGENTS.md" "AGENTS.md"
+    if [[ "$DRY_RUN" != true ]]; then
+        echo -e "${GREEN}✅ AGENTS.md のインストールが完了しました${NC}"
+    fi
 }
 
-# 設定タイプに応じてインストール
 case $config_type in
     1)
         install_cursor_rules
@@ -167,6 +234,24 @@ case $config_type in
         exit 1
         ;;
 esac
+
+if [[ "$DRY_RUN" == true ]]; then
+    echo ""
+    if [[ "$PLAN_MODE" == true ]]; then
+        echo "📝 プランモード: 実行内容のプレビュー"
+    else
+        echo "📝 ドライラン: 実行予定の内容"
+    fi
+    printf ' - %s\n' "${PLAN_REPORT[@]}"
+    if [[ ${#PLAN_DIFFS[@]} -gt 0 ]]; then
+        echo ""
+        for diff_entry in "${PLAN_DIFFS[@]}"; do
+            echo -e "$diff_entry"
+            echo ""
+        done
+    fi
+    exit 0
+fi
 
 echo ""
 echo "🎉 プロジェクト用設定のインストールが完了しました！"

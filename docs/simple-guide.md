@@ -30,6 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 2. **言語選択**
    - プロンプトに従って対象言語を選択（デフォルト: すべて）
    - 非対話運用時は `LANGUAGE_CHOICE=1..4` を事前に設定
+   - 本適用前に影響を確認する場合はコマンド末尾に `--plan`（差分表示）または `--dry-run`（一覧のみ）を付与
 
 3. **設定場所**: `~/.claude/`
 
@@ -48,6 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 3. **言語選択**
    - Java / PHP / Perl / 全部から選択（デフォルト: すべて）
    - 非対話運用時は `PROJECT_LANGUAGE_CHOICE=1..4` を指定
+   - 事前に影響を確認したい場合は `--plan` または `--dry-run` を追加
 
 ### ステップ3: 設定確認
 
@@ -139,6 +141,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
 ```
 - 既存構成を上書きする際も同じ環境変数フラグ（`LANGUAGE_CHOICE`, `PROJECT_CONFIG_TYPE`, `PROJECT_LANGUAGE_CHOICE`）で対象を制御できます。
+- 上書き前に差分をチェックしたい場合は上記コマンドに `--plan` または `--dry-run` を付与してプレビューできます（`bash -s -- --plan` 形式）。
 
 ### 2. Gitで管理
 ```bash
