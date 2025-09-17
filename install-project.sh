@@ -13,7 +13,7 @@ NC='\033[0m'
 
 # デフォルト値
 REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
-PROJECT_ROOT="."
+PROJECT_ROOT="${PROJECT_ROOT:-.}"
 
 # バックアップ関数
 backup_if_exists() {
