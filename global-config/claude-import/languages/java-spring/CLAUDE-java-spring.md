@@ -13,9 +13,7 @@
 ### コーディング標準
 - Google Java Style Guide準拠
 - NullAwayによるNull安全性チェック
-- strict_typesを宣言
-- 型ヒントと戻り値の型を使用
-
+- 型/戻り値を明確にする（@Nullable/@NonNull 等のアノテーション）
 ### 技術スタック
 - Spring MVC (REST API)
 - Spring Data JPA
