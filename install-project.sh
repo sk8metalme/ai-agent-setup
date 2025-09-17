@@ -12,8 +12,18 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # デフォルト値
-REPO_URL="https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main"
+REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
 PROJECT_ROOT="."
+
+# バックアップ関数
+backup_if_exists() {
+    local file=$1
+    if [[ -f "$file" ]]; then
+        local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+        echo -e "${YELLOW}📋 既存ファイルをバックアップ: $backup${NC}"
+        mv "$file" "$backup"
+    fi
+}
 
 # ロゴ表示
 echo -e "${GREEN}"
@@ -36,7 +46,19 @@ echo "  1) Cursor Project Rules (.mdc)"
 echo "  2) AGENTS.md (シンプル)"
 echo "  3) 両方"
 echo ""
-read -p "選択 (1-3): " config_type
+
+config_type=${PROJECT_CONFIG_TYPE:-}
+
+if [[ -n "$config_type" ]]; then
+    echo "➡️  環境変数 PROJECT_CONFIG_TYPE=$config_type を使用します"
+elif [[ -t 0 ]]; then
+    read -rp "選択 (1-3) [デフォルト: 3]: " config_type
+fi
+
+if [[ -z "$config_type" ]]; then
+    config_type=3
+    echo "ℹ️  非対話モードまたは未入力のため『両方』を選択しました (PROJECT_CONFIG_TYPE で変更可能)"
+fi
 
 # 言語選択
 echo ""
@@ -47,7 +69,19 @@ echo "  2) PHP"
 echo "  3) Perl"
 echo "  4) すべて"
 echo ""
-read -p "選択 (1-4): " lang_choice
+
+lang_choice=${PROJECT_LANGUAGE_CHOICE:-}
+
+if [[ -n "$lang_choice" ]]; then
+    echo "➡️  環境変数 PROJECT_LANGUAGE_CHOICE=$lang_choice を使用します"
+elif [[ -t 0 ]]; then
+    read -rp "選択 (1-4) [デフォルト: 4]: " lang_choice
+fi
+
+if [[ -z "$lang_choice" ]]; then
+    lang_choice=4
+    echo "ℹ️  非対話モードまたは未入力のため『すべて』を選択しました (PROJECT_LANGUAGE_CHOICE で変更可能)"
+fi
 
 # Cursor Project Rules のインストール
 install_cursor_rules() {
@@ -57,6 +91,7 @@ install_cursor_rules() {
     mkdir -p "$PROJECT_ROOT/.cursor/rules"
     
     # 基本ルール
+    backup_if_exists "$PROJECT_ROOT/.cursor/rules/general.mdc"
     curl -fsSL "$REPO_URL/project-config/cursor-rules/general.mdc" \
         -o "$PROJECT_ROOT/.cursor/rules/general.mdc" 2>/dev/null || {
         echo -e "${RED}❌ 基本ルールのダウンロードに失敗しました${NC}"
@@ -67,8 +102,9 @@ install_cursor_rules() {
     download_language_rule() {
         local lang=$1
         local display_name=$2
-        
+
         echo "📥 $display_name ルールをダウンロード中..."
+        backup_if_exists "$PROJECT_ROOT/.cursor/rules/$lang.mdc"
         curl -fsSL "$REPO_URL/project-config/cursor-rules/$lang.mdc" \
             -o "$PROJECT_ROOT/.cursor/rules/$lang.mdc" 2>/dev/null || {
             echo -e "${YELLOW}⚠️  $display_name ルールが見つかりません${NC}"
@@ -89,8 +125,10 @@ install_cursor_rules() {
             download_language_rule "java-spring" "Java Spring Boot"
             download_language_rule "php" "PHP"
             download_language_rule "perl" "Perl"
-            download_language_rule "python" "Python"
-            download_language_rule "database" "Database"
+            ;;
+        *)
+            echo -e "${RED}無効な選択です${NC}"
+            return 1
             ;;
     esac
     
@@ -102,6 +140,7 @@ install_agents_md() {
     echo ""
     echo "📥 AGENTS.md をインストール中..."
     
+    backup_if_exists "$PROJECT_ROOT/AGENTS.md"
     curl -fsSL "$REPO_URL/project-config/AGENTS.md" \
         -o "$PROJECT_ROOT/AGENTS.md" 2>/dev/null || {
         echo -e "${RED}❌ AGENTS.mdのダウンロードに失敗しました${NC}"

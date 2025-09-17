@@ -46,9 +46,9 @@ alwaysApply: false         # 常に適用するか
 ### 1. プロジェクトへの適用
 
 ```bash
-# プロジェクトルートで
+# プロジェクトルートで（このリポジトリ内のテンプレートをコピー）
 mkdir -p .cursor/rules
-cp examples/cursor-rules/*.mdc .cursor/rules/
+cp project-config/cursor-rules/*.mdc .cursor/rules/
 ```
 
 ### 2. ネストされたルール

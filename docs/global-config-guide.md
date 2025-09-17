@@ -11,9 +11,11 @@
 ```
 ~/
 ├── .claude/
-│   └── CLAUDE.md         # Claudeの全プロジェクト共通設定
-└── .cursor/
-    └── .cursorrules      # Cursorの全プロジェクト共通設定
+│   └── CLAUDE.md         # Claudeの全プロジェクト共通設定（本リポジトリが提供）
+└── (任意) .cursor/
+    └── .cursorrules      # Cursorのグローバル設定（必要な場合のみ／手動管理）
+
+※ Cursor向けテンプレートは `install-project.sh` で各プロジェクト配下の `.cursor/rules/*.mdc` に配置する方式を推奨しています。
 ```
 
 ### メリット
@@ -28,22 +30,26 @@
 ### 方法1: ワンコマンドインストール（推奨）
 
 ```bash
-# 最新の設定をインストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install.sh | bash
+# すべての言語テンプレートを取得（非対話モードでもOK）
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 
-# 特定のテンプレートを指定
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install.sh | bash -s backend
+# Java + Spring Boot のみ取得したい場合（環境変数で制御）
+LANGUAGE_CHOICE=1 curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 ```
 
 ### 方法2: 手動インストール
 
 ```bash
 # ディレクトリ作成
-mkdir -p ~/.claude ~/.cursor
+mkdir -p ~/.claude
 
 # ファイルをダウンロード
-curl -o ~/.claude/CLAUDE.md https://example.com/CLAUDE.md
-curl -o ~/.cursor/.cursorrules https://example.com/.cursorrules
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/global-config/claude-import/CLAUDE.md \
+  -o ~/.claude/CLAUDE.md
+
+# Cursorのグローバル設定が必要な場合のみ（オプション）
+# mkdir -p ~/.cursor
+# curl -fsSL https://example.com/.cursorrules -o ~/.cursor/.cursorrules
 ```
 
 ### 方法3: Gitで管理
@@ -52,9 +58,11 @@ curl -o ~/.cursor/.cursorrules https://example.com/.cursorrules
 # 設定リポジトリをクローン
 git clone https://github.com/your-team/ai-configs.git ~/.ai-configs
 
-# シンボリックリンクを作成
+# シンボリックリンクを作成（Claude）
 ln -s ~/.ai-configs/CLAUDE.md ~/.claude/CLAUDE.md
-ln -s ~/.ai-configs/.cursorrules ~/.cursor/.cursorrules
+
+# Cursorのグローバル設定を共有したい場合のみ（任意）
+# ln -s ~/.ai-configs/.cursorrules ~/.cursor/.cursorrules
 ```
 
 ## 📊 優先順位
@@ -63,11 +71,11 @@ AIツールは以下の優先順位で設定を読み込みます：
 
 1. **プロジェクトローカル設定**（最優先）
    - `./CLAUDE.md`
-   - `./.cursorrules`
+   - `./.cursor/rules/*.mdc`
 
 2. **グローバル設定**
    - `~/.claude/CLAUDE.md`
-   - `~/.cursor/.cursorrules`
+   - `~/.cursor/.cursorrules`（必要な場合のみ）
 
 3. **デフォルト設定**
    - AIツールの標準設定
@@ -78,7 +86,7 @@ AIツールは以下の優先順位で設定を読み込みます：
 
 ```bash
 # 最新版に更新（既存設定は自動バックアップ）
-curl -fsSL https://your-team-url/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 
 # または、Gitで管理している場合
 cd ~/.ai-configs && git pull
@@ -88,7 +96,7 @@ cd ~/.ai-configs && git pull
 
 ```bash
 # ~/.zshrc または ~/.bashrc に追加
-alias ai-update='curl -fsSL https://your-team-url/install.sh | bash'
+alias ai-update='curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash'
 ```
 
 ## 🎯 ベストプラクティス
@@ -152,13 +160,13 @@ export CURSOR_IGNORE_GLOBAL=1
 1. **ファイルの存在確認**
    ```bash
    ls -la ~/.claude/CLAUDE.md
-   ls -la ~/.cursor/.cursorrules
+   ls -la ~/.cursor/.cursorrules   # 使用している場合のみ
    ```
 
 2. **権限の確認**
    ```bash
    chmod 644 ~/.claude/CLAUDE.md
-   chmod 644 ~/.cursor/.cursorrules
+   chmod 644 ~/.cursor/.cursorrules   # 使用している場合のみ
    ```
 
 3. **AIツールの再起動**
@@ -170,7 +178,7 @@ export CURSOR_IGNORE_GLOBAL=1
 ```bash
 # バックアップファイルを探す
 ls ~/.claude/CLAUDE.md.backup.*
-ls ~/.cursor/.cursorrules.backup.*
+ls ~/.cursor/.cursorrules.backup.*   # 使用している場合のみ
 
 # 復元
 cp ~/.claude/CLAUDE.md.backup.20240101_120000 ~/.claude/CLAUDE.md
@@ -186,7 +194,7 @@ cp ~/.claude/CLAUDE.md.backup.20240101_120000 ~/.claude/CLAUDE.md
    ```bash
    # 自分だけが読み書きできるように
    chmod 600 ~/.claude/CLAUDE.md
-   chmod 600 ~/.cursor/.cursorrules
+   chmod 600 ~/.cursor/.cursorrules   # 使用している場合のみ
    ```
 
 3. **監査ログ**

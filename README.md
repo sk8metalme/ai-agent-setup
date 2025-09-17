@@ -22,15 +22,19 @@
 
 ```bash
 # Claude グローバル設定をインストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 ```
+
+- 非対話で実行する場合は `LANGUAGE_CHOICE=1..4` を付与すると対象言語を選択できます（未指定時は自動的に「すべて」を取得）。
 
 ### プロジェクト設定（Cursor/AGENTS.md用）
 
 ```bash
 # プロジェクト用設定をインストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-project.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
 ```
+
+- 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..4` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
 
 ## 🎯 対応言語・フレームワーク
 

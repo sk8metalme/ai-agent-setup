@@ -9,27 +9,27 @@ AIエージェント（Claude、Cursor）の設定を最小限の手間で行う
 #### Claude グローバル設定
 ```bash
 # チーム共通のClaude設定をインストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 ```
+- 対話プロンプトをスキップしたい場合は `LANGUAGE_CHOICE=1..4`（1:Java, 2:PHP, 3:Perl, 4:すべて）を付与してください。未指定時は自動で「すべて」が選択されます。
 
 #### プロジェクト用設定（Cursor/AGENTS.md）
 ```bash
 # プロジェクト固有の設定をインストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-project.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
 ```
+- 非対話実行時は `PROJECT_CONFIG_TYPE=1..3`（1:Rules, 2:AGENTS.md, 3:両方）と `PROJECT_LANGUAGE_CHOICE=1..4`（1:Java, 2:PHP, 3:Perl, 4:すべて）でインストール対象を指定できます。
 
 ### ステップ1: グローバル設定（Claude用）
 
 1. **インストール実行**
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
    ```
 
 2. **言語選択**
-   - Java + Spring Boot
-   - PHP
-   - Perl
-   - すべて
+   - プロンプトに従って対象言語を選択（デフォルト: すべて）
+   - 非対話運用時は `LANGUAGE_CHOICE=1..4` を事前に設定
 
 3. **設定場所**: `~/.claude/`
 
@@ -38,19 +38,16 @@ curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/in
 1. **プロジェクトルートで実行**
    ```bash
    cd your-project/
-   curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-project.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
    ```
 
 2. **設定タイプ選択**
-   - Cursor Project Rules (.mdc)
-   - AGENTS.md (シンプル)
-   - 両方
+   - プロンプトで `.mdc` / `AGENTS.md` / 両方から選択（デフォルト: 両方）
+   - 非対話運用時は `PROJECT_CONFIG_TYPE=1..3` を指定
 
 3. **言語選択**
-   - Java + Spring Boot
-   - PHP
-   - Perl
-   - すべて
+   - Java / PHP / Perl / 全部から選択（デフォルト: すべて）
+   - 非対話運用時は `PROJECT_LANGUAGE_CHOICE=1..4` を指定
 
 ### ステップ3: 設定確認
 
@@ -136,11 +133,12 @@ vi AGENTS.md
 ### 1. 設定の更新
 ```bash
 # グローバル設定の再インストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 
 # プロジェクト設定の再インストール
-curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-project.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
 ```
+- 既存構成を上書きする際も同じ環境変数フラグ（`LANGUAGE_CHOICE`, `PROJECT_CONFIG_TYPE`, `PROJECT_LANGUAGE_CHOICE`）で対象を制御できます。
 
 ### 2. Gitで管理
 ```bash
@@ -180,7 +178,7 @@ git commit -m "Add AI agent project configurations"
 ### インストールエラー
 ```bash
 # ネットワーク接続を確認
-curl -I https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh
+curl -I https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh
 
 # 権限エラーの場合
 chmod +x install-global.sh

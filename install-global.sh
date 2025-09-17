@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # デフォルト値
-REPO_URL="https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main"
+REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
 CLAUDE_DIR="$HOME/.claude"
 
 # ロゴ表示
@@ -54,13 +54,26 @@ echo "  2) PHP"
 echo "  3) Perl"
 echo "  4) すべて"
 echo ""
-read -p "選択 (1-4): " choice
+
+choice=${LANGUAGE_CHOICE:-}
+
+if [[ -n "$choice" ]]; then
+    echo "➡️  環境変数 LANGUAGE_CHOICE=$choice を使用します"
+elif [[ -t 0 ]]; then
+    read -rp "選択 (1-4) [デフォルト: 4]: " choice
+fi
+
+if [[ -z "$choice" ]]; then
+    choice=4
+    echo "ℹ️  非対話モードまたは未入力のため『すべて』を選択しました (LANGUAGE_CHOICE で変更可能)"
+fi
 
 # 基本設定のダウンロード
 echo ""
 echo "📥 基本設定をダウンロード中..."
 
 # 基本設定
+backup_if_exists "$CLAUDE_DIR/base/CLAUDE-base.md"
 curl -fsSL "$REPO_URL/global-config/claude-import/base/CLAUDE-base.md" \
     -o "$CLAUDE_DIR/base/CLAUDE-base.md" 2>/dev/null || {
     echo -e "${RED}❌ 基本設定のダウンロードに失敗しました${NC}"
@@ -68,6 +81,7 @@ curl -fsSL "$REPO_URL/global-config/claude-import/base/CLAUDE-base.md" \
 }
 
 # チーム設定
+backup_if_exists "$CLAUDE_DIR/team/CLAUDE-team-standards.md"
 curl -fsSL "$REPO_URL/global-config/claude-import/team/CLAUDE-team-standards.md" \
     -o "$CLAUDE_DIR/team/CLAUDE-team-standards.md" 2>/dev/null || {
     echo -e "${RED}❌ チーム設定のダウンロードに失敗しました${NC}"
@@ -75,6 +89,7 @@ curl -fsSL "$REPO_URL/global-config/claude-import/team/CLAUDE-team-standards.md"
 }
 
 # セキュリティ設定
+backup_if_exists "$CLAUDE_DIR/security/CLAUDE-security-policy.md"
 curl -fsSL "$REPO_URL/global-config/claude-import/security/CLAUDE-security-policy.md" \
     -o "$CLAUDE_DIR/security/CLAUDE-security-policy.md" 2>/dev/null || {
     echo -e "${RED}❌ セキュリティ設定のダウンロードに失敗しました${NC}"
@@ -89,6 +104,7 @@ download_language_config() {
     echo "📥 $display_name 設定をダウンロード中..."
     mkdir -p "$CLAUDE_DIR/languages/$lang"
     
+    backup_if_exists "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md"
     curl -fsSL "$REPO_URL/global-config/claude-import/languages/$lang/CLAUDE-$lang.md" \
         -o "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md" 2>/dev/null || {
         echo -e "${YELLOW}⚠️  $display_name 設定のダウンロードに失敗しました${NC}"
@@ -119,6 +135,8 @@ esac
 # メインCLAUDE.mdファイルの作成
 echo ""
 echo "📝 メインCLAUDE.mdファイルを作成中..."
+
+backup_if_exists "$CLAUDE_DIR/CLAUDE.md"
 
 cat > "$CLAUDE_DIR/CLAUDE.md" << 'EOF'
 # グローバルClaude設定
