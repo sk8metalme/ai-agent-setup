@@ -138,8 +138,9 @@ my $users = $schema->resultset('User')->search({
 - HTML::Entitiesでエスケープ
 - 適切なパスワード管理
 
-```perl
-#!/usr/bin/env perl -T
+#!/usr/bin/env -S perl -T
+# 互換性重視の場合:
+# #!/usr/bin/perl -T
 # taintチェックを有効化
 
 # 危険な文字を除去
