@@ -21,17 +21,26 @@
 ### グローバル設定（Claude用）
 
 ```bash
-# Claude グローバル設定をインストール
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
+# Claude グローバル設定を対話的にインストール（推奨）
+bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
+
+# 非対話でインストールする場合（デフォルトを環境変数で指定）
+LANGUAGE_CHOICE=4 \
+  curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | bash
 ```
 
-- 非対話で実行する場合は `LANGUAGE_CHOICE=1..4` を付与すると対象言語を選択できます（未指定時は自動的に「すべて」を取得）。
+- 手動実行時はテキストメニューで選択肢を確認できる対話モードの利用を推奨します。
+- 自動化など非対話で実行する場合は `LANGUAGE_CHOICE=1..4` で言語テンプレートを指定してください（未指定時は自動的に「すべて」を取得）。
 
 ### プロジェクト設定（Cursor/AGENTS.md用）
 
 ```bash
-# プロジェクト用設定をインストール
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
+# プロジェクト用設定を対話的にインストール（推奨）
+bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
+
+# 非対話でインストールする場合
+PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 \
+  curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | bash
 ```
 
 - 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..4` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
