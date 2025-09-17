@@ -1,1 +1,143 @@
-# ai-agent-setup
+# AI Agent Setup
+
+生成AIエージェント（Claude、Cursor）の設定ファイルを簡単に配布・セットアップできるシステムです。
+
+## 📋 概要
+
+このプロジェクトでは、以下の2つの配布方式を提供しています：
+
+### 🌐 グローバル設定（Claude用）
+- **配置場所**: `~/.claude/`
+- **用途**: チーム共通の基本設定、セキュリティポリシー、言語別設定
+- **特徴**: `@import`構文でモジュール化、一度設定すれば全プロジェクトで利用可能
+
+### 📁 プロジェクト設定（Cursor/AGENTS.md用）
+- **配置場所**: プロジェクトルート
+- **用途**: プロジェクト固有の設定、開発チーム向け
+- **特徴**: `.cursor/rules/*.mdc`形式またはシンプルな`AGENTS.md`
+
+## 🚀 クイックスタート
+
+### グローバル設定（Claude用）
+
+```bash
+# Claude グローバル設定をインストール
+curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-global.sh | bash
+```
+
+### プロジェクト設定（Cursor/AGENTS.md用）
+
+```bash
+# プロジェクト用設定をインストール
+curl -fsSL https://raw.githubusercontent.com/arigatatsuya/ai-agent-setup/main/install-project.sh | bash
+```
+
+## 🎯 対応言語・フレームワーク
+
+| 言語 | フレームワーク | 特徴 |
+|------|---------------|------|
+| **Java** | Spring Boot 3.x + Gradle | エンタープライズ開発、NullAway、Rocky Linux |
+| **PHP** | Slim Framework + Composer | 軽量API、Monolog、Phake、MySQL/Oracle |
+| **Perl** | Mojolicious + Modern Perl | スクリプト・Web、モダンPerl機能 |
+
+## 📁 インストール後のファイル配置
+
+### グローバル設定（Claude）
+```
+~/.claude/
+├── CLAUDE.md                    # メインエントリーポイント
+├── base/CLAUDE-base.md         # 基本設定
+├── team/CLAUDE-team-standards.md # チーム標準
+├── security/CLAUDE-security-policy.md # セキュリティポリシー
+└── languages/
+    ├── java-spring/CLAUDE-java-spring.md
+    ├── php/CLAUDE-php.md
+    └── perl/CLAUDE-perl.md
+```
+
+### プロジェクト設定（Cursor）
+```
+my-project/
+├── .cursor/
+│   └── rules/                # Project Rules（推奨）
+│       ├── general.mdc       # 全般的なルール
+│       └── java-spring.mdc   # Java固有
+├── AGENTS.md                 # シンプルな代替手段
+└── src/                      # ソースコード
+```
+
+## 🔧 設定の特徴
+
+### 共通設定
+- **言語**: 日本語での応答
+- **コード品質**: クリーンコード、SOLID原則
+- **テスト**: カバレッジ95%以上
+- **セキュリティ**: 入力検証、機密情報保護
+- **批判的思考**: より良い判断のための否定的意見も含む
+
+### 言語別設定
+
+#### Java + Spring Boot
+- Gradle 8.x、Rocky Linux 9
+- NullAway（Null安全性チェック）
+- JUnit 5 + Mockito
+- Spring Security + JWT
+
+#### PHP
+- PHP 8.2+、PSR-12準拠
+- Slim Framework（Laravelなし）
+- PHPUnit + Phake（モック）
+- Monolog（ロギング）
+- MySQL/Oracle対応
+
+#### Perl
+- Perl 5.32+、モダンPerl
+- Mojolicious、Moo/Moose
+- Test::More + Test::Exception
+- DBI（MySQL/Oracle）
+
+## ⚙️ Cursor User Rules 推奨設定
+
+以下をCursorの設定（`Cmd/Ctrl + ,` → Cursor Settings → Rules）に追加することを推奨します：
+
+```
+# User Rules 推奨設定
+
+1. タスクが完了したら、ターミナルからsayコマンドを実行して、音声で通知してください。
+2. 回答は常に日本語で行ってください。
+```
+
+これにより、プロジェクト固有の設定と組み合わせて、より一貫した開発体験が得られます。
+
+## 📚 ドキュメント
+
+- [シンプルガイド](docs/simple-guide.md) - 基本的な使い方
+- [グローバル設定ガイド](docs/global-config-guide.md) - グローバル設定の詳細
+- [Claude Import ガイド](docs/claude-import-guide.md) - @import構文の使い方
+- [Cursor公式ガイド](docs/cursor-official-guide.md) - Project Rules仕様
+
+
+## 🏢 エンタープライズ向け
+
+プライベートリポジトリでの配布を行う場合は、インストーラースクリプト内の `REPO_URL` を変更してください：
+
+```bash
+# install-global.sh または install-project.sh の先頭で変更
+REPO_URL="https://raw.githubusercontent.com/your-org/your-repo/main"
+```
+
+## 🤝 コントリビューション
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add amazing feature'`)
+4. ブランチをプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+## 📄 ライセンス
+
+MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照してください。
+
+---
+
+**注意**: このシステムは機密情報を含まず、設定ファイルのみを管理します。APIキーやパスワードなどの機密情報は別途管理してください。
