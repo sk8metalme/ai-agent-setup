@@ -250,6 +250,37 @@ case $choice in
         ;;
 esac
 
+# Claude設定ファイルのインストール
+echo ""
+echo "⚙️ Claude設定ファイルをインストール中..."
+
+install_claude_settings() {
+    local settings_url="$REPO_URL/global-config/claude-settings/settings.json"
+    local target_file="$CLAUDE_DIR/settings.json"
+    
+    record_step "Claude設定ファイルを $target_file にダウンロード"
+    
+    if [[ "$PLAN_MODE" == true ]]; then
+        tmp_settings=$(mktemp)
+        download_file_content "$settings_url" > "$tmp_settings" 2>/dev/null || echo "# Claude設定ファイル（ダウンロード予定）" > "$tmp_settings"
+        print_diff "$target_file" "$tmp_settings"
+        rm -f "$tmp_settings"
+        return
+    fi
+    
+    backup_if_exists "$target_file"
+    
+    if download_file "$settings_url" "$target_file" "Claude設定ファイル"; then
+        echo -e "${GREEN}✅ Claude設定ファイルのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 設定ファイルの場所: $target_file${NC}"
+        echo -e "${YELLOW}💡 チーム設定（reviewers, codeOwners）は実際の環境に合わせて調整してください${NC}"
+    else
+        echo -e "${RED}❌ Claude設定ファイルのダウンロードに失敗しました${NC}"
+    fi
+}
+
+install_claude_settings
+
 # メインCLAUDE.mdファイルの作成
 echo ""
 echo "📝 メインCLAUDE.mdファイルを作成中..."
@@ -283,9 +314,21 @@ fi
 echo -e "${GREEN}✅ Claude グローバル設定のインストールが完了しました${NC}"
 echo ""
 echo "📍 インストール場所: $CLAUDE_DIR"
+echo "   ├── CLAUDE.md              # メイン設定ファイル"
+echo "   ├── settings.json          # Claude Desktop/Web設定"
+echo "   ├── base/                  # 基本設定"
+echo "   ├── languages/             # 言語別設定"
+echo "   ├── security/              # セキュリティポリシー"
+echo "   └── team/                  # チーム標準"
 echo ""
 echo "🚀 次のステップ:"
 echo "   1. 必要に応じて言語設定のコメントを外す"
-echo "   2. Claudeを再起動して設定を反映"
-echo "   3. プロジェクト用設定は install-project.sh を使用"
+echo "   2. settings.jsonのチーム設定を実際の環境に合わせて調整"
+echo "   3. Claudeを再起動して設定を反映"
+echo "   4. プロジェクト用設定は install-project.sh を使用"
+echo ""
+echo "⚙️ Claude設定ファイル:"
+echo "   - 場所: $CLAUDE_DIR/settings.json"
+echo "   - 内容: セキュリティ、権限、Git統合、チーム設定"
+echo "   - カスタマイズ: reviewers, codeOwners等を調整してください"
 echo ""

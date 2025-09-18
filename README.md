@@ -76,6 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 ```
 ~/.claude/
 ├── CLAUDE.md                    # メインエントリーポイント
+├── settings.json               # Claude Desktop/Web設定
 ├── base/CLAUDE-base.md         # 基本設定
 ├── team/CLAUDE-team-standards.md # チーム標準
 ├── security/CLAUDE-security-policy.md # セキュリティポリシー
@@ -109,6 +110,13 @@ my-project/
 - **テスト**: カバレッジ95%以上
 - **セキュリティ**: 入力検証、機密情報保護
 - **批判的思考**: より良い判断のための否定的意見も含む
+
+### Claude設定（settings.json）
+- **セキュリティ**: 危険コマンド拒否、機密情報スキャン
+- **Git統合**: コミットテンプレート、保護ブランチ設定
+- **チーム設定**: レビュアー、コードオーナー管理
+- **権限管理**: 安全なコマンドのみ許可
+- **開発ツール**: bash, read, edit, write, glob, grep有効
 
 ### 言語別設定
 

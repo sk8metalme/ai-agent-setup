@@ -1,0 +1,76 @@
+{
+  "theme": "dark",
+  "editor": {
+    "defaultLanguage": "markdown",
+    "wrapLines": true
+  },
+  "ai": {
+    "temperature": 0.5
+  },
+  "hooks": {},
+  "tools": {
+    "enabled": ["bash", "read", "edit", "write", "glob", "grep"]
+  },
+  "workspace": {
+    "autoSave": true
+  },
+  "env": {
+    "MAX_THINKING_TOKENS": "31999",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-20250514"
+  },
+  "permissions": {
+    "allowed": [
+      "Edit",
+      "Bash(git commit:*)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull)",
+      "Bash(git push)",
+      "Bash(npm install:*)",
+      "Bash(npm test)",
+      "Bash(npm run build)",
+      "Bash(npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(yarn:*)",
+      "Read"
+    ],
+    "denied": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git push --force:*)",
+      "Bash(npm publish:*)"
+    ]
+  },
+  "git": {
+    "autoStage": false,
+    "requireCommitMessage": true,
+    "commitMessageTemplate": "[type]: brief description\n\n- Detailed changes\n- Impact on other components",
+    "protectedBranches": ["main", "master", "production"],
+    "requirePullRequest": true
+  },
+  "security": {
+    "preventSecretCommits": true,
+    "scanDependencies": true,
+    "requireCodeReview": true
+  },
+  "notifications": {
+    "onError": true,
+    "onSuccess": true,
+    "onCommit": true
+  },
+  "team": {
+    "reviewers": ["tech-lead", "senior-dev"],
+    "codeOwners": {
+      "src/components/": ["frontend-team"],
+      "src/api/": ["backend-team"],
+      "docs/": ["documentation-team"]
+    }
+  }
+}
