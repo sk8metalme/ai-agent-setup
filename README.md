@@ -25,18 +25,18 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
 
 # 非対話でインストールする場合（デフォルトを環境変数で指定）
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=4 bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=5 bash
 # または
-LANGUAGE_CHOICE=4 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
+LANGUAGE_CHOICE=5 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
 
 # 実行前に影響を確認したい場合
 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh) --plan
 # または
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=4 bash -s -- --plan
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=5 bash -s -- --plan
 ```
 
 - 手動実行時はテキストメニューで選択肢を確認できる対話モードの利用を推奨します。
-- 自動化など非対話で実行する場合は `LANGUAGE_CHOICE=1..4` で言語テンプレートを指定してください（未指定時は自動的に「すべて」を取得）。
+- 自動化など非対話で実行する場合は `LANGUAGE_CHOICE=1..5` で言語テンプレートを指定してください（未指定時は自動的に「すべて」を取得）。
 - **環境変数の渡し方**: `ENV=value bash` の形式で環境変数をbashプロセスに渡してください。パイプ使用時は `| ENV=value bash` の順序で記述。
 - 実行前に影響をレビューしたい場合は `--plan`（差分表示）を付与すると、既存環境との違いを可視化できます。
 
@@ -47,17 +47,17 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
 
 # 非対話でインストールする場合
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 bash
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash
 # または
-PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
+PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
 
 # 実行前に影響を確認したい場合
 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh) --plan
 # または
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=4 bash -s -- --plan
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash -s -- --plan
 ```
 
-- 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..4` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
+- 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..5` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
 - **環境変数の渡し方**: `ENV=value bash` の形式で環境変数をbashプロセスに渡してください。複数の環境変数は `ENV1=value1 ENV2=value2 bash` の形式。
 - 実行前の確認には `--plan`（詳細差分）を使用すると既存ファイルへの影響を把握できます。
 
@@ -82,7 +82,8 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 └── languages/
     ├── java-spring/CLAUDE-java-spring.md
     ├── php/CLAUDE-php.md
-    └── perl/CLAUDE-perl.md
+    ├── perl/CLAUDE-perl.md
+    └── python/CLAUDE-python.md
 ```
 
 ### プロジェクト設定（Cursor）

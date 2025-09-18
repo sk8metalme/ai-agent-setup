@@ -143,7 +143,8 @@ echo ""
 echo "  1) Java + Spring Boot"
 echo "  2) PHP"
 echo "  3) Perl"
-echo "  4) すべて"
+echo "  4) Python"
+echo "  5) すべて"
 echo ""
 
 choice=${LANGUAGE_CHOICE:-}
@@ -151,11 +152,11 @@ choice=${LANGUAGE_CHOICE:-}
 if [[ -n "$choice" ]]; then
     echo "➡️  環境変数 LANGUAGE_CHOICE=$choice を使用します"
 elif [[ -t 0 ]]; then
-    read -rp "選択 (1-4) [デフォルト: 4]: " choice
+    read -rp "選択 (1-5) [デフォルト: 5]: " choice
 fi
 
 if [[ -z "$choice" ]]; then
-    choice=4
+    choice=5
     echo "ℹ️  非対話モードまたは未入力のため『すべて』を選択しました (LANGUAGE_CHOICE で変更可能)"
 fi
 
@@ -235,9 +236,13 @@ case $choice in
         download_language_config "perl" "Perl"
         ;;
     4)
+        download_language_config "python" "Python"
+        ;;
+    5)
         download_language_config "java-spring" "Java + Spring Boot"
         download_language_config "php" "PHP"
         download_language_config "perl" "Perl"
+        download_language_config "python" "Python"
         ;;
     *)
         echo -e "${RED}無効な選択です${NC}"
