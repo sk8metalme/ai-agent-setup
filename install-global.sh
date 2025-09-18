@@ -15,6 +15,88 @@ NC='\033[0m'
 REPO_URL="${REPO_URL:-https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main}"
 CLAUDE_DIR="$HOME/.claude"
 
+PLAN_MODE=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --plan)
+            PLAN_MODE=true
+            shift
+            ;;
+        *)
+            echo "未対応のオプションです: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+PLAN_REPORT=()
+PLAN_DIFFS=()
+
+record_step() {
+    if [[ "$PLAN_MODE" == true ]]; then
+        PLAN_REPORT+=("$1")
+    fi
+}
+
+print_diff() {
+    local target=$1
+    local tmp=$2
+    if [[ -f "$target" ]]; then
+        diff_output=$(diff -u "$target" "$tmp" 2>/dev/null || true)
+        if [[ -n "$diff_output" ]]; then
+            PLAN_DIFFS+=("--- $target の差分 ---\n$diff_output")
+        else
+            PLAN_DIFFS+=("$target に変更はありません")
+        fi
+    else
+        PLAN_DIFFS+=("新規作成予定: $target")
+    fi
+}
+
+ensure_dir() {
+    local dir=$1
+    if [[ "$PLAN_MODE" == true ]]; then
+        record_step "ディレクトリ作成予定: $dir"
+    else
+        mkdir -p "$dir"
+    fi
+}
+
+download_file() {
+    local url=$1
+    local dest=$2
+    local label=$3
+
+    record_step "$label を $dest に配置"
+
+    if [[ "$PLAN_MODE" == true ]]; then
+        # PLAN_MODE: Download to temp file and show diff
+        local tmp
+        tmp=$(mktemp)
+        # Ensure temp file is always cleaned up
+        trap "rm -f '$tmp'" EXIT
+        
+        if curl -fsSL "$url" -o "$tmp" 2>/dev/null; then
+            print_diff "$dest" "$tmp"
+            rm -f "$tmp"
+            trap - EXIT  # Remove trap after successful cleanup
+        else
+            PLAN_DIFFS+=("$label の取得に失敗しました: $url")
+            rm -f "$tmp"
+            trap - EXIT  # Remove trap after cleanup
+        fi
+        return 0
+    fi
+
+    # Real execution: backup and download
+    backup_if_exists "$dest"
+    curl -fsSL "$url" -o "$dest" 2>/dev/null || {
+        echo -e "${RED}❌ $label のダウンロードに失敗しました${NC}"
+        exit 1
+    }
+}
+
 # ロゴ表示
 echo -e "${GREEN}"
 cat << 'EOF'
@@ -36,6 +118,10 @@ backup_if_exists() {
     local file=$1
     if [[ -f "$file" ]]; then
         local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+        if [[ "$PLAN_MODE" == true ]]; then
+            record_step "バックアップ予定: $file -> $backup"
+            return
+        fi
         echo -e "${YELLOW}📋 既存ファイルをバックアップ: $backup${NC}"
         mv "$file" "$backup"
     fi
@@ -43,7 +129,12 @@ backup_if_exists() {
 
 # ディレクトリ作成
 echo "📁 ディレクトリ作成中..."
-mkdir -p "$CLAUDE_DIR"/{base,team,security,languages,projects}
+ensure_dir "$CLAUDE_DIR"
+ensure_dir "$CLAUDE_DIR/base"
+ensure_dir "$CLAUDE_DIR/team"
+ensure_dir "$CLAUDE_DIR/security"
+ensure_dir "$CLAUDE_DIR/languages"
+ensure_dir "$CLAUDE_DIR/projects"
 
 # 言語選択
 echo ""
@@ -73,28 +164,16 @@ echo ""
 echo "📥 基本設定をダウンロード中..."
 
 # 基本設定
-backup_if_exists "$CLAUDE_DIR/base/CLAUDE-base.md"
-curl -fsSL "$REPO_URL/global-config/claude-import/base/CLAUDE-base.md" \
-    -o "$CLAUDE_DIR/base/CLAUDE-base.md" 2>/dev/null || {
-    echo -e "${RED}❌ 基本設定のダウンロードに失敗しました${NC}"
-    exit 1
-}
+download_file "$REPO_URL/global-config/claude-import/base/CLAUDE-base.md" \
+    "$CLAUDE_DIR/base/CLAUDE-base.md" "基本設定"
 
 # チーム設定
-backup_if_exists "$CLAUDE_DIR/team/CLAUDE-team-standards.md"
-curl -fsSL "$REPO_URL/global-config/claude-import/team/CLAUDE-team-standards.md" \
-    -o "$CLAUDE_DIR/team/CLAUDE-team-standards.md" 2>/dev/null || {
-    echo -e "${RED}❌ チーム設定のダウンロードに失敗しました${NC}"
-    exit 1
-}
+download_file "$REPO_URL/global-config/claude-import/team/CLAUDE-team-standards.md" \
+    "$CLAUDE_DIR/team/CLAUDE-team-standards.md" "チーム設定"
 
 # セキュリティ設定
-backup_if_exists "$CLAUDE_DIR/security/CLAUDE-security-policy.md"
-curl -fsSL "$REPO_URL/global-config/claude-import/security/CLAUDE-security-policy.md" \
-    -o "$CLAUDE_DIR/security/CLAUDE-security-policy.md" 2>/dev/null || {
-    echo -e "${RED}❌ セキュリティ設定のダウンロードに失敗しました${NC}"
-    exit 1
-}
+download_file "$REPO_URL/global-config/claude-import/security/CLAUDE-security-policy.md" \
+    "$CLAUDE_DIR/security/CLAUDE-security-policy.md" "セキュリティ設定"
 
 # 言語別設定のダウンロード
 download_language_config() {
@@ -102,43 +181,13 @@ download_language_config() {
     local display_name=$2
     
     echo "📥 $display_name 設定をダウンロード中..."
-    mkdir -p "$CLAUDE_DIR/languages/$lang"
-    
-    backup_if_exists "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md"
-    curl -fsSL "$REPO_URL/global-config/claude-import/languages/$lang/CLAUDE-$lang.md" \
-        -o "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md" 2>/dev/null || {
-        echo -e "${YELLOW}⚠️  $display_name 設定のダウンロードに失敗しました${NC}"
-    }
+    ensure_dir "$CLAUDE_DIR/languages/$lang"
+    download_file "$REPO_URL/global-config/claude-import/languages/$lang/CLAUDE-$lang.md" \
+        "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md" "$display_name 設定"
 }
 
-case $choice in
-    1)
-        download_language_config "java-spring" "Java + Spring Boot"
-        ;;
-    2)
-        download_language_config "php" "PHP"
-        ;;
-    3)
-        download_language_config "perl" "Perl"
-        ;;
-    4)
-        download_language_config "java-spring" "Java + Spring Boot"
-        download_language_config "php" "PHP"
-        download_language_config "perl" "Perl"
-        ;;
-    *)
-        echo -e "${RED}無効な選択です${NC}"
-        exit 1
-        ;;
-esac
-
-# メインCLAUDE.mdファイルの作成
-echo ""
-echo "📝 メインCLAUDE.mdファイルを作成中..."
-
-backup_if_exists "$CLAUDE_DIR/CLAUDE.md"
-
-cat > "$CLAUDE_DIR/CLAUDE.md" << 'EOF'
+generate_claude_main() {
+cat <<'EOF'
 # グローバルClaude設定
 
 このファイルはグローバルなClaude設定です。
@@ -173,6 +222,58 @@ cat > "$CLAUDE_DIR/CLAUDE.md" << 'EOF'
 注: このファイルは`@import`構文を使用して、複数の設定ファイルを組み合わせています。
 プロジェクト固有の設定は、各プロジェクトのCLAUDE.mdファイルで定義してください。
 EOF
+}
+
+case $choice in
+    1)
+        download_language_config "java-spring" "Java + Spring Boot"
+        ;;
+    2)
+        download_language_config "php" "PHP"
+        ;;
+    3)
+        download_language_config "perl" "Perl"
+        ;;
+    4)
+        download_language_config "java-spring" "Java + Spring Boot"
+        download_language_config "php" "PHP"
+        download_language_config "perl" "Perl"
+        ;;
+    *)
+        echo -e "${RED}無効な選択です${NC}"
+        exit 1
+        ;;
+esac
+
+# メインCLAUDE.mdファイルの作成
+echo ""
+echo "📝 メインCLAUDE.mdファイルを作成中..."
+
+record_step "CLAUDE.md を $CLAUDE_DIR/CLAUDE.md に生成"
+
+if [[ "$PLAN_MODE" == true ]]; then
+    tmp_main=$(mktemp)
+    generate_claude_main > "$tmp_main"
+    print_diff "$CLAUDE_DIR/CLAUDE.md" "$tmp_main"
+    rm -f "$tmp_main"
+else
+    backup_if_exists "$CLAUDE_DIR/CLAUDE.md"
+    generate_claude_main > "$CLAUDE_DIR/CLAUDE.md"
+fi
+
+if [[ "$PLAN_MODE" == true ]]; then
+    echo ""
+    echo "📝 プランモード: 以下の内容を実行予定です"
+    printf ' - %s\n' "${PLAN_REPORT[@]}"
+    if [[ ${#PLAN_DIFFS[@]} -gt 0 ]]; then
+        echo ""
+        for diff_entry in "${PLAN_DIFFS[@]}"; do
+            echo -e "$diff_entry"
+            echo ""
+        done
+    fi
+    exit 0
+fi
 
 echo -e "${GREEN}✅ Claude グローバル設定のインストールが完了しました${NC}"
 echo ""
