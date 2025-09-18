@@ -50,7 +50,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/ma
 mkdir -p ~/.claude
 
 # 設定ファイルをダウンロード
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/global-config/claude-settings/settings.json -o ~/.claude/settings.json
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/.claude/settings.json -o ~/.claude/settings.json
 ```
 
 ### 方法3: 既存設定のバックアップ付きインストール
@@ -61,7 +61,7 @@ if [ -f ~/.claude/settings.json ]; then
 fi
 
 # 新しい設定をインストール
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/global-config/claude-settings/settings.json -o ~/.claude/settings.json
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/.claude/settings.json -o ~/.claude/settings.json
 ```
 
 ## ⚙️ カスタマイズ
