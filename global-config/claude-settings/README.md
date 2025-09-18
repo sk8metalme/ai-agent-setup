@@ -99,6 +99,25 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/glob
 }
 ```
 
+### 多言語対応セキュリティ設定
+
+設定ファイルには、PHP、Java、Python、Perl、Node.jsを扱う際の危険なコマンドも含まれています：
+
+#### パッケージ管理の危険操作
+- **グローバルインストール**: `npm install -g`, `pip install --user`, `composer global require`
+- **システム破壊**: `pip install --break-system-packages`, `cpanm --sudo`
+- **パブリッシュ操作**: `mvn deploy`, `gradle publish`, `npm publish`
+
+#### 任意コード実行の防止
+- **インライン実行**: `php -r`, `python -c`, `perl -e`, `node -e`
+- **一時ファイル実行**: `/tmp/`や`/var/tmp/`からのJAR実行
+- **パイプ実行**: `curl|bash`, `wget|sh`等の危険なパイプライン
+
+#### システムレベル操作
+- **プロセス管理**: `kill -9`, `killall`, `systemctl`
+- **ディスク操作**: `dd`, `mkfs`, `fdisk`
+- **マウント操作**: `mount`, `umount`
+
 ## 🔧 設定項目詳細
 
 ### AI設定
