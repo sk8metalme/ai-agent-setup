@@ -165,15 +165,15 @@ echo ""
 echo "📥 基本設定をダウンロード中..."
 
 # 基本設定
-download_file "$REPO_URL/global-config/claude-import/base/CLAUDE-base.md" \
+download_file "$REPO_URL/.claude/base/CLAUDE-base.md" \
     "$CLAUDE_DIR/base/CLAUDE-base.md" "基本設定"
 
 # チーム設定
-download_file "$REPO_URL/global-config/claude-import/team/CLAUDE-team-standards.md" \
+download_file "$REPO_URL/.claude/team/CLAUDE-team-standards.md" \
     "$CLAUDE_DIR/team/CLAUDE-team-standards.md" "チーム設定"
 
 # セキュリティ設定
-download_file "$REPO_URL/global-config/claude-import/security/CLAUDE-security-policy.md" \
+download_file "$REPO_URL/.claude/security/CLAUDE-security-policy.md" \
     "$CLAUDE_DIR/security/CLAUDE-security-policy.md" "セキュリティ設定"
 
 # 言語別設定のダウンロード
@@ -183,7 +183,7 @@ download_language_config() {
     
     echo "📥 $display_name 設定をダウンロード中..."
     ensure_dir "$CLAUDE_DIR/languages/$lang"
-    download_file "$REPO_URL/global-config/claude-import/languages/$lang/CLAUDE-$lang.md" \
+    download_file "$REPO_URL/.claude/languages/$lang/CLAUDE-$lang.md" \
         "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md" "$display_name 設定"
 }
 
@@ -255,7 +255,7 @@ echo ""
 echo "⚙️ Claude設定ファイルをインストール中..."
 
 install_claude_settings() {
-    local settings_url="$REPO_URL/global-config/claude-settings/settings.json"
+    local settings_url="$REPO_URL/.claude/settings.json"
     local target_file="$CLAUDE_DIR/settings.json"
     
     record_step "Claude設定ファイルを $target_file にダウンロード"

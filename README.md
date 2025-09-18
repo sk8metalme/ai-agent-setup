@@ -87,6 +87,32 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
     └── python/CLAUDE-python.md
 ```
 
+### 配布用テンプレート（本プロジェクト）
+```
+ai-agent-setup/
+├── .cursor/                     # Cursor設定テンプレート
+│   └── rules/
+│       ├── general.mdc          # 全般的なルール
+│       ├── java-spring.mdc      # Java固有
+│       ├── php.mdc             # PHP固有
+│       ├── perl.mdc            # Perl固有
+│       ├── python.mdc          # Python固有
+│       └── database.mdc        # データベース設計
+├── .claude/                     # Claude設定テンプレート
+│   ├── CLAUDE.md               # メインエントリーポイント
+│   ├── settings.json           # Claude Desktop/Web設定
+│   ├── base/CLAUDE-base.md     # 基本設定
+│   ├── languages/              # 言語別設定
+│   ├── security/               # セキュリティポリシー
+│   └── team/                   # チーム標準
+├── project-config/             # プロジェクト用設定
+│   ├── claude-import/          # プロジェクト用Claude import
+│   └── claude-settings/        # プロジェクト用Claude settings
+├── AGENTS.md                   # シンプル設定
+├── install-global.sh           # グローバル設定インストーラー
+└── install-project.sh          # プロジェクト設定インストーラー
+```
+
 ### プロジェクト設定（Cursor + Claude）
 ```
 my-project/
