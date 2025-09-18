@@ -8,9 +8,10 @@
 .cursor/
 └── rules/
     ├── general.mdc      # 全般的な開発ルール
-    ├── typescript.mdc   # TypeScript/React用ルール
     ├── java-spring.mdc  # Java Spring Boot用ルール
     ├── php.mdc         # PHP開発用ルール
+    ├── perl.mdc        # Perl開発用ルール
+    ├── python.mdc      # Python開発用ルール
     └── database.mdc    # データベース設計ルール
 ```
 
@@ -45,11 +46,39 @@ alwaysApply: false         # 常に適用するか
 
 ### 1. プロジェクトへの適用
 
+> **💡 推奨**: 方法Aのインストールスクリプトを使用すると、対話的に必要なルールを選択でき、最も簡単です。
+
+#### 方法A: インストールスクリプト使用（推奨）
 ```bash
-# プロジェクトルートで（このリポジトリ内のテンプレートをコピー）
-mkdir -p .cursor/rules
-cp project-config/cursor-rules/*.mdc .cursor/rules/
+# プロジェクトルートで実行
+bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
 ```
+
+#### 方法B: 直接ダウンロード
+```bash
+# プロジェクトルートで実行
+mkdir -p .cursor/rules
+
+# 基本ルール
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/.cursor/rules/general.mdc -o .cursor/rules/general.mdc
+
+# 言語固有ルール（例：Python）
+curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/.cursor/rules/python.mdc -o .cursor/rules/python.mdc
+```
+
+#### 方法C: リポジトリクローン後コピー
+```bash
+# 一時的にクローン
+git clone https://github.com/sk8metalme/ai-agent-setup.git /tmp/ai-agent-setup
+mkdir -p .cursor/rules
+cp /tmp/ai-agent-setup/.cursor/rules/*.mdc .cursor/rules/
+rm -rf /tmp/ai-agent-setup
+```
+
+**各方法の特徴:**
+- **方法A**: 対話的選択、言語別インストール、AGENTS.mdも同時取得可能
+- **方法B**: 必要なファイルのみ選択的取得、軽量
+- **方法C**: 全ファイル一括取得、オフライン作業可能
 
 ### 2. ネストされたルール
 

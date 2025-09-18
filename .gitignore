@@ -33,7 +33,11 @@ build/
 *.bak
 .temp/
 
-# Note: AI configuration files should be committed
-# CLAUDE.md
-# .cursorrules
-# AGENTS.md
+# AI Configuration Files
+# All AI configuration files (.cursor/, AGENTS.md, etc.) are committed
+# as they serve as distribution templates for other projects
+#
+# Managed files include:
+# - .cursor/rules/*.mdc (Cursor Project Rules)
+# - AGENTS.md (Simple agent instructions)
+# - global-config/ (Claude global configuration templates)

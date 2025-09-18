@@ -152,7 +152,8 @@ echo ""
 echo "  1) Java + Spring Boot"
 echo "  2) PHP"
 echo "  3) Perl"
-echo "  4) すべて"
+echo "  4) Python"
+echo "  5) すべて"
 echo ""
 
 lang_choice=${PROJECT_LANGUAGE_CHOICE:-}
@@ -160,11 +161,11 @@ lang_choice=${PROJECT_LANGUAGE_CHOICE:-}
 if [[ -n "$lang_choice" ]]; then
     echo "➡️  環境変数 PROJECT_LANGUAGE_CHOICE=$lang_choice を使用します"
 elif [[ -t 0 ]]; then
-    read -rp "選択 (1-4) [デフォルト: 4]: " lang_choice
+    read -rp "選択 (1-5) [デフォルト: 5]: " lang_choice
 fi
 
 if [[ -z "$lang_choice" ]]; then
-    lang_choice=4
+    lang_choice=5
     echo "ℹ️  非対話モードまたは未入力のため『すべて』を選択しました (PROJECT_LANGUAGE_CHOICE で変更可能)"
 fi
 
@@ -174,14 +175,14 @@ install_cursor_rules() {
 
     ensure_dir "$PROJECT_ROOT/.cursor/rules"
 
-    download_file "$REPO_URL/project-config/cursor-rules/general.mdc" \
+    download_file "$REPO_URL/.cursor/rules/general.mdc" \
         "$PROJECT_ROOT/.cursor/rules/general.mdc" "基本ルール"
 
     download_language_rule() {
         local lang=$1
         local display_name=$2
         echo "📥 $display_name ルールをダウンロード中..."
-        download_file "$REPO_URL/project-config/cursor-rules/$lang.mdc" \
+        download_file "$REPO_URL/.cursor/rules/$lang.mdc" \
             "$PROJECT_ROOT/.cursor/rules/$lang.mdc" "$display_name ルール"
     }
 
@@ -196,9 +197,13 @@ install_cursor_rules() {
             download_language_rule "perl" "Perl"
             ;;
         4)
+            download_language_rule "python" "Python"
+            ;;
+        5)
             download_language_rule "java-spring" "Java Spring Boot"
             download_language_rule "php" "PHP"
             download_language_rule "perl" "Perl"
+            download_language_rule "python" "Python"
             ;;
         *)
             echo -e "${RED}無効な選択です${NC}"
@@ -214,7 +219,7 @@ install_cursor_rules() {
 install_agents_md() {
     echo ""
     echo "📥 AGENTS.md をインストール中..."
-    download_file "$REPO_URL/project-config/AGENTS.md" "$PROJECT_ROOT/AGENTS.md" "AGENTS.md"
+    download_file "$REPO_URL/AGENTS.md" "$PROJECT_ROOT/AGENTS.md" "AGENTS.md"
     if [[ "$PLAN_MODE" != true ]]; then
         echo -e "${GREEN}✅ AGENTS.md のインストールが完了しました${NC}"
     fi
