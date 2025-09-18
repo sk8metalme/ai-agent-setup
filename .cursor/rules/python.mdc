@@ -1,13 +1,7 @@
 ---
 description: Python開発のルールとベストプラクティス
-globs:
-  - "**/*.py"
-  - "**/requirements.txt"
-  - "**/pyproject.toml"
-  - "**/Pipfile"
 alwaysApply: false
 ---
-
 # Python開発ルール
 
 ## Python設定
