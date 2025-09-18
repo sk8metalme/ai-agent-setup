@@ -262,8 +262,12 @@ install_claude_settings() {
     
     if [[ "$PLAN_MODE" == true ]]; then
         tmp_settings=$(mktemp)
-        download_file_content "$settings_url" > "$tmp_settings" 2>/dev/null || echo "# Claude設定ファイル（ダウンロード予定）" > "$tmp_settings"
-        print_diff "$target_file" "$tmp_settings"
+        if curl -fsSL "$settings_url" -o "$tmp_settings" 2>/dev/null; then
+            print_diff "$target_file" "$tmp_settings"
+        else
+            echo "# Claude設定ファイル（ダウンロード予定）" > "$tmp_settings"
+            print_diff "$target_file" "$tmp_settings"
+        fi
         rm -f "$tmp_settings"
         return
     fi
