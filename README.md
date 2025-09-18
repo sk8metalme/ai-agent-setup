@@ -76,6 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 ```
 ~/.claude/
 ├── CLAUDE.md                    # メインエントリーポイント
+├── settings.json               # Claude Desktop/Web設定
 ├── base/CLAUDE-base.md         # 基本設定
 ├── team/CLAUDE-team-standards.md # チーム標準
 ├── security/CLAUDE-security-policy.md # セキュリティポリシー
@@ -86,7 +87,33 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
     └── python/CLAUDE-python.md
 ```
 
-### プロジェクト設定（Cursor）
+### 配布用テンプレート（本プロジェクト）
+```
+ai-agent-setup/
+├── .cursor/                     # Cursor設定テンプレート
+│   └── rules/
+│       ├── general.mdc          # 全般的なルール
+│       ├── java-spring.mdc      # Java固有
+│       ├── php.mdc             # PHP固有
+│       ├── perl.mdc            # Perl固有
+│       ├── python.mdc          # Python固有
+│       └── database.mdc        # データベース設計
+├── .claude/                     # Claude設定テンプレート
+│   ├── CLAUDE.md               # メインエントリーポイント
+│   ├── settings.json           # Claude Desktop/Web設定
+│   ├── base/CLAUDE-base.md     # 基本設定
+│   ├── languages/              # 言語別設定
+│   ├── security/               # セキュリティポリシー
+│   └── team/                   # チーム標準
+├── project-config/             # プロジェクト用設定
+│   ├── claude-import/          # プロジェクト用Claude import
+│   └── claude-settings/        # プロジェクト用Claude settings
+├── AGENTS.md                   # シンプル設定
+├── install-global.sh           # グローバル設定インストーラー
+└── install-project.sh          # プロジェクト設定インストーラー
+```
+
+### プロジェクト設定（Cursor + Claude）
 ```
 my-project/
 ├── .cursor/
@@ -97,6 +124,13 @@ my-project/
 │       ├── perl.mdc         # Perl固有
 │       ├── python.mdc       # Python固有
 │       └── database.mdc     # データベース設計
+├── .claude/                  # Claude設定（プロジェクト固有）
+│   ├── CLAUDE.md             # メインエントリーポイント
+│   ├── settings.json         # Claude Desktop/Web設定
+│   ├── base/CLAUDE-base.md   # 基本設定
+│   ├── languages/            # 言語別設定
+│   ├── security/             # セキュリティポリシー
+│   └── team/                 # チーム標準
 ├── AGENTS.md                 # シンプルな代替手段
 └── src/                      # ソースコード
 ```
@@ -109,6 +143,20 @@ my-project/
 - **テスト**: カバレッジ95%以上
 - **セキュリティ**: 入力検証、機密情報保護
 - **批判的思考**: より良い判断のための否定的意見も含む
+
+### Claude設定（settings.json）
+- **セキュリティ**: 危険コマンド拒否、機密情報スキャン
+- **Git統合**: コミットテンプレート、保護ブランチ設定
+- **チーム設定**: レビュアー、コードオーナー管理
+- **権限管理**: 安全なコマンドのみ許可
+- **開発ツール**: bash, read, edit, write, glob, grep有効
+
+### プロジェクト用Claude設定
+- **プロジェクト最適化**: プロジェクト固有のワークフロー対応
+- **チーム協業**: プロジェクトメンバー全員で統一設定
+- **設定の優先順位**: プロジェクト設定 > グローバル設定
+- **保護ブランチ拡張**: developブランチも追加保護
+- **ディレクトリ別管理**: src/, tests/, docs/, config/別のコードオーナー
 
 ### 言語別設定
 

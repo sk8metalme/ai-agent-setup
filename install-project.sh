@@ -145,6 +145,26 @@ if [[ -z "$config_type" ]]; then
     echo "ℹ️  非対話モードまたは未入力のため『両方』を選択しました (PROJECT_CONFIG_TYPE で変更可能)"
 fi
 
+# Claude設定選択
+echo ""
+echo "🤖 Claude設定を含めますか？:"
+echo ""
+echo "  1) Claude設定を含める（推奨）"
+echo "  2) Cursor設定のみ"
+echo ""
+
+claude_choice=${PROJECT_CLAUDE_CHOICE:-}
+
+if [[ -n "$claude_choice" ]]; then
+    echo "➡️  環境変数 PROJECT_CLAUDE_CHOICE=$claude_choice を使用します"
+elif [[ -t 0 ]]; then
+    read -p "選択してください (1-2) [1]: " claude_choice
+    claude_choice=${claude_choice:-1}
+else
+    claude_choice=1
+    echo "ℹ️  非対話モードまたは未入力のため『Claude設定を含める』を選択しました (PROJECT_CLAUDE_CHOICE で変更可能)"
+fi
+
 # 言語選択
 echo ""
 echo "📋 対応言語を選択してください:"
@@ -225,6 +245,65 @@ install_agents_md() {
     fi
 }
 
+install_claude_settings() {
+    echo ""
+    echo "🤖 Claude設定をインストール中..."
+    
+    # .claudeディレクトリ作成
+    mkdir -p "$PROJECT_ROOT/.claude"
+    
+    # Claude settings.json
+    echo "📥 Claude settings.json をダウンロード中..."
+    download_file "$REPO_URL/project-config/claude-settings/settings.json" "$PROJECT_ROOT/.claude/settings.json" "Claude settings.json"
+    
+    # Claude import設定
+    echo "📥 Claude import設定をダウンロード中..."
+    download_file "$REPO_URL/project-config/claude-import/CLAUDE.md" "$PROJECT_ROOT/.claude/CLAUDE.md" "Claude CLAUDE.md"
+    
+    # 基本設定
+    mkdir -p "$PROJECT_ROOT/.claude/base"
+    download_file "$REPO_URL/project-config/claude-import/base/CLAUDE-base.md" "$PROJECT_ROOT/.claude/base/CLAUDE-base.md" "Claude base設定"
+    
+    # セキュリティ・チーム設定
+    mkdir -p "$PROJECT_ROOT/.claude/security" "$PROJECT_ROOT/.claude/team"
+    download_file "$REPO_URL/project-config/claude-import/security/CLAUDE-security-policy.md" "$PROJECT_ROOT/.claude/security/CLAUDE-security-policy.md" "Claude セキュリティポリシー"
+    download_file "$REPO_URL/project-config/claude-import/team/CLAUDE-team-standards.md" "$PROJECT_ROOT/.claude/team/CLAUDE-team-standards.md" "Claude チーム標準"
+    
+    # 言語設定
+    mkdir -p "$PROJECT_ROOT/.claude/languages"
+    case $lang_choice in
+        1)
+            mkdir -p "$PROJECT_ROOT/.claude/languages/java-spring"
+            download_file "$REPO_URL/project-config/claude-import/languages/java-spring/CLAUDE-java-spring.md" "$PROJECT_ROOT/.claude/languages/java-spring/CLAUDE-java-spring.md" "Claude Java設定"
+            ;;
+        2)
+            mkdir -p "$PROJECT_ROOT/.claude/languages/php"
+            download_file "$REPO_URL/project-config/claude-import/languages/php/CLAUDE-php.md" "$PROJECT_ROOT/.claude/languages/php/CLAUDE-php.md" "Claude PHP設定"
+            ;;
+        3)
+            mkdir -p "$PROJECT_ROOT/.claude/languages/perl"
+            download_file "$REPO_URL/project-config/claude-import/languages/perl/CLAUDE-perl.md" "$PROJECT_ROOT/.claude/languages/perl/CLAUDE-perl.md" "Claude Perl設定"
+            ;;
+        4)
+            mkdir -p "$PROJECT_ROOT/.claude/languages/python"
+            download_file "$REPO_URL/project-config/claude-import/languages/python/CLAUDE-python.md" "$PROJECT_ROOT/.claude/languages/python/CLAUDE-python.md" "Claude Python設定"
+            ;;
+        5)
+            mkdir -p "$PROJECT_ROOT/.claude/languages/java-spring" "$PROJECT_ROOT/.claude/languages/php" "$PROJECT_ROOT/.claude/languages/perl" "$PROJECT_ROOT/.claude/languages/python"
+            download_file "$REPO_URL/project-config/claude-import/languages/java-spring/CLAUDE-java-spring.md" "$PROJECT_ROOT/.claude/languages/java-spring/CLAUDE-java-spring.md" "Claude Java設定"
+            download_file "$REPO_URL/project-config/claude-import/languages/php/CLAUDE-php.md" "$PROJECT_ROOT/.claude/languages/php/CLAUDE-php.md" "Claude PHP設定"
+            download_file "$REPO_URL/project-config/claude-import/languages/perl/CLAUDE-perl.md" "$PROJECT_ROOT/.claude/languages/perl/CLAUDE-perl.md" "Claude Perl設定"
+            download_file "$REPO_URL/project-config/claude-import/languages/python/CLAUDE-python.md" "$PROJECT_ROOT/.claude/languages/python/CLAUDE-python.md" "Claude Python設定"
+            ;;
+    esac
+    
+    if [[ "$PLAN_MODE" != true ]]; then
+        echo -e "${GREEN}✅ Claude設定のインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 設定ファイルの場所: $PROJECT_ROOT/.claude/${NC}"
+        echo -e "${YELLOW}💡 チーム設定（reviewers, codeOwners）は実際の環境に合わせて調整してください${NC}"
+    fi
+}
+
 case $config_type in
     1)
         install_cursor_rules
@@ -241,6 +320,82 @@ case $config_type in
         exit 1
         ;;
 esac
+
+# Claude設定インストール
+if [[ "$claude_choice" == "1" ]]; then
+    install_claude_settings
+fi
+
+# .gitignore設定チェック・追加
+setup_gitignore_backup_exclusion() {
+    echo ""
+    echo "🔍 .gitignore設定をチェック中..."
+    
+    local gitignore_file="$PROJECT_ROOT/.gitignore"
+    local backup_patterns_exist=false
+    
+    # .gitignoreファイルの存在確認
+    if [[ -f "$gitignore_file" ]]; then
+        # バックアップファイル除外設定の存在確認
+        if grep -q "^\*\.backup\.\*" "$gitignore_file" 2>/dev/null; then
+            backup_patterns_exist=true
+            record_step ".gitignoreにバックアップファイル除外設定が既に存在"
+            if [[ "$PLAN_MODE" != true ]]; then
+                echo -e "${GREEN}✅ .gitignoreにバックアップファイル除外設定が既に存在します${NC}"
+            fi
+        fi
+    fi
+    
+    # バックアップファイル除外設定が存在しない場合は追加
+    if [[ "$backup_patterns_exist" == false ]]; then
+        record_step ".gitignoreにバックアップファイル除外設定を追加"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            local tmp_gitignore=$(mktemp)
+            if [[ -f "$gitignore_file" ]]; then
+                cp "$gitignore_file" "$tmp_gitignore"
+            fi
+            
+            cat >> "$tmp_gitignore" << 'EOF'
+
+# Backup Files
+# Exclude backup files created by install scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
+EOF
+            print_diff "$gitignore_file" "$tmp_gitignore"
+            rm -f "$tmp_gitignore"
+        else
+            # .gitignoreファイルが存在しない場合は作成
+            if [[ ! -f "$gitignore_file" ]]; then
+                echo "📝 .gitignoreファイルを作成中..."
+            else
+                echo "📝 .gitignoreにバックアップファイル除外設定を追加中..."
+            fi
+            
+            cat >> "$gitignore_file" << 'EOF'
+
+# Backup Files
+# Exclude backup files created by ai-agent-setup scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
+EOF
+            echo -e "${GREEN}✅ .gitignoreにバックアップファイル除外設定を追加しました${NC}"
+            echo -e "${YELLOW}💡 以下のパターンが除外されます:${NC}"
+            echo -e "${YELLOW}   - *.backup.* (インストールスクリプトのバックアップ)${NC}"
+            echo -e "${YELLOW}   - *.bak (一般的なバックアップファイル)${NC}"
+            echo -e "${YELLOW}   - *~ (エディタの一時ファイル)${NC}"
+        fi
+    fi
+}
+
+setup_gitignore_backup_exclusion
 
 if [[ "$PLAN_MODE" == true ]]; then
     echo ""
@@ -266,9 +421,27 @@ fi
 if [[ $config_type == "2" ]] || [[ $config_type == "3" ]]; then
     echo "   - AGENTS.md: $PROJECT_ROOT/AGENTS.md"
 fi
+if [[ "$claude_choice" == "1" ]]; then
+    echo "   - Claude設定: $PROJECT_ROOT/.claude/"
+    echo "     ├── settings.json          # Claude Desktop/Web設定"
+    echo "     ├── CLAUDE.md              # Claude import設定"
+    echo "     ├── base/                  # 基本設定"
+    echo "     ├── languages/             # 言語別設定"
+    echo "     ├── security/              # セキュリティポリシー"
+    echo "     └── team/                  # チーム標準"
+fi
 echo ""
 echo "🚀 次のステップ:"
 echo "   1. 必要に応じて設定ファイルをカスタマイズ"
-echo "   2. Cursorを再起動して設定を反映"
-echo "   3. グローバル設定は install-global.sh を使用"
+if [[ "$claude_choice" == "1" ]]; then
+    echo "   2. Claude設定のチーム設定（reviewers, codeOwners）を調整"
+    echo "   3. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   4. Claudeを再起動して設定を反映"
+    echo "   5. Cursorを再起動して設定を反映"
+    echo "   6. グローバル設定は install-global.sh を使用"
+else
+    echo "   2. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   3. Cursorを再起動して設定を反映"
+    echo "   4. グローバル設定は install-global.sh を使用"
+fi
 echo ""

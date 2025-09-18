@@ -39,5 +39,18 @@ build/
 #
 # Managed files include:
 # - .cursor/rules/*.mdc (Cursor Project Rules)
+# - .claude/ (Claude configuration templates)
 # - AGENTS.md (Simple agent instructions)
-# - global-config/ (Claude global configuration templates)
+# - project-config/ (Project-specific configuration templates)
+
+# Backup Files
+# Exclude backup files created by install scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
+
+# Team Standards
+# Temporary documentation directory (as per team standards)
+docs/tmp/
