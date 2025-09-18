@@ -42,3 +42,11 @@ build/
 # - .claude/ (Claude configuration templates)
 # - AGENTS.md (Simple agent instructions)
 # - project-config/ (Project-specific configuration templates)
+
+# Backup Files
+# Exclude backup files created by install scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
