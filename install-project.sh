@@ -379,7 +379,7 @@ EOF
             cat >> "$gitignore_file" << 'EOF'
 
 # Backup Files
-# Exclude backup files created by install scripts
+# Exclude backup files created by ai-agent-setup scripts
 *.backup.*
 *.bak
 *~
