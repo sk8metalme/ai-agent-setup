@@ -242,7 +242,7 @@ from typing import Optional, List, Dict, Any
 import logging
 
 from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
@@ -255,13 +255,12 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     """ユーザー応答用スキーマ"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     name: str
     email: str
     age: Optional[int] = None
-    
-    class Config:
-        from_attributes = True
 
 def get_db():
     """データベースセッション取得"""
@@ -422,14 +421,14 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
-from pydantic import BaseSettings, validator
 
+from pydantic import field_validator, ConfigDict
 from pydantic_settings import BaseSettings
-from pydantic import field_validator
-import secrets
 
 class SecuritySettings(BaseSettings):
     """セキュリティ設定（環境変数から取得）"""
+    model_config = ConfigDict(env_file=".env")
+    
     secret_key: str = secrets.token_urlsafe(32)
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
@@ -439,9 +438,6 @@ class SecuritySettings(BaseSettings):
         if len(v) < 32:
             raise ValueError("Secret key must be at least 32 characters")
         return v
-
-    class Config:
-        env_file = ".env"
 
 # セキュリティ設定インスタンス
 security_settings = SecuritySettings()
