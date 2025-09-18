@@ -128,6 +128,40 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/glob
 - `MAX_THINKING_TOKENS`: 思考トークン数上限
 - `ANTHROPIC_MODEL`: 使用モデル指定
 
+### 許可コマンド（allowed）
+
+#### **ファイル・ディレクトリ操作**
+- **参照系**: `ls`, `cat`, `less`, `head`, `tail`, `tree`
+- **検索系**: `grep`, `find`, `locate`, `which`, `whereis`
+- **情報系**: `file`, `stat`, `diff`, `cmp`, `wc`, `du`
+
+#### **システム情報**
+- **基本情報**: `pwd`, `whoami`, `date`, `uptime`, `env`
+- **プロセス**: `ps`, `top`, `htop`, `lsof`
+- **ネットワーク**: `ping`, `nslookup`, `dig`, `netstat`, `ss`
+- **ディスク**: `df`, `du`, `free`
+
+#### **Git操作**
+- **参照系**: `git status`, `git diff`, `git log`, `git show`, `git blame`
+- **ブランチ**: `git branch`, `git checkout`, `git remote`, `git tag`
+- **履歴**: `git stash list`, `git stash show`
+- **同期**: `git pull`, `git push`, `git commit`, `git add`
+
+#### **言語・パッケージ管理**
+- **バージョン確認**: 各言語の`--version`コマンド
+- **パッケージ情報**: `npm list`, `pip list`, `composer show`
+- **セキュリティ**: `npm audit`, `yarn audit`, `pip check`
+- **開発**: `npm run`, `npm test`, `yarn`コマンド
+
+#### **テキスト処理**
+- **編集系**: `sort`, `uniq`, `cut`, `awk`, `sed`, `tr`
+- **出力系**: `echo`, `printf`
+- **ハッシュ**: `md5sum`, `sha256sum`
+
+#### **安全なネットワーク**
+- **ヘッダー確認**: `curl -I`, `curl --head`
+- **接続テスト**: `wget --spider`, `ping`
+
 ### セキュリティ
 - `preventSecretCommits`: 機密情報コミット防止
 - `scanDependencies`: 依存関係脆弱性スキャン
