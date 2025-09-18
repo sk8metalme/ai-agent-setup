@@ -326,6 +326,77 @@ if [[ "$claude_choice" == "1" ]]; then
     install_claude_settings
 fi
 
+# .gitignore設定チェック・追加
+setup_gitignore_backup_exclusion() {
+    echo ""
+    echo "🔍 .gitignore設定をチェック中..."
+    
+    local gitignore_file="$PROJECT_ROOT/.gitignore"
+    local backup_patterns_exist=false
+    
+    # .gitignoreファイルの存在確認
+    if [[ -f "$gitignore_file" ]]; then
+        # バックアップファイル除外設定の存在確認
+        if grep -q "^\*\.backup\.\*" "$gitignore_file" 2>/dev/null; then
+            backup_patterns_exist=true
+            record_step ".gitignoreにバックアップファイル除外設定が既に存在"
+            if [[ "$PLAN_MODE" != true ]]; then
+                echo -e "${GREEN}✅ .gitignoreにバックアップファイル除外設定が既に存在します${NC}"
+            fi
+        fi
+    fi
+    
+    # バックアップファイル除外設定が存在しない場合は追加
+    if [[ "$backup_patterns_exist" == false ]]; then
+        record_step ".gitignoreにバックアップファイル除外設定を追加"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            local tmp_gitignore=$(mktemp)
+            if [[ -f "$gitignore_file" ]]; then
+                cp "$gitignore_file" "$tmp_gitignore"
+            fi
+            
+            cat >> "$tmp_gitignore" << 'EOF'
+
+# Backup Files
+# Exclude backup files created by install scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
+EOF
+            print_diff "$gitignore_file" "$tmp_gitignore"
+            rm -f "$tmp_gitignore"
+        else
+            # .gitignoreファイルが存在しない場合は作成
+            if [[ ! -f "$gitignore_file" ]]; then
+                echo "📝 .gitignoreファイルを作成中..."
+            else
+                echo "📝 .gitignoreにバックアップファイル除外設定を追加中..."
+            fi
+            
+            cat >> "$gitignore_file" << 'EOF'
+
+# Backup Files
+# Exclude backup files created by install scripts
+*.backup.*
+*.bak
+*~
+.#*
+#*#
+EOF
+            echo -e "${GREEN}✅ .gitignoreにバックアップファイル除外設定を追加しました${NC}"
+            echo -e "${YELLOW}💡 以下のパターンが除外されます:${NC}"
+            echo -e "${YELLOW}   - *.backup.* (インストールスクリプトのバックアップ)${NC}"
+            echo -e "${YELLOW}   - *.bak (一般的なバックアップファイル)${NC}"
+            echo -e "${YELLOW}   - *~ (エディタの一時ファイル)${NC}"
+        fi
+    fi
+}
+
+setup_gitignore_backup_exclusion
+
 if [[ "$PLAN_MODE" == true ]]; then
     echo ""
     echo "📝 プランモード: 実行内容のプレビュー"
@@ -364,11 +435,13 @@ echo "🚀 次のステップ:"
 echo "   1. 必要に応じて設定ファイルをカスタマイズ"
 if [[ "$claude_choice" == "1" ]]; then
     echo "   2. Claude設定のチーム設定（reviewers, codeOwners）を調整"
-    echo "   3. Claudeを再起動して設定を反映"
-    echo "   4. Cursorを再起動して設定を反映"
-    echo "   5. グローバル設定は install-global.sh を使用"
+    echo "   3. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   4. Claudeを再起動して設定を反映"
+    echo "   5. Cursorを再起動して設定を反映"
+    echo "   6. グローバル設定は install-global.sh を使用"
 else
-    echo "   2. Cursorを再起動して設定を反映"
-    echo "   3. グローバル設定は install-global.sh を使用"
+    echo "   2. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   3. Cursorを再起動して設定を反映"
+    echo "   4. グローバル設定は install-global.sh を使用"
 fi
 echo ""
