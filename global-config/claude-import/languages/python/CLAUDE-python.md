@@ -387,50 +387,6 @@ def safe_divide(a: float, b: float) -> Optional[float]:
 ```
 
 ### テスト
-```python
-import pytest
-from httpx import AsyncClient
-from fastapi.testclient import TestClient
-
-from app.main import app
-from app.core.database import get_db
-from tests.utils import override_get_db
-
-@pytest.fixture
-def client():
-    """テストクライアント"""
-    app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as c:
-        yield c
-    app.dependency_overrides.clear()
-
-@pytest.mark.asyncio
-async def test_create_user(client: TestClient):
-    """ユーザー作成テスト"""
-    user_data = {
-        "name": "テストユーザー",
-        "email": "test@example.com",
-        "age": 25
-    }
-    
-    response = client.post("/api/v1/users/", json=user_data)
-    
-    assert response.status_code == 201
-    data = response.json()
-    assert data["name"] == user_data["name"]
-    assert data["email"] == user_data["email"]
-    assert "id" in data
-
-def test_calculate_total():
-    """計算テスト"""
-    items = [
-        {"price": 100.0},
-        {"price": 200.0}
-    ]
-    
-    result = calculate_total(items, tax_rate=0.1)
-    assert result == 330.0
-```
 
 ### 非同期処理
 ```python
