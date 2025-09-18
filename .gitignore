@@ -50,3 +50,7 @@ build/
 *~
 .#*
 #*#
+
+# Team Standards
+# Temporary documentation directory (as per team standards)
+docs/tmp/
