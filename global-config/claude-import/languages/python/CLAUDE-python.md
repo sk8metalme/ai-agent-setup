@@ -5,7 +5,7 @@
 ## Python開発固有のルール
 
 ### バージョン要件
-- Python 3.9以降（推奨: Python 3.11+）
+- Python 3.10以降（推奨: Python 3.11+）
 - 型ヒントを積極的に使用する
 - f-stringsを使用する
 - PEP 8に準拠する
@@ -71,12 +71,15 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 fastapi = "^0.104.0"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 pydantic = "^2.5.0"
 sqlalchemy = "^2.0.0"
 alembic = "^1.13.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+httpx = "^0.25.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -92,21 +95,21 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py39']
+target-version = ['py310']
 
 [tool.isort]
 profile = "black"
 line_length = 88
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 ```
 
 ### コードスタイル例
@@ -139,6 +142,11 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+def get_db():
+    """データベースセッション取得"""
+    # 実装は省略
+    pass
+
 def create_user(
     user_data: UserCreate,
     db: Session = Depends(get_db)
@@ -157,6 +165,8 @@ def create_user(
     """
     try:
         # ビジネスロジックの実装
+        # User モデルは models/user.py で定義されている想定
+        from app.models.user import User
         user = User(**user_data.model_dump())
         db.add(user)
         db.commit()
@@ -215,8 +225,8 @@ class CustomError(Exception):
         super().__init__(self.message)
 
 @asynccontextmanager
-async def database_transaction(db: Session):
-    """データベーストランザクション管理"""
+async def database_transaction(db):
+    """データベーストランザクション管理（非同期セッション用）"""
     try:
         yield db
         await db.commit()
@@ -226,6 +236,22 @@ async def database_transaction(db: Session):
         raise
     finally:
         await db.close()
+
+# 同期セッション用のコンテキストマネージャー
+from contextlib import contextmanager
+
+@contextmanager
+def sync_database_transaction(db: Session):
+    """データベーストランザクション管理（同期セッション用）"""
+    try:
+        yield db
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger.error(f"トランザクションエラー: {e}")
+        raise
+    finally:
+        db.close()
 
 def safe_divide(a: float, b: float) -> Optional[float]:
     """安全な除算"""
@@ -288,8 +314,11 @@ def test_calculate_total():
 ### 非同期処理
 ```python
 import asyncio
-from typing import List
+import logging
+from typing import List, Dict, Any, Optional
 from httpx import AsyncClient
+
+logger = logging.getLogger(__name__)
 
 async def fetch_data(url: str) -> Optional[Dict[str, Any]]:
     """非同期でデータを取得"""
@@ -313,6 +342,11 @@ async def process_multiple_urls(urls: List[str]) -> List[Optional[Dict[str, Any]
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from typing import Dict, Any, Optional
+
+# 設定値（実際は環境変数から取得）
+SECRET_KEY = "your-secret-key-here"  # 実際は環境変数から取得
+ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
