@@ -87,7 +87,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
     └── python/CLAUDE-python.md
 ```
 
-### プロジェクト設定（Cursor）
+### プロジェクト設定（Cursor + Claude）
 ```
 my-project/
 ├── .cursor/
@@ -98,6 +98,13 @@ my-project/
 │       ├── perl.mdc         # Perl固有
 │       ├── python.mdc       # Python固有
 │       └── database.mdc     # データベース設計
+├── .claude/                  # Claude設定（プロジェクト固有）
+│   ├── CLAUDE.md             # メインエントリーポイント
+│   ├── settings.json         # Claude Desktop/Web設定
+│   ├── base/CLAUDE-base.md   # 基本設定
+│   ├── languages/            # 言語別設定
+│   ├── security/             # セキュリティポリシー
+│   └── team/                 # チーム標準
 ├── AGENTS.md                 # シンプルな代替手段
 └── src/                      # ソースコード
 ```
@@ -117,6 +124,13 @@ my-project/
 - **チーム設定**: レビュアー、コードオーナー管理
 - **権限管理**: 安全なコマンドのみ許可
 - **開発ツール**: bash, read, edit, write, glob, grep有効
+
+### プロジェクト用Claude設定
+- **プロジェクト最適化**: プロジェクト固有のワークフロー対応
+- **チーム協業**: プロジェクトメンバー全員で統一設定
+- **設定の優先順位**: プロジェクト設定 > グローバル設定
+- **保護ブランチ拡張**: developブランチも追加保護
+- **ディレクトリ別管理**: src/, tests/, docs/, config/別のコードオーナー
 
 ### 言語別設定
 
