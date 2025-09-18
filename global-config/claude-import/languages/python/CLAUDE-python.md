@@ -424,24 +424,27 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from pydantic import BaseSettings, validator
 
+from pydantic_settings import BaseSettings
+from pydantic import field_validator
+import secrets
+
 class SecuritySettings(BaseSettings):
     """セキュリティ設定（環境変数から取得）"""
     secret_key: str = secrets.token_urlsafe(32)
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
-    
-    @validator("secret_key")
-    def validate_secret_key(cls, v):
+
+    @field_validator("secret_key")
+    def validate_secret_key(cls, v: str) -> str:
         if len(v) < 32:
             raise ValueError("Secret key must be at least 32 characters")
         return v
-    
+
     class Config:
         env_file = ".env"
 
 # セキュリティ設定インスタンス
 security_settings = SecuritySettings()
-
 # パスワードハッシュ化設定
 pwd_context = CryptContext(
     schemes=["bcrypt"], 
