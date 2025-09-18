@@ -8,9 +8,10 @@
 .cursor/
 └── rules/
     ├── general.mdc      # 全般的な開発ルール
-    ├── typescript.mdc   # TypeScript/React用ルール
     ├── java-spring.mdc  # Java Spring Boot用ルール
     ├── php.mdc         # PHP開発用ルール
+    ├── perl.mdc        # Perl開発用ルール
+    ├── python.mdc      # Python開発用ルール
     └── database.mdc    # データベース設計ルール
 ```
 
@@ -48,7 +49,7 @@ alwaysApply: false         # 常に適用するか
 ```bash
 # プロジェクトルートで（このリポジトリ内のテンプレートをコピー）
 mkdir -p .cursor/rules
-cp project-config/cursor-rules/*.mdc .cursor/rules/
+cp .cursor/rules/*.mdc .cursor/rules/
 ```
 
 ### 2. ネストされたルール

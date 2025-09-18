@@ -68,6 +68,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 | **Java** | Spring Boot 3.x + Gradle | エンタープライズ開発、NullAway、Rocky Linux |
 | **PHP** | Slim Framework + Composer | 軽量API、Monolog、Phake、MySQL/Oracle |
 | **Perl** | Mojolicious + Modern Perl | スクリプト・Web、モダンPerl機能 |
+| **Python** | FastAPI + Poetry | 高速API、型ヒント、非同期処理 |
 
 ## 📁 インストール後のファイル配置
 
@@ -90,7 +91,11 @@ my-project/
 ├── .cursor/
 │   └── rules/                # Project Rules（推奨）
 │       ├── general.mdc       # 全般的なルール
-│       └── java-spring.mdc   # Java固有
+│       ├── java-spring.mdc   # Java固有
+│       ├── php.mdc          # PHP固有
+│       ├── perl.mdc         # Perl固有
+│       ├── python.mdc       # Python固有
+│       └── database.mdc     # データベース設計
 ├── AGENTS.md                 # シンプルな代替手段
 └── src/                      # ソースコード
 ```
@@ -124,6 +129,12 @@ my-project/
 - Mojolicious、Moo/Moose
 - Test::More + Test::Exception
 - DBI（MySQL/Oracle）
+
+#### Python
+- Python 3.9+、型ヒント必須
+- FastAPI、Pydantic
+- pytest + pytest-asyncio
+- SQLAlchemy（MySQL/PostgreSQL）
 
 ## ⚙️ Cursor User Rules 推奨設定
 

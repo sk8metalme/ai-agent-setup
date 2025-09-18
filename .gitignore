@@ -34,6 +34,4 @@ build/
 .temp/
 
 # Note: AI configuration files should be committed
-# CLAUDE.md
-# .cursorrules
-# AGENTS.md
+# These are now managed as distribution templates
