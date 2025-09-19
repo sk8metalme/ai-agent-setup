@@ -193,13 +193,5 @@
     "onError": true,
     "onSuccess": true,
     "onCommit": true
-  },
-  "team": {
-    "reviewers": ["tech-lead", "senior-dev"],
-    "codeOwners": {
-      "src/components/": ["frontend-team"],
-      "src/api/": ["backend-team"],
-      "docs/": ["documentation-team"]
-    }
   }
 }
