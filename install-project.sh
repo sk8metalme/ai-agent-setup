@@ -397,6 +397,72 @@ EOF
 
 setup_gitignore_backup_exclusion
 
+# プロジェクト用コマンドファイルのインストール
+install_project_commands() {
+    echo ""
+    echo "📋 プロジェクト用コマンドファイルをインストール中..."
+    
+    # Claude用コマンドファイル
+    local claude_commands_dir="$PROJECT_ROOT/.claude/commands"
+    ensure_dir "$claude_commands_dir"
+    
+    record_step "Claudeコマンドファイルを $claude_commands_dir にダウンロード"
+    
+    local commands=("dev.md" "documentation.md" "plan.md")
+    
+    for cmd in "${commands[@]}"; do
+        local cmd_url="$REPO_URL/.claude/commands/$cmd"
+        local target_file="$claude_commands_dir/$cmd"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            tmp_cmd=$(mktemp)
+            if curl -fsSL "$cmd_url" -o "$tmp_cmd" 2>/dev/null; then
+                print_diff "$target_file" "$tmp_cmd"
+            else
+                echo "# $cmd（ダウンロード予定）" > "$tmp_cmd"
+                print_diff "$target_file" "$tmp_cmd"
+            fi
+            rm -f "$tmp_cmd"
+        else
+            backup_if_exists "$target_file"
+            download_file "$cmd_url" "$target_file" "$cmd"
+        fi
+    done
+    
+    # Cursor用コマンドファイル
+    local cursor_commands_dir="$PROJECT_ROOT/.cursor/commands"
+    ensure_dir "$cursor_commands_dir"
+    
+    record_step "Cursorコマンドファイルを $cursor_commands_dir にダウンロード"
+    
+    for cmd in "${commands[@]}"; do
+        local cmd_url="$REPO_URL/.claude/commands/$cmd"
+        local target_file="$cursor_commands_dir/$cmd"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            tmp_cmd=$(mktemp)
+            if curl -fsSL "$cmd_url" -o "$tmp_cmd" 2>/dev/null; then
+                print_diff "$target_file" "$tmp_cmd"
+            else
+                echo "# $cmd（ダウンロード予定）" > "$tmp_cmd"
+                print_diff "$target_file" "$tmp_cmd"
+            fi
+            rm -f "$tmp_cmd"
+        else
+            backup_if_exists "$target_file"
+            download_file "$cmd_url" "$target_file" "$cmd"
+        fi
+    done
+    
+    if [[ "$PLAN_MODE" != true ]]; then
+        echo -e "${GREEN}✅ プロジェクト用コマンドファイルのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 Claudeコマンドファイル: $claude_commands_dir${NC}"
+        echo -e "${YELLOW}💡 Cursorコマンドファイル: $cursor_commands_dir${NC}"
+    fi
+}
+
+install_project_commands
+
 if [[ "$PLAN_MODE" == true ]]; then
     echo ""
     echo "📝 プランモード: 実行内容のプレビュー"
@@ -425,23 +491,28 @@ if [[ "$claude_choice" == "1" ]]; then
     echo "   - Claude設定: $PROJECT_ROOT/.claude/"
     echo "     ├── settings.json          # Claude Desktop/Web設定"
     echo "     ├── CLAUDE.md              # Claude import設定"
+    echo "     ├── commands/              # コマンドファイル"
     echo "     ├── base/                  # 基本設定"
     echo "     ├── languages/             # 言語別設定"
     echo "     ├── security/              # セキュリティポリシー"
     echo "     └── team/                  # チーム標準"
 fi
+echo "   - コマンドファイル:"
+echo "     ├── $PROJECT_ROOT/.claude/commands/    # Claude用"
+echo "     └── $PROJECT_ROOT/.cursor/commands/    # Cursor用"
 echo ""
 echo "🚀 次のステップ:"
 echo "   1. 必要に応じて設定ファイルをカスタマイズ"
+echo "   2. コマンドファイル（@dev, @documentation, @plan）を活用"
 if [[ "$claude_choice" == "1" ]]; then
-    echo "   2. Claude設定のチーム設定（reviewers, codeOwners）を調整"
-    echo "   3. .gitignoreでバックアップファイルが除外されることを確認"
-    echo "   4. Claudeを再起動して設定を反映"
-    echo "   5. Cursorを再起動して設定を反映"
-    echo "   6. グローバル設定は install-global.sh を使用"
+    echo "   3. Claude設定のチーム設定（reviewers, codeOwners）を調整"
+    echo "   4. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   5. Claudeを再起動して設定を反映"
+    echo "   6. Cursorを再起動して設定を反映"
+    echo "   7. グローバル設定は install-global.sh を使用"
 else
-    echo "   2. .gitignoreでバックアップファイルが除外されることを確認"
-    echo "   3. Cursorを再起動して設定を反映"
-    echo "   4. グローバル設定は install-global.sh を使用"
+    echo "   3. .gitignoreでバックアップファイルが除外されることを確認"
+    echo "   4. Cursorを再起動して設定を反映"
+    echo "   5. グローバル設定は install-global.sh を使用"
 fi
 echo ""
