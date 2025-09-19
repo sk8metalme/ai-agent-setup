@@ -285,6 +285,84 @@ install_claude_settings() {
 
 install_claude_settings
 
+# Claudeコマンドファイルのインストール
+echo ""
+echo "📋 Claudeコマンドファイルをインストール中..."
+
+install_claude_commands() {
+    local commands_dir="$CLAUDE_DIR/commands"
+    ensure_dir "$commands_dir"
+    
+    record_step "Claudeコマンドファイルを $commands_dir にダウンロード"
+    
+    local commands=("dev.md" "documentation.md" "plan.md")
+    
+    for cmd in "${commands[@]}"; do
+        local cmd_url="$REPO_URL/.claude/commands/$cmd"
+        local target_file="$commands_dir/$cmd"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            tmp_cmd=$(mktemp)
+            if curl -fsSL "$cmd_url" -o "$tmp_cmd" 2>/dev/null; then
+                print_diff "$target_file" "$tmp_cmd"
+            else
+                echo "# $cmd（ダウンロード予定）" > "$tmp_cmd"
+                print_diff "$target_file" "$tmp_cmd"
+            fi
+            rm -f "$tmp_cmd"
+        else
+            backup_if_exists "$target_file"
+            download_file "$cmd_url" "$target_file" "$cmd"
+        fi
+    done
+    
+    if [[ "$PLAN_MODE" != true ]]; then
+        echo -e "${GREEN}✅ Claudeコマンドファイルのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 コマンドファイルの場所: $commands_dir${NC}"
+    fi
+}
+
+install_claude_commands
+
+# Cursorコマンドファイルのインストール
+echo ""
+echo "📋 Cursorコマンドファイルをインストール中..."
+
+install_cursor_commands() {
+    local cursor_commands_dir="$HOME/.cursor/commands"
+    ensure_dir "$cursor_commands_dir"
+    
+    record_step "Cursorコマンドファイルを $cursor_commands_dir にダウンロード"
+    
+    local commands=("dev.md" "documentation.md" "plan.md")
+    
+    for cmd in "${commands[@]}"; do
+        local cmd_url="$REPO_URL/.claude/commands/$cmd"
+        local target_file="$cursor_commands_dir/$cmd"
+        
+        if [[ "$PLAN_MODE" == true ]]; then
+            tmp_cmd=$(mktemp)
+            if curl -fsSL "$cmd_url" -o "$tmp_cmd" 2>/dev/null; then
+                print_diff "$target_file" "$tmp_cmd"
+            else
+                echo "# $cmd（ダウンロード予定）" > "$tmp_cmd"
+                print_diff "$target_file" "$tmp_cmd"
+            fi
+            rm -f "$tmp_cmd"
+        else
+            backup_if_exists "$target_file"
+            download_file "$cmd_url" "$target_file" "$cmd"
+        fi
+    done
+    
+    if [[ "$PLAN_MODE" != true ]]; then
+        echo -e "${GREEN}✅ Cursorコマンドファイルのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 コマンドファイルの場所: $cursor_commands_dir${NC}"
+    fi
+}
+
+install_cursor_commands
+
 # メインCLAUDE.mdファイルの作成
 echo ""
 echo "📝 メインCLAUDE.mdファイルを作成中..."
@@ -320,15 +398,22 @@ echo ""
 echo "📍 インストール場所: $CLAUDE_DIR"
 echo "   ├── CLAUDE.md              # メイン設定ファイル"
 echo "   ├── settings.json          # Claude Desktop/Web設定"
+echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
 echo "   ├── languages/             # 言語別設定"
 echo "   ├── security/              # セキュリティポリシー"
 echo "   └── team/                  # チーム標準"
 echo ""
+echo "📍 Cursor用コマンドファイル: $HOME/.cursor/commands/"
+echo "   ├── dev.md                 # 開発コマンド"
+echo "   ├── documentation.md       # ドキュメント化コマンド"
+echo "   └── plan.md                # 計画コマンド"
+echo ""
 echo "🚀 次のステップ:"
 echo "   1. 必要に応じて言語設定のコメントを外す"
 echo "   2. settings.jsonのチーム設定を実際の環境に合わせて調整"
-echo "   3. Claudeを再起動して設定を反映"
+echo "   3. コマンドファイル（@dev, @documentation, @plan）を活用"
+echo "   4. Claudeを再起動して設定を反映"
 echo "   4. プロジェクト用設定は install-project.sh を使用"
 echo ""
 echo "⚙️ Claude設定ファイル:"

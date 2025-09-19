@@ -77,6 +77,10 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 ~/.claude/
 ├── CLAUDE.md                    # メインエントリーポイント
 ├── settings.json               # Claude Desktop/Web設定
+├── commands/                    # コマンドファイル
+│   ├── dev.md                  # 開発コマンド
+│   ├── documentation.md        # ドキュメント化コマンド
+│   └── plan.md                 # 計画コマンド
 ├── base/CLAUDE-base.md         # 基本設定
 ├── team/CLAUDE-team-standards.md # チーム標準
 ├── security/CLAUDE-security-policy.md # セキュリティポリシー
@@ -85,6 +89,11 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
     ├── php/CLAUDE-php.md
     ├── perl/CLAUDE-perl.md
     └── python/CLAUDE-python.md
+
+~/.cursor/commands/              # Cursor用コマンドファイル
+├── dev.md                      # 開発コマンド
+├── documentation.md            # ドキュメント化コマンド
+└── plan.md                     # 計画コマンド
 ```
 
 ### 配布用テンプレート（本プロジェクト）
@@ -150,6 +159,13 @@ my-project/
 - **チーム設定**: レビュアー、コードオーナー管理
 - **権限管理**: 安全なコマンドのみ許可
 - **開発ツール**: bash, read, edit, write, glob, grep有効
+
+### コマンドファイル（commands/）
+- **@dev**: TDD開発、コードレビュー、リファクタリング支援
+- **@documentation**: 世界レベルのドキュメント化戦略・テンプレート
+- **@plan**: プロジェクト計画、要件定義、リスク管理
+- **Claude・Cursor両対応**: 同一コマンドを両環境で利用可能
+- **実践的テンプレート**: 即座に使える包括的なドキュメント体系
 
 ### プロジェクト用Claude設定
 - **プロジェクト最適化**: プロジェクト固有のワークフロー対応
