@@ -1,6 +1,22 @@
 # Jujutsu Development Workflow for AI Agents
 
-このドキュメントは、Cursor Settings > General > Rules for AI にコピペして使用します。
+> **NOTE: Single Source of Truth (SSOT) - TODO: Consolidation**
+> 
+> このファイル（`.claude/jujutsu/jujutsu-rule.md`）がJujutsuルールの正規（canonical）ソースです。
+> 
+> ⚠️ **現在、`.cursor/rules/jujutsu.mdc` の内容が重複しています。**
+> 
+> **現状**: Cursor Project Rulesでは`@import`構文が使用できないため、
+> `.cursor/rules/jujutsu.mdc`には実際のルール内容を含める必要があります。
+> 
+> **更新方針**: 
+> - 変更は常にこのファイル（`.claude/jujutsu/jujutsu-rule.md`）に対して行ってください
+> - 変更後、`.cursor/rules/jujutsu.mdc`にも手動で反映してください
+> 
+> **将来の統合計画**:
+> - Cursor Project Rulesで`@import`構文がサポートされるか、
+>   参照のみの形式がサポートされるまで、両ファイルを手動で同期します
+> - 統合は後続のPRで完了予定です
 
 ---
 
