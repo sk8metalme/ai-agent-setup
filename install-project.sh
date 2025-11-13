@@ -269,6 +269,11 @@ install_claude_settings() {
     download_file "$REPO_URL/project-config/claude-import/security/CLAUDE-security-policy.md" "$PROJECT_ROOT/.claude/security/CLAUDE-security-policy.md" "Claude セキュリティポリシー"
     download_file "$REPO_URL/project-config/claude-import/team/CLAUDE-team-standards.md" "$PROJECT_ROOT/.claude/team/CLAUDE-team-standards.md" "Claude チーム標準"
     
+    # Jujutsuルール
+    echo "📥 Jujutsuルールをダウンロード中..."
+    mkdir -p "$PROJECT_ROOT/.claude/jujutsu"
+    download_file "$REPO_URL/.claude/jujutsu/jujutsu-rule.md" "$PROJECT_ROOT/.claude/jujutsu/jujutsu-rule.md" "Claude Jujutsuルール"
+    
     # 言語設定
     mkdir -p "$PROJECT_ROOT/.claude/languages"
     case $lang_choice in
@@ -495,7 +500,8 @@ if [[ "$claude_choice" == "1" ]]; then
     echo "     ├── base/                  # 基本設定"
     echo "     ├── languages/             # 言語別設定"
     echo "     ├── security/              # セキュリティポリシー"
-    echo "     └── team/                  # チーム標準"
+    echo "     ├── team/                  # チーム標準"
+    echo "     └── jujutsu/               # Jujutsuルール"
 fi
 echo "   - コマンドファイル:"
 echo "     ├── $PROJECT_ROOT/.claude/commands/    # Claude用"
