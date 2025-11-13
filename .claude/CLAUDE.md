@@ -15,7 +15,8 @@
 @security/CLAUDE-security-policy.md
 
 ## jujutsuのルールインポート
-＠jujutsu/jujutsu-rule.md
+
+@jujutsu/jujutsu-rule.md
 
 ## プロジェクト固有の設定
 
