@@ -42,6 +42,10 @@
 
 @import team/CLAUDE-team-standards.md
 
+## jujutsuのルールインポート
+
+@import jujutsu/jujutsu-rule.md
+
 ## プロジェクト固有の指示
 
 ### 開発方針

@@ -135,6 +135,7 @@ ensure_dir "$CLAUDE_DIR/team"
 ensure_dir "$CLAUDE_DIR/security"
 ensure_dir "$CLAUDE_DIR/languages"
 ensure_dir "$CLAUDE_DIR/projects"
+ensure_dir "$CLAUDE_DIR/jujutsu"
 
 # 言語選択
 echo ""
@@ -176,6 +177,11 @@ download_file "$REPO_URL/.claude/team/CLAUDE-team-standards.md" \
 download_file "$REPO_URL/.claude/security/CLAUDE-security-policy.md" \
     "$CLAUDE_DIR/security/CLAUDE-security-policy.md" "セキュリティ設定"
 
+# Jujutsuルール
+echo "📥 Jujutsuルールをダウンロード中..."
+download_file "$REPO_URL/.claude/jujutsu/jujutsu-rule.md" \
+    "$CLAUDE_DIR/jujutsu/jujutsu-rule.md" "Jujutsuルール"
+
 # 言語別設定のダウンロード
 download_language_config() {
     local lang=$1
@@ -204,6 +210,10 @@ cat <<'EOF'
 ## セキュリティポリシーのインポート
 
 @security/CLAUDE-security-policy.md
+
+## jujutsuのルールインポート
+
+@jujutsu/jujutsu-rule.md
 
 ## 言語別設定のインポート（必要に応じて選択）
 
@@ -402,7 +412,8 @@ echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
 echo "   ├── languages/             # 言語別設定"
 echo "   ├── security/              # セキュリティポリシー"
-echo "   └── team/                  # チーム標準"
+echo "   ├── team/                  # チーム標準"
+echo "   └── jujutsu/               # Jujutsuルール"
 echo ""
 echo "📍 Cursor用コマンドファイル: $HOME/.cursor/commands/"
 echo "   ├── dev.md                 # 開発コマンド"
