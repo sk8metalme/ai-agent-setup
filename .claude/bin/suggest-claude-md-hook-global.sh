@@ -39,19 +39,72 @@ if [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 1
 fi
 
-# プロジェクトルートの取得（グローバル版用）
-# Claude Code が提供する環境変数 CLAUDE_PROJECT_DIR を使用
-PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-}"
+# プロジェクトルートの取得（改善版）
+# 検出順序: 1) CLAUDE_PROJECT_DIR → 2) .claude/settings.json → 3) git root → 4) pwd
+PROJECT_ROOT=""
+CHECKED_LOCATIONS=()
 
-# プロジェクトルートが取得できない場合はカレントディレクトリを使用
+# 1) Claude Code が提供する環境変数 CLAUDE_PROJECT_DIR を使用
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
+    # チルダ展開を処理
+    PROJECT_ROOT=$(eval echo "${CLAUDE_PROJECT_DIR}")
+    CHECKED_LOCATIONS+=("CLAUDE_PROJECT_DIR: $PROJECT_ROOT")
+    echo "Using CLAUDE_PROJECT_DIR: $PROJECT_ROOT" >&2
+fi
+
+# 2) .claude/settings.json から project_dir を読み取り
 if [ -z "$PROJECT_ROOT" ]; then
-    echo "Warning: CLAUDE_PROJECT_DIR not set, using current directory" >&2
+    SETTINGS_FILE="$HOME/.claude/settings.json"
+    if [ -f "$SETTINGS_FILE" ]; then
+        # jqが利用可能な場合のみ使用
+        if command -v jq >/dev/null 2>&1; then
+            PROJECT_DIR_FROM_SETTINGS=$(jq -r '.project_dir // empty' "$SETTINGS_FILE" 2>/dev/null)
+            if [ -n "$PROJECT_DIR_FROM_SETTINGS" ] && [ "$PROJECT_DIR_FROM_SETTINGS" != "null" ]; then
+                # チルダ展開を処理
+                PROJECT_ROOT=$(eval echo "$PROJECT_DIR_FROM_SETTINGS")
+                CHECKED_LOCATIONS+=("settings.json: $PROJECT_ROOT")
+                echo "Using project_dir from settings.json: $PROJECT_ROOT" >&2
+            else
+                CHECKED_LOCATIONS+=("settings.json: no project_dir entry found")
+            fi
+        else
+            CHECKED_LOCATIONS+=("settings.json: jq not available, skipping")
+        fi
+    else
+        CHECKED_LOCATIONS+=("settings.json: $SETTINGS_FILE not found")
+    fi
+fi
+
+# 3) Git リポジトリルートを検出
+if [ -z "$PROJECT_ROOT" ]; then
+    if command -v git >/dev/null 2>&1; then
+        GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$GIT_ROOT" ]; then
+            PROJECT_ROOT="$GIT_ROOT"
+            CHECKED_LOCATIONS+=("git root: $PROJECT_ROOT")
+            echo "Using git repository root: $PROJECT_ROOT" >&2
+        else
+            CHECKED_LOCATIONS+=("git root: not in a git repository or git command failed")
+        fi
+    else
+        CHECKED_LOCATIONS+=("git root: git command not available")
+    fi
+fi
+
+# 4) 最終フォールバック: カレントディレクトリ
+if [ -z "$PROJECT_ROOT" ]; then
     PROJECT_ROOT="$(pwd)"
+    CHECKED_LOCATIONS+=("fallback pwd: $PROJECT_ROOT")
+    echo "Warning: Using current directory as fallback: $PROJECT_ROOT" >&2
 fi
 
 # プロジェクトルートが存在するか確認
 if [ ! -d "$PROJECT_ROOT" ]; then
     echo "Error: Project root directory not found: $PROJECT_ROOT" >&2
+    echo "Checked locations:" >&2
+    for location in "${CHECKED_LOCATIONS[@]}"; do
+        echo "  - $location" >&2
+    done
     exit 1
 fi
 
@@ -59,14 +112,40 @@ CONVERSATION_ID=$(basename "$TRANSCRIPT_PATH" .jsonl)
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="/tmp/suggest-claude-md-${CONVERSATION_ID}-${TIMESTAMP}.log"
 
-# コマンド定義ファイルのチェック
+# コマンド定義ファイルの検証
 COMMAND_FILE="$PROJECT_ROOT/.claude/commands/suggest-claude-md.md"
 if [ ! -f "$COMMAND_FILE" ]; then
     echo "Error: Command definition file not found: $COMMAND_FILE" >&2
-    echo "Please create .claude/commands/suggest-claude-md.md in your project." >&2
-    echo "Project root: $PROJECT_ROOT" >&2
+    echo "" >&2
+    echo "Project root detection summary:" >&2
+    for location in "${CHECKED_LOCATIONS[@]}"; do
+        echo "  - $location" >&2
+    done
+    echo "" >&2
+    echo "Expected file: $COMMAND_FILE" >&2
+    echo "Please ensure the suggest-claude-md.md command file exists in your project." >&2
+    echo "" >&2
+    echo "To create the file, you can:" >&2
+    echo "  1. Run the install-project.sh script to download it automatically" >&2
+    echo "  2. Or manually create .claude/commands/suggest-claude-md.md" >&2
+    echo "" >&2
+    echo "Directory structure check:" >&2
+    if [ -d "$PROJECT_ROOT/.claude" ]; then
+        echo "  ✓ .claude directory exists" >&2
+        if [ -d "$PROJECT_ROOT/.claude/commands" ]; then
+            echo "  ✓ .claude/commands directory exists" >&2
+            echo "  Available command files:" >&2
+            ls -la "$PROJECT_ROOT/.claude/commands/" 2>/dev/null | sed 's/^/    /' >&2 || echo "    (none or permission denied)" >&2
+        else
+            echo "  ✗ .claude/commands directory missing" >&2
+        fi
+    else
+        echo "  ✗ .claude directory missing" >&2
+    fi
     exit 1
 fi
+
+echo "Using command file: $COMMAND_FILE" >&2
 
 # フックイベント情報を表示
 HOOK_INFO="Hook: $HOOK_EVENT_NAME"
