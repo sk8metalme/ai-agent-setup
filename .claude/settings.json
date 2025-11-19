@@ -7,7 +7,28 @@
   "ai": {
     "temperature": 0.5
   },
-  "hooks": {},
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/bin/suggest-claude-md-hook-global.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/bin/suggest-claude-md-hook-global.sh"
+          }
+        ]
+      }
+    ]
+  },
   "tools": {
     "enabled": ["bash", "read", "edit", "write", "glob", "grep"]
   },

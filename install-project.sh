@@ -413,7 +413,7 @@ install_project_commands() {
     
     record_step "Claudeコマンドファイルを $claude_commands_dir にダウンロード"
     
-    local commands=("dev.md" "documentation.md" "plan.md")
+    local commands=("dev.md" "documentation.md" "plan.md" "suggest-claude-md.md")
     
     for cmd in "${commands[@]}"; do
         local cmd_url="$REPO_URL/.claude/commands/$cmd"
