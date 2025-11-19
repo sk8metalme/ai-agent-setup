@@ -39,17 +39,59 @@ if [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 1
 fi
 
-# プロジェクトルートの取得（改善版）
+# 安全なチルダ展開とパス検証の関数
+safe_expand_and_validate_path() {
+    local input_path="$1"
+    local source_name="$2"
+    local expanded_path=""
+    
+    # 安全なチルダ展開: evalを使わずにパラメータ展開で処理
+    if [[ "$input_path" =~ ^~(/.*)?$ ]]; then
+        # ~/... の形式の場合
+        expanded_path="${input_path/#\~/$HOME}"
+    elif [[ "$input_path" =~ ^~[^/]+(/.*)?$ ]]; then
+        # ~user/... の形式の場合（サポートしない）
+        echo "Warning: User home directory expansion (~user) not supported: $input_path" >&2
+        return 1
+    else
+        # チルダがない場合はそのまま使用
+        expanded_path="$input_path"
+    fi
+    
+    # パスの正規化（realpathが利用可能な場合）
+    if command -v realpath >/dev/null 2>&1; then
+        local canonical_path
+        canonical_path=$(realpath "$expanded_path" 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$canonical_path" ]; then
+            expanded_path="$canonical_path"
+        fi
+    fi
+    
+    # ディレクトリの存在確認
+    if [ -d "$expanded_path" ]; then
+        echo "$expanded_path"
+        return 0
+    else
+        echo "Warning: Directory does not exist: $expanded_path (from $source_name)" >&2
+        return 1
+    fi
+}
+
+# プロジェクトルートの取得（セキュリティ改善版）
 # 検出順序: 1) CLAUDE_PROJECT_DIR → 2) .claude/settings.json → 3) git root → 4) pwd
 PROJECT_ROOT=""
 CHECKED_LOCATIONS=()
 
 # 1) Claude Code が提供する環境変数 CLAUDE_PROJECT_DIR を使用
 if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
-    # チルダ展開を処理
-    PROJECT_ROOT=$(eval echo "${CLAUDE_PROJECT_DIR}")
-    CHECKED_LOCATIONS+=("CLAUDE_PROJECT_DIR: $PROJECT_ROOT")
-    echo "Using CLAUDE_PROJECT_DIR: $PROJECT_ROOT" >&2
+    EXPANDED_PATH=$(safe_expand_and_validate_path "${CLAUDE_PROJECT_DIR}" "CLAUDE_PROJECT_DIR")
+    if [ $? -eq 0 ] && [ -n "$EXPANDED_PATH" ]; then
+        PROJECT_ROOT="$EXPANDED_PATH"
+        CHECKED_LOCATIONS+=("CLAUDE_PROJECT_DIR: $PROJECT_ROOT")
+        echo "Using CLAUDE_PROJECT_DIR: $PROJECT_ROOT" >&2
+    else
+        CHECKED_LOCATIONS+=("CLAUDE_PROJECT_DIR: invalid path '${CLAUDE_PROJECT_DIR}'")
+    fi
 fi
 
 # 2) .claude/settings.json から project_dir を読み取り
@@ -60,10 +102,14 @@ if [ -z "$PROJECT_ROOT" ]; then
         if command -v jq >/dev/null 2>&1; then
             PROJECT_DIR_FROM_SETTINGS=$(jq -r '.project_dir // empty' "$SETTINGS_FILE" 2>/dev/null)
             if [ -n "$PROJECT_DIR_FROM_SETTINGS" ] && [ "$PROJECT_DIR_FROM_SETTINGS" != "null" ]; then
-                # チルダ展開を処理
-                PROJECT_ROOT=$(eval echo "$PROJECT_DIR_FROM_SETTINGS")
-                CHECKED_LOCATIONS+=("settings.json: $PROJECT_ROOT")
-                echo "Using project_dir from settings.json: $PROJECT_ROOT" >&2
+                EXPANDED_PATH=$(safe_expand_and_validate_path "$PROJECT_DIR_FROM_SETTINGS" "settings.json")
+                if [ $? -eq 0 ] && [ -n "$EXPANDED_PATH" ]; then
+                    PROJECT_ROOT="$EXPANDED_PATH"
+                    CHECKED_LOCATIONS+=("settings.json: $PROJECT_ROOT")
+                    echo "Using project_dir from settings.json: $PROJECT_ROOT" >&2
+                else
+                    CHECKED_LOCATIONS+=("settings.json: invalid path '$PROJECT_DIR_FROM_SETTINGS'")
+                fi
             else
                 CHECKED_LOCATIONS+=("settings.json: no project_dir entry found")
             fi
@@ -80,9 +126,14 @@ if [ -z "$PROJECT_ROOT" ]; then
     if command -v git >/dev/null 2>&1; then
         GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
         if [ $? -eq 0 ] && [ -n "$GIT_ROOT" ]; then
-            PROJECT_ROOT="$GIT_ROOT"
-            CHECKED_LOCATIONS+=("git root: $PROJECT_ROOT")
-            echo "Using git repository root: $PROJECT_ROOT" >&2
+            # Gitルートは既に絶対パスなので検証のみ
+            if [ -d "$GIT_ROOT" ]; then
+                PROJECT_ROOT="$GIT_ROOT"
+                CHECKED_LOCATIONS+=("git root: $PROJECT_ROOT")
+                echo "Using git repository root: $PROJECT_ROOT" >&2
+            else
+                CHECKED_LOCATIONS+=("git root: directory does not exist '$GIT_ROOT'")
+            fi
         else
             CHECKED_LOCATIONS+=("git root: not in a git repository or git command failed")
         fi
@@ -93,9 +144,16 @@ fi
 
 # 4) 最終フォールバック: カレントディレクトリ
 if [ -z "$PROJECT_ROOT" ]; then
-    PROJECT_ROOT="$(pwd)"
-    CHECKED_LOCATIONS+=("fallback pwd: $PROJECT_ROOT")
-    echo "Warning: Using current directory as fallback: $PROJECT_ROOT" >&2
+    CURRENT_DIR=$(pwd)
+    if [ -d "$CURRENT_DIR" ]; then
+        PROJECT_ROOT="$CURRENT_DIR"
+        CHECKED_LOCATIONS+=("fallback pwd: $PROJECT_ROOT")
+        echo "Warning: Using current directory as fallback: $PROJECT_ROOT" >&2
+    else
+        CHECKED_LOCATIONS+=("fallback pwd: current directory is invalid")
+        echo "Error: Current directory is not accessible" >&2
+        exit 1
+    fi
 fi
 
 # プロジェクトルートが存在するか確認
@@ -267,15 +325,55 @@ echo 'このウィンドウを閉じてください。このウィンドウの�
 exit
 SCRIPT
 
-# ヒアドキュメント内の変数プレースホルダーを実際の値に置換
+# 安全なsed置換のためのエスケープ関数
+escape_for_sed() {
+    local input="$1"
+    # sedの特殊文字をエスケープ: \ & / (デリミタとして/を使用)
+    # \は最初にエスケープする必要がある（他のエスケープが影響を受けるため）
+    printf '%s\n' "$input" | sed 's/\\/\\\\/g; s/&/\\&/g; s/\//\\\//g'
+}
+
+# 安全な変数置換（sedの代わりにperlを使用してより安全に処理）
+safe_substitute_variables() {
+    local script_file="$1"
+    
+    # Perlが利用可能な場合は安全な置換を使用
+    if command -v perl >/dev/null 2>&1; then
+        # Perlを使用した安全な置換（リテラル文字列として扱う）
+        perl -i -pe "
+            s/\\\$PROJECT_ROOT/\Q$PROJECT_ROOT\E/g;
+            s/\\\$HOOK_INFO/\Q$HOOK_INFO\E/g;
+            s/\\\$LOG_FILE/\Q$LOG_FILE\E/g;
+            s/\\\$TEMP_PROMPT_FILE/\Q$TEMP_PROMPT_FILE\E/g;
+            s/\\\$TEMP_CLAUDE_OUTPUT/\Q$TEMP_CLAUDE_OUTPUT\E/g;
+            s/\\\$TEMP_SCRIPT/\Q$TEMP_SCRIPT\E/g;
+        " "$script_file"
+    else
+        # Perlが利用できない場合はエスケープ済みsedを使用
+        local escaped_project_root escaped_hook_info escaped_log_file
+        local escaped_temp_prompt_file escaped_temp_claude_output escaped_temp_script
+        
+        escaped_project_root=$(escape_for_sed "$PROJECT_ROOT")
+        escaped_hook_info=$(escape_for_sed "$HOOK_INFO")
+        escaped_log_file=$(escape_for_sed "$LOG_FILE")
+        escaped_temp_prompt_file=$(escape_for_sed "$TEMP_PROMPT_FILE")
+        escaped_temp_claude_output=$(escape_for_sed "$TEMP_CLAUDE_OUTPUT")
+        escaped_temp_script=$(escape_for_sed "$TEMP_SCRIPT")
+        
+        # /をデリミタとして使用し、エスケープ済みの値で置換
+        sed -i '' "s/\$PROJECT_ROOT/$escaped_project_root/g" "$script_file"
+        sed -i '' "s/\$HOOK_INFO/$escaped_hook_info/g" "$script_file"
+        sed -i '' "s/\$LOG_FILE/$escaped_log_file/g" "$script_file"
+        sed -i '' "s/\$TEMP_PROMPT_FILE/$escaped_temp_prompt_file/g" "$script_file"
+        sed -i '' "s/\$TEMP_CLAUDE_OUTPUT/$escaped_temp_claude_output/g" "$script_file"
+        sed -i '' "s/\$TEMP_SCRIPT/$escaped_temp_script/g" "$script_file"
+    fi
+}
+
+# ヒアドキュメント内の変数プレースホルダーを実際の値に安全に置換
 # 理由: <<'SCRIPT' でシングルクォートを使っているため、変数が展開されない
-#       sedで後から置換することで、特殊文字のエスケープ問題を回避しつつ安全に変数を展開
-sed -i '' "s|\$PROJECT_ROOT|$PROJECT_ROOT|g" "$TEMP_SCRIPT"
-sed -i '' "s|\$HOOK_INFO|$HOOK_INFO|g" "$TEMP_SCRIPT"
-sed -i '' "s|\$LOG_FILE|$LOG_FILE|g" "$TEMP_SCRIPT"
-sed -i '' "s|\$TEMP_PROMPT_FILE|$TEMP_PROMPT_FILE|g" "$TEMP_SCRIPT"
-sed -i '' "s|\$TEMP_CLAUDE_OUTPUT|$TEMP_CLAUDE_OUTPUT|g" "$TEMP_SCRIPT"
-sed -i '' "s|\$TEMP_SCRIPT|$TEMP_SCRIPT|g" "$TEMP_SCRIPT"
+#       安全な置換関数を使用して、特殊文字による脆弱性を防ぐ
+safe_substitute_variables "$TEMP_SCRIPT"
 
 chmod +x "$TEMP_SCRIPT"
 
