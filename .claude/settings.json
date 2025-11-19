@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/bin/suggest-claude-md-hook.sh"
+            "command": "~/.claude/bin/suggest-claude-md-hook-global.sh"
           }
         ]
       }
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/bin/suggest-claude-md-hook.sh"
+            "command": "~/.claude/bin/suggest-claude-md-hook-global.sh"
           }
         ]
       }
