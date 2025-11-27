@@ -5,12 +5,14 @@
 # 設定:
 # - 通知方法: terminal-notifier（推奨）またはosascript（フォールバック）
 # - プロジェクト名を通知に表示
+# - 通知音: 環境変数 CLAUDE_NOTIFY_SOUND で制御（デフォルト: Glass）
 # - 音声通知: 環境変数 CLAUDE_NOTIFY_VOICE で制御（デフォルト: 有効）
 #
 # インストール:
 # このスクリプトは install-global.sh によって自動的に ~/.claude/hooks/ に配置されます
 
-# JSON入力を読み込み
+# JSON入力を読み込み（将来の拡張用に保持）
+# shellcheck disable=SC2034
 read -r json_input
 
 # プロジェクト名を取得
@@ -21,6 +23,9 @@ NOTIFICATION_TITLE="Claude Code"
 NOTIFICATION_SUBTITLE="プロジェクト: $project_name"
 NOTIFICATION_MESSAGE="回答が完了しました"
 
+# 通知音（環境変数で制御可能）
+NOTIFICATION_SOUND="${CLAUDE_NOTIFY_SOUND:-Glass}"
+
 # terminal-notifierが利用可能かチェック
 if command -v terminal-notifier &> /dev/null; then
     # terminal-notifierを使用（高機能版）
@@ -28,7 +33,7 @@ if command -v terminal-notifier &> /dev/null; then
         -title "$NOTIFICATION_TITLE" \
         -subtitle "$NOTIFICATION_SUBTITLE" \
         -message "$NOTIFICATION_MESSAGE" \
-        -sound Glass \
+        -sound "$NOTIFICATION_SOUND" \
         -group "claude-code"
 else
     # osascriptにフォールバック（標準版）

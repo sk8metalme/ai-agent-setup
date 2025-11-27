@@ -444,8 +444,15 @@ install_cline_rules() {
             local tmp_mdc=$(mktemp)
             local tmp_md=$(mktemp)
             if curl -fsSL "$source_url" -o "$tmp_mdc" 2>/dev/null; then
-                # frontmatterを削除
+                # frontmatterを削除（最初の2つの --- で囲まれた部分をスキップ）
+                # count: --- の出現回数をカウント
+                # skip: frontmatter内部かどうかのフラグ（count<=2の間はスキップ）
                 awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$tmp_md"
+
+                # 出力が空でないか確認（malformed fileの検出）
+                if [[ ! -s "$tmp_md" ]]; then
+                    PLAN_DIFFS+=("⚠️  Warning: $basename の処理結果が空です（frontmatterが不正な可能性）")
+                fi
 
                 # グローバルルール
                 print_diff "$cline_rules_dir/$target_md" "$tmp_md"
@@ -460,12 +467,23 @@ install_cline_rules() {
             local tmp_mdc=$(mktemp)
             if curl -fsSL "$source_url" -o "$tmp_mdc" 2>/dev/null; then
                 # frontmatterを削除してグローバルルールに配置
+                # 最初の2つの --- で囲まれた部分（YAML frontmatter）をスキップ
                 backup_if_exists "$cline_rules_dir/$target_md"
                 awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$cline_rules_dir/$target_md"
+
+                # 出力が空でないか確認（malformed fileの検出）
+                if [[ ! -s "$cline_rules_dir/$target_md" ]]; then
+                    echo -e "${YELLOW}⚠️  Warning: $basename の処理結果が空です（frontmatterが不正な可能性）${NC}"
+                fi
 
                 # frontmatterを削除してプロジェクトルールに配置
                 backup_if_exists "$project_cline_dir/$target_md"
                 awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$project_cline_dir/$target_md"
+
+                # 出力が空でないか確認
+                if [[ ! -s "$project_cline_dir/$target_md" ]]; then
+                    echo -e "${YELLOW}⚠️  Warning: $basename の処理結果が空です（frontmatterが不正な可能性）${NC}"
+                fi
             else
                 echo -e "${RED}❌ $basename のダウンロードに失敗しました${NC}"
             fi
