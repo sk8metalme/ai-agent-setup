@@ -295,6 +295,45 @@ install_claude_settings() {
 
 install_claude_settings
 
+# Claude hookスクリプトのインストール
+echo ""
+echo "🔔 Claude hookスクリプトをインストール中..."
+
+install_claude_hooks() {
+    local hooks_dir="$CLAUDE_DIR/hooks"
+    ensure_dir "$hooks_dir"
+
+    record_step "Claude hookスクリプトを $hooks_dir にダウンロード"
+
+    local hook_url="$REPO_URL/.claude/bin/notify-completion.sh"
+    local target_file="$hooks_dir/notify-completion.sh"
+
+    if [[ "$PLAN_MODE" == true ]]; then
+        tmp_hook=$(mktemp)
+        if curl -fsSL "$hook_url" -o "$tmp_hook" 2>/dev/null; then
+            print_diff "$target_file" "$tmp_hook"
+        else
+            echo "# notify-completion.sh（ダウンロード予定）" > "$tmp_hook"
+            print_diff "$target_file" "$tmp_hook"
+        fi
+        rm -f "$tmp_hook"
+        return
+    fi
+
+    backup_if_exists "$target_file"
+
+    if download_file "$hook_url" "$target_file" "通知hookスクリプト"; then
+        chmod +x "$target_file"
+        echo -e "${GREEN}✅ Claude hookスクリプトのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 hookスクリプトの場所: $target_file${NC}"
+        echo -e "${YELLOW}💡 音声通知を無効化する場合: export CLAUDE_NOTIFY_VOICE=false${NC}"
+    else
+        echo -e "${RED}❌ Claude hookスクリプトのダウンロードに失敗しました${NC}"
+    fi
+}
+
+install_claude_hooks
+
 # Claudeコマンドファイルのインストール
 echo ""
 echo "📋 Claudeコマンドファイルをインストール中..."
@@ -373,6 +412,76 @@ install_cursor_commands() {
 
 install_cursor_commands
 
+# Clineルールのインストール
+echo ""
+echo "📋 Clineルールをインストール中..."
+
+install_cline_rules() {
+    local cline_rules_dir="$HOME/Documents/Cline/Rules"
+    local project_cline_dir=".clinerules"
+
+    ensure_dir "$cline_rules_dir"
+    ensure_dir "$project_cline_dir"
+
+    record_step "Clineルールを $cline_rules_dir と $project_cline_dir にダウンロード"
+
+    local mdc_files=(
+        "general.mdc"
+        "jujutsu.mdc"
+        "java-spring.mdc"
+        "php.mdc"
+        "python.mdc"
+        "perl.mdc"
+        "database.mdc"
+    )
+
+    for mdc in "${mdc_files[@]}"; do
+        local basename="${mdc%.mdc}"
+        local source_url="$REPO_URL/.cursor/rules/$mdc"
+        local target_md="$basename.md"
+
+        if [[ "$PLAN_MODE" == true ]]; then
+            local tmp_mdc=$(mktemp)
+            local tmp_md=$(mktemp)
+            if curl -fsSL "$source_url" -o "$tmp_mdc" 2>/dev/null; then
+                # frontmatterを削除
+                awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$tmp_md"
+
+                # グローバルルール
+                print_diff "$cline_rules_dir/$target_md" "$tmp_md"
+
+                # プロジェクトルール
+                print_diff "$project_cline_dir/$target_md" "$tmp_md"
+            else
+                PLAN_DIFFS+=("$basename のダウンロードに失敗しました: $source_url")
+            fi
+            rm -f "$tmp_mdc" "$tmp_md"
+        else
+            local tmp_mdc=$(mktemp)
+            if curl -fsSL "$source_url" -o "$tmp_mdc" 2>/dev/null; then
+                # frontmatterを削除してグローバルルールに配置
+                backup_if_exists "$cline_rules_dir/$target_md"
+                awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$cline_rules_dir/$target_md"
+
+                # frontmatterを削除してプロジェクトルールに配置
+                backup_if_exists "$project_cline_dir/$target_md"
+                awk 'BEGIN{skip=0; count=0} /^---$/{count++; if(count<=2){skip=!skip; next}} !skip' "$tmp_mdc" > "$project_cline_dir/$target_md"
+            else
+                echo -e "${RED}❌ $basename のダウンロードに失敗しました${NC}"
+            fi
+            rm -f "$tmp_mdc"
+        fi
+    done
+
+    if [[ "$PLAN_MODE" != true ]]; then
+        echo -e "${GREEN}✅ Clineルールのインストールが完了しました${NC}"
+        echo -e "${YELLOW}💡 グローバルルール: $cline_rules_dir${NC}"
+        echo -e "${YELLOW}💡 プロジェクトルール: $project_cline_dir${NC}"
+    fi
+}
+
+install_cline_rules
+
 # メインCLAUDE.mdファイルの作成
 echo ""
 echo "📝 メインCLAUDE.mdファイルを作成中..."
@@ -420,15 +529,33 @@ echo "   ├── dev.md                 # 開発コマンド"
 echo "   ├── documentation.md       # ドキュメント化コマンド"
 echo "   └── plan.md                # 計画コマンド"
 echo ""
+echo "📍 Cline用ルールファイル: $HOME/Documents/Cline/Rules/"
+echo "   ├── general.md             # 全般ルール"
+echo "   ├── jujutsu.md             # Jujutsuルール（SSOT）"
+echo "   ├── java-spring.md         # Java Spring"
+echo "   ├── php.md                 # PHP"
+echo "   ├── python.md              # Python"
+echo "   ├── perl.md                # Perl"
+echo "   └── database.md            # DB設計"
+echo ""
+echo "📍 Cline用プロジェクトルール: .clinerules/"
+echo "   └── （上記と同じ7ファイル）"
+echo ""
 echo "🚀 次のステップ:"
 echo "   1. 必要に応じて言語設定のコメントを外す"
 echo "   2. settings.jsonのチーム設定を実際の環境に合わせて調整"
 echo "   3. コマンドファイル（@dev, @documentation, @plan）を活用"
 echo "   4. Claudeを再起動して設定を反映"
-echo "   4. プロジェクト用設定は install-project.sh を使用"
+echo "   5. Cline（VSCode拡張機能）をインストールして使用"
+echo "   6. プロジェクト用設定は install-project.sh を使用"
 echo ""
 echo "⚙️ Claude設定ファイル:"
 echo "   - 場所: $CLAUDE_DIR/settings.json"
 echo "   - 内容: セキュリティ、権限、Git統合、チーム設定"
 echo "   - カスタマイズ: reviewers, codeOwners等を調整してください"
+echo ""
+echo "🤖 Cline設定:"
+echo "   - グローバルルール: $HOME/Documents/Cline/Rules/"
+echo "   - プロジェクトルール: .clinerules/"
+echo "   - 参考: https://docs.cline.bot/features/cline-rules"
 echo ""
