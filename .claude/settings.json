@@ -43,6 +43,8 @@
     "allowed": [
       "Edit",
       "Read",
+      "Bash(say:*)",
+      "Bash(terminal-notifier:*)",
       "Bash(git commit:*)",
       "Bash(git add:*)",
       "Bash(git status)",
