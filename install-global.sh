@@ -295,45 +295,6 @@ install_claude_settings() {
 
 install_claude_settings
 
-# Claude hookスクリプトのインストール
-echo ""
-echo "🔔 Claude hookスクリプトをインストール中..."
-
-install_claude_hooks() {
-    local hooks_dir="$CLAUDE_DIR/hooks"
-    ensure_dir "$hooks_dir"
-
-    record_step "Claude hookスクリプトを $hooks_dir にダウンロード"
-
-    local hook_url="$REPO_URL/.claude/bin/notify-completion.sh"
-    local target_file="$hooks_dir/notify-completion.sh"
-
-    if [[ "$PLAN_MODE" == true ]]; then
-        tmp_hook=$(mktemp)
-        if curl -fsSL "$hook_url" -o "$tmp_hook" 2>/dev/null; then
-            print_diff "$target_file" "$tmp_hook"
-        else
-            echo "# notify-completion.sh（ダウンロード予定）" > "$tmp_hook"
-            print_diff "$target_file" "$tmp_hook"
-        fi
-        rm -f "$tmp_hook"
-        return
-    fi
-
-    backup_if_exists "$target_file"
-
-    if download_file "$hook_url" "$target_file" "通知hookスクリプト"; then
-        chmod +x "$target_file"
-        echo -e "${GREEN}✅ Claude hookスクリプトのインストールが完了しました${NC}"
-        echo -e "${YELLOW}💡 hookスクリプトの場所: $target_file${NC}"
-        echo -e "${YELLOW}💡 音声通知を無効化する場合: export CLAUDE_NOTIFY_VOICE=false${NC}"
-    else
-        echo -e "${RED}❌ Claude hookスクリプトのダウンロードに失敗しました${NC}"
-    fi
-}
-
-install_claude_hooks
-
 # Claudeコマンドファイルのインストール
 echo ""
 echo "📋 Claudeコマンドファイルをインストール中..."
