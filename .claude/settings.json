@@ -5,7 +5,7 @@
     "wrapLines": true
   },
   "ai": {
-    "temperature": 0.5
+    "temperature": 0
   },
   "hooks": {
     "SessionEnd": [
@@ -216,5 +216,10 @@
     "onError": true,
     "onSuccess": true,
     "onCommit": true
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bun x ccusage statusline",
+    "padding": 0
   }
 }
