@@ -269,36 +269,36 @@ install_claude_settings() {
     download_file "$REPO_URL/project-config/claude-import/security/CLAUDE-security-policy.md" "$PROJECT_ROOT/.claude/security/CLAUDE-security-policy.md" "Claude セキュリティポリシー"
     download_file "$REPO_URL/project-config/claude-import/team/CLAUDE-team-standards.md" "$PROJECT_ROOT/.claude/team/CLAUDE-team-standards.md" "Claude チーム標準"
     
-    # Jujutsuルール
-    echo "📥 Jujutsuルールをダウンロード中..."
-    mkdir -p "$PROJECT_ROOT/.claude/jujutsu"
-    download_file "$REPO_URL/.claude/jujutsu/jujutsu-rule.md" "$PROJECT_ROOT/.claude/jujutsu/jujutsu-rule.md" "Claude Jujutsuルール"
+    # Jujutsu Skill
+    echo "📥 Jujutsu Skillをダウンロード中..."
+    mkdir -p "$PROJECT_ROOT/.claude/skills/jujutsu"
+    download_file "$REPO_URL/.claude/skills/jujutsu/SKILL.md" "$PROJECT_ROOT/.claude/skills/jujutsu/SKILL.md" "Jujutsu Skill"
     
-    # 言語設定
-    mkdir -p "$PROJECT_ROOT/.claude/languages"
+    # 言語Skills
+    mkdir -p "$PROJECT_ROOT/.claude/skills"
     case $lang_choice in
         1)
-            mkdir -p "$PROJECT_ROOT/.claude/languages/java-spring"
-            download_file "$REPO_URL/project-config/claude-import/languages/java-spring/CLAUDE-java-spring.md" "$PROJECT_ROOT/.claude/languages/java-spring/CLAUDE-java-spring.md" "Claude Java設定"
+            mkdir -p "$PROJECT_ROOT/.claude/skills/java-spring"
+            download_file "$REPO_URL/.claude/skills/java-spring/SKILL.md" "$PROJECT_ROOT/.claude/skills/java-spring/SKILL.md" "Java Spring Boot Skill"
             ;;
         2)
-            mkdir -p "$PROJECT_ROOT/.claude/languages/php"
-            download_file "$REPO_URL/project-config/claude-import/languages/php/CLAUDE-php.md" "$PROJECT_ROOT/.claude/languages/php/CLAUDE-php.md" "Claude PHP設定"
+            mkdir -p "$PROJECT_ROOT/.claude/skills/php"
+            download_file "$REPO_URL/.claude/skills/php/SKILL.md" "$PROJECT_ROOT/.claude/skills/php/SKILL.md" "PHP Skill"
             ;;
         3)
-            mkdir -p "$PROJECT_ROOT/.claude/languages/perl"
-            download_file "$REPO_URL/project-config/claude-import/languages/perl/CLAUDE-perl.md" "$PROJECT_ROOT/.claude/languages/perl/CLAUDE-perl.md" "Claude Perl設定"
+            mkdir -p "$PROJECT_ROOT/.claude/skills/perl"
+            download_file "$REPO_URL/.claude/skills/perl/SKILL.md" "$PROJECT_ROOT/.claude/skills/perl/SKILL.md" "Perl Skill"
             ;;
         4)
-            mkdir -p "$PROJECT_ROOT/.claude/languages/python"
-            download_file "$REPO_URL/project-config/claude-import/languages/python/CLAUDE-python.md" "$PROJECT_ROOT/.claude/languages/python/CLAUDE-python.md" "Claude Python設定"
+            mkdir -p "$PROJECT_ROOT/.claude/skills/python"
+            download_file "$REPO_URL/.claude/skills/python/SKILL.md" "$PROJECT_ROOT/.claude/skills/python/SKILL.md" "Python Skill"
             ;;
         5)
-            mkdir -p "$PROJECT_ROOT/.claude/languages/java-spring" "$PROJECT_ROOT/.claude/languages/php" "$PROJECT_ROOT/.claude/languages/perl" "$PROJECT_ROOT/.claude/languages/python"
-            download_file "$REPO_URL/project-config/claude-import/languages/java-spring/CLAUDE-java-spring.md" "$PROJECT_ROOT/.claude/languages/java-spring/CLAUDE-java-spring.md" "Claude Java設定"
-            download_file "$REPO_URL/project-config/claude-import/languages/php/CLAUDE-php.md" "$PROJECT_ROOT/.claude/languages/php/CLAUDE-php.md" "Claude PHP設定"
-            download_file "$REPO_URL/project-config/claude-import/languages/perl/CLAUDE-perl.md" "$PROJECT_ROOT/.claude/languages/perl/CLAUDE-perl.md" "Claude Perl設定"
-            download_file "$REPO_URL/project-config/claude-import/languages/python/CLAUDE-python.md" "$PROJECT_ROOT/.claude/languages/python/CLAUDE-python.md" "Claude Python設定"
+            mkdir -p "$PROJECT_ROOT/.claude/skills/java-spring" "$PROJECT_ROOT/.claude/skills/php" "$PROJECT_ROOT/.claude/skills/perl" "$PROJECT_ROOT/.claude/skills/python"
+            download_file "$REPO_URL/.claude/skills/java-spring/SKILL.md" "$PROJECT_ROOT/.claude/skills/java-spring/SKILL.md" "Java Spring Boot Skill"
+            download_file "$REPO_URL/.claude/skills/php/SKILL.md" "$PROJECT_ROOT/.claude/skills/php/SKILL.md" "PHP Skill"
+            download_file "$REPO_URL/.claude/skills/perl/SKILL.md" "$PROJECT_ROOT/.claude/skills/perl/SKILL.md" "Perl Skill"
+            download_file "$REPO_URL/.claude/skills/python/SKILL.md" "$PROJECT_ROOT/.claude/skills/python/SKILL.md" "Python Skill"
             ;;
     esac
     
@@ -498,10 +498,9 @@ if [[ "$claude_choice" == "1" ]]; then
     echo "     ├── CLAUDE.md              # Claude import設定"
     echo "     ├── commands/              # コマンドファイル"
     echo "     ├── base/                  # 基本設定"
-    echo "     ├── languages/             # 言語別設定"
+    echo "     ├── skills/                # Skills（言語別・jujutsu）"
     echo "     ├── security/              # セキュリティポリシー"
-    echo "     ├── team/                  # チーム標準"
-    echo "     └── jujutsu/               # Jujutsuルール"
+    echo "     └── team/                  # チーム標準"
 fi
 echo "   - コマンドファイル:"
 echo "     ├── $PROJECT_ROOT/.claude/commands/    # Claude用"

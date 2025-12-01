@@ -14,9 +14,16 @@
 
 @security/CLAUDE-security-policy.md
 
-## jujutsuのルールインポート
+## バージョン管理
 
-@jujutsu/jujutsu-rule.md
+### Jujutsuプロジェクトの場合
+
+以下の条件でjujutsu-workflowスキルを使用してください：
+- `.jj/` ディレクトリが存在する場合
+- `jj` コマンドを使用する場合
+- PR作成やブックマーク管理を行う場合
+
+スキル呼び出し: `/jujutsu-workflow`
 
 ## プロジェクト固有の設定
 
@@ -37,18 +44,42 @@
 3. **パフォーマンス目標**
    - [目標値を記載]
 
-## 言語別設定のインポート（必要に応じて選択）
+## 言語別開発支援
 
-<!-- 使用する言語のコメントを外してください -->
+### Java + Spring Boot開発の場合
 
-<!-- Java + Spring Boot -->
-<!-- @languages/java-spring/CLAUDE-java-spring.md -->
+以下の条件でjava-springスキルを使用してください：
+- `.java` ファイルが存在する場合
+- `pom.xml` または `build.gradle` が存在する場合
+- Spring Boot関連の実装を行う場合
 
-<!-- PHP -->
-<!-- @languages/php/CLAUDE-php.md -->
+スキル呼び出し: `/java-spring`
 
-<!-- Perl -->
-<!-- @languages/perl/CLAUDE-perl.md -->
+### Python開発の場合
+
+以下の条件でpython-devスキルを使用してください：
+- `.py` ファイルが存在する場合
+- `requirements.txt` または `pyproject.toml` が存在する場合
+- Python関連の実装を行う場合
+
+スキル呼び出し: `/python-dev`
+
+### PHP開発の場合
+
+以下の条件でphp-devスキルを使用してください：
+- `.php` ファイルが存在する場合
+- `composer.json` が存在する場合
+- PHP関連の実装を行う場合
+
+スキル呼び出し: `/php-dev`
+
+### Perl開発の場合
+
+以下の条件でperl-devスキルを使用してください：
+- `.pl` または `.pm` ファイルが存在する場合
+- Perl関連の実装を行う場合
+
+スキル呼び出し: `/perl-dev`
 
 ## カスタム拡張
 
