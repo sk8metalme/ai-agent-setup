@@ -19,8 +19,9 @@
 詳細な開発フローは `/plan` コマンドで確認してください。
 
 **基本原則:**
-- docs/tmp/以下は.gitignoreに設定し、gitでの管理対象外とする
-- docs/tmp/context.md、docs/tmp/plan.mdを確認してから進めること
+- docs/tmp/以下は.gitignoreに設定し、gitでの管理対象外とするが、ローカルで作業ファイルとして利用
+- ローカルの docs/tmp/context.md、docs/tmp/plan.md を確認してから進めること
+- これらは AI が生成するコンテキスト・計画ファイルとして機能
 - 各種タスクが完了したら、context.mdとplan.mdを最新化すること
 - TDD（テスト駆動開発）を基本とする
 - すべてのコードはレビューを経てマージする
