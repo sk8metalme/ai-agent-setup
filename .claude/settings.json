@@ -156,7 +156,8 @@
       "Bash(gradle --version)",
       "Bash(gradle -v)",
       "Bash(cpan -v)",
-      "Bash(cpanm --version)"
+      "Bash(cpanm --version)",
+      "Skill(*)"
     ],
     "denied": [
       "Bash(rm -rf:*)",

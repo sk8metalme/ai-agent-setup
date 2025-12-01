@@ -133,9 +133,8 @@ ensure_dir "$CLAUDE_DIR"
 ensure_dir "$CLAUDE_DIR/base"
 ensure_dir "$CLAUDE_DIR/team"
 ensure_dir "$CLAUDE_DIR/security"
-ensure_dir "$CLAUDE_DIR/languages"
+ensure_dir "$CLAUDE_DIR/skills"
 ensure_dir "$CLAUDE_DIR/projects"
-ensure_dir "$CLAUDE_DIR/jujutsu"
 
 # 言語選択
 echo ""
@@ -177,20 +176,21 @@ download_file "$REPO_URL/.claude/team/CLAUDE-team-standards.md" \
 download_file "$REPO_URL/.claude/security/CLAUDE-security-policy.md" \
     "$CLAUDE_DIR/security/CLAUDE-security-policy.md" "セキュリティ設定"
 
-# Jujutsuルール
-echo "📥 Jujutsuルールをダウンロード中..."
-download_file "$REPO_URL/.claude/jujutsu/jujutsu-rule.md" \
-    "$CLAUDE_DIR/jujutsu/jujutsu-rule.md" "Jujutsuルール"
+# Jujutsu Skill
+echo "📥 Jujutsu Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/jujutsu"
+download_file "$REPO_URL/.claude/skills/jujutsu/SKILL.md" \
+    "$CLAUDE_DIR/skills/jujutsu/SKILL.md" "Jujutsu Skill"
 
-# 言語別設定のダウンロード
-download_language_config() {
+# 言語別Skillsのダウンロード
+download_skill() {
     local lang=$1
     local display_name=$2
-    
-    echo "📥 $display_name 設定をダウンロード中..."
-    ensure_dir "$CLAUDE_DIR/languages/$lang"
-    download_file "$REPO_URL/.claude/languages/$lang/CLAUDE-$lang.md" \
-        "$CLAUDE_DIR/languages/$lang/CLAUDE-$lang.md" "$display_name 設定"
+
+    echo "📥 $display_name Skillをダウンロード中..."
+    ensure_dir "$CLAUDE_DIR/skills/$lang"
+    download_file "$REPO_URL/.claude/skills/$lang/SKILL.md" \
+        "$CLAUDE_DIR/skills/$lang/SKILL.md" "$display_name Skill"
 }
 
 generate_claude_main() {
@@ -211,22 +211,53 @@ cat <<'EOF'
 
 @security/CLAUDE-security-policy.md
 
-## jujutsuのルールインポート
+## バージョン管理
 
-@jujutsu/jujutsu-rule.md
+### Jujutsuプロジェクトの場合
 
-## 言語別設定のインポート（必要に応じて選択）
+以下の条件でjujutsu-workflowスキルを使用してください：
+- `.jj/` ディレクトリが存在する場合
+- `jj` コマンドを使用する場合
+- PR作成やブックマーク管理を行う場合
 
-<!-- 使用する言語のコメントを外してください -->
+スキル呼び出し: `/jujutsu-workflow`
 
-<!-- Java + Spring Boot -->
-<!-- @languages/java-spring/CLAUDE-java-spring.md -->
+## 言語別開発支援
 
-<!-- PHP -->
-<!-- @languages/php/CLAUDE-php.md -->
+### Java + Spring Boot開発の場合
 
-<!-- Perl -->
-<!-- @languages/perl/CLAUDE-perl.md -->
+以下の条件でjava-springスキルを使用してください：
+- `.java` ファイルが存在する場合
+- `pom.xml` または `build.gradle` が存在する場合
+- Spring Boot関連の実装を行う場合
+
+スキル呼び出し: `/java-spring`
+
+### Python開発の場合
+
+以下の条件でpython-devスキルを使用してください：
+- `.py` ファイルが存在する場合
+- `requirements.txt` または `pyproject.toml` が存在する場合
+- Python関連の実装を行う場合
+
+スキル呼び出し: `/python-dev`
+
+### PHP開発の場合
+
+以下の条件でphp-devスキルを使用してください：
+- `.php` ファイルが存在する場合
+- `composer.json` が存在する場合
+- PHP関連の実装を行う場合
+
+スキル呼び出し: `/php-dev`
+
+### Perl開発の場合
+
+以下の条件でperl-devスキルを使用してください：
+- `.pl` または `.pm` ファイルが存在する場合
+- Perl関連の実装を行う場合
+
+スキル呼び出し: `/perl-dev`
 
 ---
 
@@ -237,22 +268,22 @@ EOF
 
 case $choice in
     1)
-        download_language_config "java-spring" "Java + Spring Boot"
+        download_skill "java-spring" "Java + Spring Boot"
         ;;
     2)
-        download_language_config "php" "PHP"
+        download_skill "php" "PHP"
         ;;
     3)
-        download_language_config "perl" "Perl"
+        download_skill "perl" "Perl"
         ;;
     4)
-        download_language_config "python" "Python"
+        download_skill "python" "Python"
         ;;
     5)
-        download_language_config "java-spring" "Java + Spring Boot"
-        download_language_config "php" "PHP"
-        download_language_config "perl" "Perl"
-        download_language_config "python" "Python"
+        download_skill "java-spring" "Java + Spring Boot"
+        download_skill "php" "PHP"
+        download_skill "perl" "Perl"
+        download_skill "python" "Python"
         ;;
     *)
         echo -e "${RED}無効な選択です${NC}"
@@ -498,10 +529,9 @@ echo "   ├── CLAUDE.md              # メイン設定ファイル"
 echo "   ├── settings.json          # Claude Desktop/Web設定"
 echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
-echo "   ├── languages/             # 言語別設定"
+echo "   ├── skills/                # Skills（言語別・jujutsu）"
 echo "   ├── security/              # セキュリティポリシー"
-echo "   ├── team/                  # チーム標準"
-echo "   └── jujutsu/               # Jujutsuルール"
+echo "   └── team/                  # チーム標準"
 echo ""
 echo "📍 Cursor用コマンドファイル: $HOME/.cursor/commands/"
 echo "   ├── dev.md                 # 開発コマンド"
