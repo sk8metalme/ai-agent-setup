@@ -41,6 +41,38 @@ resolveするスレッドを提示し、確認を得る。
 
 resolve済みスレッド数とステータスを報告。
 
+## CI/CDステータス確認
+
+PRをresolveする前に、**必ずCI/CDのステータスを確認**してください。
+
+### 重要な原則
+
+❌ **推測で判断しない**: CI/CDが失敗している場合、推測で解決せず、必ずログを確認する
+✅ **ログを確認する**: `ci-cd` スキル（`.claude/skills/ci-cd/SKILL.md`）を参照して、正しい手順でログを確認
+
+### CI/CDステータスの確認方法
+
+```bash
+# PRのCI/CDステータスを確認
+gh pr checks <PR番号>
+
+# 詳細なステータスを表示
+gh pr checks <PR番号> --watch
+
+# 失敗したチェックのログを表示
+gh run view <run-id> --log-failed
+```
+
+### CI/CD失敗時の対応
+
+1. **ログ全体を確認**: `gh run view <run-id> --log` でログ全体を取得
+2. **エラー箇所を特定**: エラーメッセージの前後のコンテキストを確認
+3. **根本原因を分析**: `.claude/skills/ci-cd/SKILL.md` を参照
+4. **修正を実施**: 根本原因を理解してから修正
+5. **再実行を確認**: CI/CDが成功するまで繰り返す
+
+**詳細は `.claude/skills/ci-cd/SKILL.md` を参照してください。**
+
 ## GitHub APIクエリ
 
 ### レビュースレッド取得

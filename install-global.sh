@@ -183,6 +183,12 @@ ensure_dir "$CLAUDE_DIR/skills/jujutsu"
 download_file "$REPO_URL/.claude/skills/jujutsu/SKILL.md" \
     "$CLAUDE_DIR/skills/jujutsu/SKILL.md" "Jujutsu Skill"
 
+# CI/CD Skill
+echo "📥 CI/CD Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/ci-cd"
+download_file "$REPO_URL/.claude/skills/ci-cd/SKILL.md" \
+    "$CLAUDE_DIR/skills/ci-cd/SKILL.md" "CI/CD Skill"
+
 # サブエージェントのダウンロード
 download_agent() {
     local agent=$1
