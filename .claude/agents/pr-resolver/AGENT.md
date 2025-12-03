@@ -145,7 +145,7 @@ git remote get-url origin | sed -E 's/.*github.com[:/](.+)\.git/\1/'
 
 ### 推奨パターン
 
-```
+```text
 AIエージェント:
 「以下の未resolveスレッドがあります。resolveしますか？
 
