@@ -134,6 +134,7 @@ ensure_dir "$CLAUDE_DIR/base"
 ensure_dir "$CLAUDE_DIR/team"
 ensure_dir "$CLAUDE_DIR/security"
 ensure_dir "$CLAUDE_DIR/skills"
+ensure_dir "$CLAUDE_DIR/agents"
 ensure_dir "$CLAUDE_DIR/projects"
 
 # 言語選択
@@ -181,6 +182,26 @@ echo "📥 Jujutsu Skillをダウンロード中..."
 ensure_dir "$CLAUDE_DIR/skills/jujutsu"
 download_file "$REPO_URL/.claude/skills/jujutsu/SKILL.md" \
     "$CLAUDE_DIR/skills/jujutsu/SKILL.md" "Jujutsu Skill"
+
+# CI/CD Skill
+echo "📥 CI/CD Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/ci-cd"
+download_file "$REPO_URL/.claude/skills/ci-cd/SKILL.md" \
+    "$CLAUDE_DIR/skills/ci-cd/SKILL.md" "CI/CD Skill"
+
+# サブエージェントのダウンロード
+download_agent() {
+    local agent=$1
+    local display_name=$2
+
+    echo "📥 $display_name エージェントをダウンロード中..."
+    ensure_dir "$CLAUDE_DIR/agents/$agent"
+    download_file "$REPO_URL/.claude/agents/$agent/AGENT.md" \
+        "$CLAUDE_DIR/agents/$agent/AGENT.md" "$display_name Agent"
+}
+
+# PR Resolver エージェント
+download_agent "pr-resolver" "PR Resolver"
 
 # 言語別Skillsのダウンロード
 download_skill() {
@@ -530,6 +551,7 @@ echo "   ├── settings.json          # Claude Desktop/Web設定"
 echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
 echo "   ├── skills/                # Skills（言語別・jujutsu）"
+echo "   ├── agents/                # サブエージェント"
 echo "   ├── security/              # セキュリティポリシー"
 echo "   └── team/                  # チーム標準"
 echo ""
