@@ -213,6 +213,12 @@ ensure_dir "$CLAUDE_DIR/skills/design-review"
 download_file "$REPO_URL/.claude/skills/design-review/SKILL.md" \
     "$CLAUDE_DIR/skills/design-review/SKILL.md" "Design Review Skill"
 
+# Changelog Skill
+echo "📥 Changelog Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/changelog"
+download_file "$REPO_URL/.claude/skills/changelog/SKILL.md" \
+    "$CLAUDE_DIR/skills/changelog/SKILL.md" "Changelog Skill"
+
 # サブエージェントのダウンロード
 download_agent() {
     local agent=$1
@@ -238,6 +244,9 @@ download_agent "e2e-first-planner" "E2E First Planner"
 
 # Design Reviewer エージェント
 download_agent "design-reviewer" "Design Reviewer"
+
+# Changelog Generator エージェント
+download_agent "changelog-generator" "Changelog Generator"
 
 # 言語別Skillsのダウンロード
 download_skill() {

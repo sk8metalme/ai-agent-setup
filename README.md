@@ -25,6 +25,7 @@
 - **stable-version**: LTS/EOL管理、バージョンアップグレード判断
 - **e2e-first-planning**: Walking Skeleton、MVP計画策定
 - **design-review**: アクセシビリティ、レスポンシブ、パフォーマンス評価
+- **changelog**: CHANGELOG/リリースノート生成、Conventional Commits、SemVer
 - **java-spring**: Java + Spring Boot開発支援
 - **php**: PHP開発支援
 - **perl**: Perl開発支援
@@ -36,6 +37,7 @@
 - **stable-version-auditor**: 技術スタックバージョン監査、リスク評価
 - **e2e-first-planner**: E2E開発計画の自動生成
 - **design-reviewer**: UI/UXデザインの自動レビュー
+- **changelog-generator**: CHANGELOG.md自動生成、GitHub Releases作成支援
 
 ## 🚀 クイックスタート
 
@@ -112,6 +114,7 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 │   ├── stable-version/SKILL.md # バージョン管理ガイド
 │   ├── e2e-first-planning/SKILL.md # E2E計画ガイド
 │   ├── design-review/SKILL.md  # デザインレビューガイド
+│   ├── changelog/SKILL.md      # CHANGELOG生成ガイド
 │   ├── java-spring/SKILL.md    # Java開発支援
 │   ├── php/SKILL.md            # PHP開発支援
 │   ├── perl/SKILL.md           # Perl開発支援
@@ -121,7 +124,8 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 │   ├── oss-license-checker/AGENT.md # ライセンス監査
 │   ├── stable-version-auditor/AGENT.md # バージョン監査
 │   ├── e2e-first-planner/AGENT.md # E2E計画生成
-│   └── design-reviewer/AGENT.md # デザインレビュー
+│   ├── design-reviewer/AGENT.md # デザインレビュー
+│   └── changelog-generator/AGENT.md # CHANGELOG生成
 └── languages/
     ├── java-spring/CLAUDE-java-spring.md
     ├── php/CLAUDE-php.md
@@ -252,6 +256,7 @@ my-project/
 - **stable-version**: LTS判断、EOL対応、endoflife.date API活用
 - **e2e-first-planning**: Walking Skeleton → MVP、縦割りタスク分割
 - **design-review**: WCAG 2.1 AA、Core Web Vitals、レスポンシブ確認
+- **changelog**: Keep a Changelog形式、Conventional Commits、SemVer、自動生成ツール（conventional-changelog/standard-version/git-chglog）
 - **言語別スキル**: Java/PHP/Perl/Python開発のベストプラクティス
 
 #### エージェント（実行アシスタント）
@@ -260,6 +265,7 @@ my-project/
 - **stable-version-auditor**: 技術スタック検出、リスク評価（Critical/Warning/Info）
 - **e2e-first-planner**: ユーザーストーリーからE2Eスライス生成、計画出力
 - **design-reviewer**: Playwright MCP連携、ブレークポイント別レビュー
+- **changelog-generator**: git/jjコミット履歴解析、CHANGELOG.md生成、バージョン提案、GitHub Releases作成支援
 
 ### プロジェクト用Claude設定
 - **プロジェクト最適化**: プロジェクト固有のワークフロー対応
