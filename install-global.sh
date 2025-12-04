@@ -189,6 +189,30 @@ ensure_dir "$CLAUDE_DIR/skills/ci-cd"
 download_file "$REPO_URL/.claude/skills/ci-cd/SKILL.md" \
     "$CLAUDE_DIR/skills/ci-cd/SKILL.md" "CI/CD Skill"
 
+# OSS License Skill
+echo "📥 OSS License Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/oss-license"
+download_file "$REPO_URL/.claude/skills/oss-license/SKILL.md" \
+    "$CLAUDE_DIR/skills/oss-license/SKILL.md" "OSS License Skill"
+
+# Stable Version Skill
+echo "📥 Stable Version Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/stable-version"
+download_file "$REPO_URL/.claude/skills/stable-version/SKILL.md" \
+    "$CLAUDE_DIR/skills/stable-version/SKILL.md" "Stable Version Skill"
+
+# E2E First Planning Skill
+echo "📥 E2E First Planning Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/e2e-first-planning"
+download_file "$REPO_URL/.claude/skills/e2e-first-planning/SKILL.md" \
+    "$CLAUDE_DIR/skills/e2e-first-planning/SKILL.md" "E2E First Planning Skill"
+
+# Design Review Skill
+echo "📥 Design Review Skillをダウンロード中..."
+ensure_dir "$CLAUDE_DIR/skills/design-review"
+download_file "$REPO_URL/.claude/skills/design-review/SKILL.md" \
+    "$CLAUDE_DIR/skills/design-review/SKILL.md" "Design Review Skill"
+
 # サブエージェントのダウンロード
 download_agent() {
     local agent=$1
@@ -202,6 +226,18 @@ download_agent() {
 
 # PR Resolver エージェント
 download_agent "pr-resolver" "PR Resolver"
+
+# OSS License Checker エージェント
+download_agent "oss-license-checker" "OSS License Checker"
+
+# Stable Version Auditor エージェント
+download_agent "stable-version-auditor" "Stable Version Auditor"
+
+# E2E First Planner エージェント
+download_agent "e2e-first-planner" "E2E First Planner"
+
+# Design Reviewer エージェント
+download_agent "design-reviewer" "Design Reviewer"
 
 # 言語別Skillsのダウンロード
 download_skill() {
@@ -550,8 +586,8 @@ echo "   ├── CLAUDE.md              # メイン設定ファイル"
 echo "   ├── settings.json          # Claude Desktop/Web設定"
 echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
-echo "   ├── skills/                # Skills（言語別・jujutsu）"
-echo "   ├── agents/                # サブエージェント"
+echo "   ├── skills/                # Skills（言語別・jujutsu・ci-cd・oss-license・stable-version・e2e-first-planning・design-review）"
+echo "   ├── agents/                # Agents（pr-resolver・oss-license-checker・stable-version-auditor・e2e-first-planner・design-reviewer）"
 echo "   ├── security/              # セキュリティポリシー"
 echo "   └── team/                  # チーム標準"
 echo ""
