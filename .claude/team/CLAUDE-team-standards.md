@@ -33,6 +33,10 @@
 - **bugfix/**: バグ修正用（developから分岐）
 - **hotfix/**: 緊急修正用（mainから分岐）
 
+**禁止事項:**
+- main/masterブランチへの直接push/commitは禁止
+- force push（`--force`, `-f`）の使用は禁止（特にmain/masterへは厳禁）
+
 **品質基準:**
 - テストカバレッジ95%以上を維持
 - 静的解析の警告はマージ前に解消
