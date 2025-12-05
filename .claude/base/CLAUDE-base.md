@@ -9,7 +9,7 @@
 - **プロフェッショナリズム**: 丁寧で専門的な対応を心がけてください
 - **コード品質**: クリーンで保守性の高いコードを実装してください
 - **思考**: 常に、より良い判断、実装をするため、時には否定的な意見も述べてください。必ず、理由と代替案を添えてください
-- **通知**: 作業完了時やユーザへの質問時にsayコマンドでユーザに知らせて、またterminal-notifierで通知を実施すること
+- **通知**: 作業完了時やユーザへの質問時など、作業が止まるタイミングでterminal-notifierコマンドでユーザに通知すること
 
 ## AI エージェントの動作原則
 
@@ -31,19 +31,13 @@
 2. **通知コマンド**
    ```bash
    # 作業完了時の例
-   terminal-notifier -message "ファイル編集が完了しました" -title "Claude Code" -sound default
-   sleep 2
-   say "作業が完了しました"
+   terminal-notifier -message "ファイル編集が完了しました" -title "作業ディレクトリ名" -sound default
 
    # ユーザー確認時の例（選択肢提示時など）
-   terminal-notifier -message "次のアクションを選択してください" -title "Claude Code" -sound default
-   sleep 2
-   say "確認が必要です"
+   terminal-notifier -message "次のアクションを選択してください" -title "作業ディレクトリ名" -sound default
 
    # エラー発生時の例
-   terminal-notifier -message "処理中にエラーが発生しました" -title "Claude Code" -sound default
-   sleep 2
-   say "エラーが発生しました"
+   terminal-notifier -message "処理中にエラーが発生しました" -title "作業ディレクトリ名" -sound default
    ```
 
 3. **例外なく適用**
@@ -109,16 +103,16 @@
 - リソースの効率的な利用
 
 ## 開発ツール
-- $ which npm   
+- $ which npm
 /opt/homebrew/bin/npm
 
-- $ which jj  
+- $ which jj
 /opt/homebrew/bin/jj
 
-- $ which gh  
+- $ which gh
 /opt/homebrew/bin/gh
 
-- $ which node  
+- $ which node
 /opt/homebrew/bin/node
 
 
