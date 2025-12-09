@@ -37,6 +37,31 @@
 - main/masterブランチへの直接push/commitは禁止
 - force push（`--force`, `-f`）の使用は禁止（特にmain/masterへは厳禁）
 
+**Git操作の安全確認（AIエージェント必須）:**
+
+コミット・プッシュを実行する前に、以下の確認を必ず行う:
+
+1. **ブランチ確認**
+   ```bash
+   git branch --show-current
+   ```
+   - main/masterの場合は即座に操作を中止
+   - feature/, bugfix/, hotfix/ ブランチでのみ作業を継続
+
+2. **作業開始時のブランチ作成**
+   ```bash
+   git checkout -b feature/<task-description>
+   ```
+   - 新しい作業は必ずfeatureブランチで開始
+
+3. **プッシュ時の確認**
+   - プッシュ先が `origin/feature/*`, `origin/bugfix/*`, `origin/hotfix/*` であることを確認
+   - main/masterへの直接プッシュは絶対に行わない
+
+4. **違反時の対応**
+   - mainにいることに気づいた場合、ユーザーに確認を求める
+   - 勝手にmainで作業を続けない
+
 **品質基準:**
 - テストカバレッジ95%以上を維持
 - 静的解析の警告はマージ前に解消
