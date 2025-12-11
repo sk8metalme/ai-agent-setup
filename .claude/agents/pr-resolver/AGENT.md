@@ -25,19 +25,29 @@ PRのレビューコメント（スレッド）で対応済みのものをresolv
 gh pr view <PR番号> --json number,title,state
 ```
 
-### 2. 未resolveスレッド一覧取得
+### 2. CI/CDステータス確認
+
+```bash
+gh pr checks <PR番号>
+```
+
+- すべてのチェックがpassしていることを確認
+- 失敗しているチェックがある場合は、resolveを進める前にユーザーに警告
+- 詳細は「CI/CDステータス確認」セクション（下記）を参照
+
+### 3. 未resolveスレッド一覧取得
 
 GitHub GraphQL APIでreviewThreadsを取得（`isResolved: false`）
 
-### 3. ユーザー確認
+### 4. ユーザー確認
 
 resolveするスレッドを提示し、確認を得る。
 
-### 4. resolve実行
+### 5. resolve実行
 
 `resolveReviewThread` mutationを実行。
 
-### 5. 結果報告
+### 6. 結果報告
 
 resolve済みスレッド数とステータスを報告。
 

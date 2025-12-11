@@ -10,14 +10,14 @@ allowed-tools: Bash, Read, Grep, Glob
 
 ## 目的
 
-WebページのUIデザインを自動的にレビューし、アクセシビリティ、レスポンシブデザイン、UXパターン、パフォーマンスの観点から改善提案を行う。
+Web ページの UI デザインを自動的にレビューし、アクセシビリティ、レスポンシブデザイン、UX パターン、パフォーマンスの観点から改善提案を行う。
 
 ## 前提条件
 
 - **Playwright MCP**: ブラウザ自動化のために必要
-  - インストール確認: Claude Codeの設定で `mcp__playwright__*` ツールが利用可能
-- **レビュー対象のURL**: ローカル開発サーバーまたは公開URL
-- **ブラウザ**: Chromium（Playwright MCPが自動管理）
+  - インストール確認: Claude Code の設定で `mcp__playwright__*` ツールが利用可能
+- **レビュー対象の URL**: ローカル開発サーバーまたは公開 URL
+- **ブラウザ**: Chromium（Playwright MCP が自動管理）
 
 ## 参照すべきスキル
 
@@ -46,7 +46,8 @@ fi
 ```
 
 **ユーザー確認事項:**
-- レビュー対象のURL（例: `http://localhost:3000`）
+
+- レビュー対象の URL（例: `http://localhost:3000`）
 - レビュー対象のページ（例: `/`, `/login`, `/dashboard`）
 - 特定のコンポーネント（例: ヘッダー、フォーム、モーダル）
 
@@ -65,6 +66,7 @@ URL: http://localhost:3000
 使用ツール: `mcp__playwright__browser_snapshot`
 
 このツールは、以下の情報を返します：
+
 - ページのアクセシビリティツリー
 - インタラクティブ要素のリスト
 - テキストコンテンツ
@@ -80,19 +82,23 @@ URL: http://localhost:3000
 **チェック対象:**
 
 1. **Mobile（375x667）**
+
    ```
    width: 375
    height: 667
    ```
+
    - 横スクロールが発生しないか
-   - タッチターゲットが44x44px以上か
-   - フォントサイズが読みやすいか（最小16px推奨）
+   - タッチターゲットが 44x44px 以上か
+   - フォントサイズが読みやすいか（最小 16px 推奨）
 
 2. **Tablet（768x1024）**
+
    ```
    width: 768
    height: 1024
    ```
+
    - レイアウトが適切に変化するか
    - 画像が適切にリサイズされるか
 
@@ -120,21 +126,24 @@ filename: docs/tmp/review-mobile.png
 
 **チェック項目:**
 
-1. **セマンティックHTML**
+1. **セマンティック HTML**
+
    - `<header>`, `<nav>`, `<main>`, `<footer>` が使用されているか
    - 見出し階層が適切か（h1 → h2 → h3）
    - リストが `<ul>`, `<ol>` で構造化されているか
 
 2. **フォームのラベル**
+
    - すべての `<input>` に対応する `<label>` があるか
    - `aria-label` または `aria-labelledby` が適切に使用されているか
 
 3. **インタラクティブ要素**
+
    - ボタンが `<button>` または `role="button"` を使用しているか
    - リンクが `<a href="...">` を使用しているか
    - カスタム要素に適切な `role` があるか
 
-4. **ARIA属性**
+4. **ARIA 属性**
    - `aria-hidden="true"` が適切に使用されているか
    - `aria-live` がステータスメッセージに使用されているか
    - `aria-modal="true"` がモーダルに使用されているか
@@ -147,11 +156,11 @@ filename: docs/tmp/review-mobile.png
 // Lighthouse のアクセシビリティチェックを実行
 () => {
   // axe-core を実行（ページに注入されている場合）
-  if (typeof axe !== 'undefined') {
-    return axe.run().then(results => ({
+  if (typeof axe !== "undefined") {
+    return axe.run().then((results) => ({
       violations: results.violations.length,
       passes: results.passes.length,
-      incomplete: results.incomplete.length
+      incomplete: results.incomplete.length,
     }));
   }
 
@@ -159,25 +168,27 @@ filename: docs/tmp/review-mobile.png
   const issues = [];
 
   // 画像のalt属性チェック
-  document.querySelectorAll('img:not([alt])').forEach(img => {
+  document.querySelectorAll("img:not([alt])").forEach((img) => {
     issues.push({
-      type: 'missing-alt',
-      element: img.outerHTML.substring(0, 100)
+      type: "missing-alt",
+      element: img.outerHTML.substring(0, 100),
     });
   });
 
   // ボタンのラベルチェック
-  document.querySelectorAll('button:empty, button:not([aria-label])').forEach(btn => {
-    if (!btn.textContent.trim() && !btn.getAttribute('aria-label')) {
-      issues.push({
-        type: 'unlabeled-button',
-        element: btn.outerHTML.substring(0, 100)
-      });
-    }
-  });
+  document
+    .querySelectorAll("button:empty, button:not([aria-label])")
+    .forEach((btn) => {
+      if (!btn.textContent.trim() && !btn.getAttribute("aria-label")) {
+        issues.push({
+          type: "unlabeled-button",
+          element: btn.outerHTML.substring(0, 100),
+        });
+      }
+    });
 
   return { issues };
-}
+};
 ```
 
 ### Step 5: コントラスト比チェック
@@ -203,7 +214,7 @@ filename: docs/tmp/review-mobile.png
 
   // 相対輝度計算
   const getLuminance = (r, g, b) => {
-    const [rs, gs, bs] = [r, g, b].map(c => {
+    const [rs, gs, bs] = [r, g, b].map((c) => {
       c = c / 255;
       return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
     });
@@ -221,9 +232,9 @@ filename: docs/tmp/review-mobile.png
     backgroundColor,
     contrastRatio: contrastRatio.toFixed(2),
     passes_AA: contrastRatio >= 4.5,
-    passes_AAA: contrastRatio >= 7
+    passes_AAA: contrastRatio >= 7,
   };
-}
+};
 ```
 
 ### Step 6: パフォーマンス分析
@@ -250,7 +261,7 @@ filename: docs/tmp/review-mobile.png
           }
         }
       });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
+      clsObserver.observe({ type: "layout-shift", buffered: true });
 
       // FID はユーザー操作が必要なので省略
 
@@ -260,15 +271,19 @@ filename: docs/tmp/review-mobile.png
           lcp: lastEntry.renderTime || lastEntry.loadTime,
           cls: clsValue,
           // その他のメトリクス
-          domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
-          loadComplete: performance.timing.loadEventEnd - performance.timing.navigationStart
+          domContentLoaded:
+            performance.timing.domContentLoadedEventEnd -
+            performance.timing.navigationStart,
+          loadComplete:
+            performance.timing.loadEventEnd -
+            performance.timing.navigationStart,
         });
       }, 3000);
     });
 
-    lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+    lcpObserver.observe({ type: "largest-contentful-paint", buffered: true });
   });
-}
+};
 ```
 
 #### リソースサイズの確認
@@ -276,9 +291,10 @@ filename: docs/tmp/review-mobile.png
 使用ツール: `mcp__playwright__browser_network_requests`
 
 このツールで以下を確認：
-- 画像サイズが最適化されているか（推奨: WebP形式、100KB以下）
-- JavaScriptバンドルサイズ（推奨: 200KB以下）
-- CSSファイルサイズ（推奨: 50KB以下）
+
+- 画像サイズが最適化されているか（推奨: WebP 形式、100KB 以下）
+- JavaScript バンドルサイズ（推奨: 200KB 以下）
+- CSS ファイルサイズ（推奨: 50KB 以下）
 - 外部リソースの数（推奨: 最小限）
 
 ### Step 7: レビューレポート生成
@@ -358,11 +374,12 @@ echo "✅ レビューレポートを docs/tmp/design-review-report.md に出力
 
 ## レビュー例
 
-### 例1: ログインフォームのレビュー
+### 例 1: ログインフォームのレビュー
 
 **URL**: `http://localhost:3000/login`
 
 **実行手順:**
+
 1. ページナビゲーション: `/login`
 2. スナップショット取得
 3. アクセシビリティチェック:
@@ -371,53 +388,61 @@ echo "✅ レビューレポートを docs/tmp/design-review-report.md に出力
    - ❌ エラーメッセージに `role="alert"` がない
 4. レスポンシブチェック（375px, 768px, 1280px）
 5. コントラスト比チェック:
-   - ❌ ボタンのコントラスト比が3.2:1（推奨: 4.5:1以上）
+   - ❌ ボタンのコントラスト比が 3.2:1（推奨: 4.5:1 以上）
 
 **レポート出力:**
+
 ```markdown
 ## アクセシビリティ
 
 ### Warning
-- **autocomplete属性不足**: パスワードフィールドに `autocomplete="current-password"` を追加してください
+
+- **autocomplete 属性不足**: パスワードフィールドに `autocomplete="current-password"` を追加してください
 - **エラーメッセージの通知不足**: `<span role="alert">` を使用してエラーをスクリーンリーダーに通知してください
 
 ### Critical
-- **コントラスト不足**: ログインボタンのコントラスト比が3.2:1です。WCAG AA基準（4.5:1）を満たすため、色を調整してください。
+
+- **コントラスト不足**: ログインボタンのコントラスト比が 3.2:1 です。WCAG AA 基準（4.5:1）を満たすため、色を調整してください。
   - 現在: `color: #666` on `background: #fff`
   - 推奨: `color: #333` on `background: #fff`（コントラスト比: 12.6:1）
 ```
 
-### 例2: ダッシュボードのレビュー
+### 例 2: ダッシュボードのレビュー
 
 **URL**: `http://localhost:3000/dashboard`
 
 **実行手順:**
+
 1. ページナビゲーション: `/dashboard`
 2. パフォーマンス分析:
    - LCP: 2.8s（改善が必要）
    - CLS: 0.15（改善が必要）
 3. リソース確認:
-   - ❌ 画像 `hero.jpg` が2.5MB（推奨: 300KB以下）
-   - ❌ JavaScriptバンドルが1.2MB（推奨: 200KB以下）
+   - ❌ 画像 `hero.jpg` が 2.5MB（推奨: 300KB 以下）
+   - ❌ JavaScript バンドルが 1.2MB（推奨: 200KB 以下）
 4. レスポンシブチェック:
    - ❌ Mobile (375px) で横スクロール発生
 
 **レポート出力:**
+
 ```markdown
 ## パフォーマンス
 
 ### Critical
-- **LCP遅延**: Hero画像 (2.5MB) が最適化されていません
-  - 推奨: WebP形式 (300KB) に変換
+
+- **LCP 遅延**: Hero 画像 (2.5MB) が最適化されていません
+
+  - 推奨: WebP 形式 (300KB) に変換
   - 推奨: `loading="eager"` と `fetchpriority="high"` を設定
 
-- **JavaScriptバンドル過大**: 1.2MB のバンドルがパフォーマンスに影響
+- **JavaScript バンドル過大**: 1.2MB のバンドルがパフォーマンスに影響
   - 推奨: Code Splitting を実装
   - 推奨: Tree Shaking を有効化
 
 ## レスポンシブデザイン
 
 ### Critical
+
 - **横スクロール発生**: Mobile (375px) で横スクロールが発生しています
   - 原因: `.container { width: 400px }`
   - 推奨: `max-width: 100%` に変更
@@ -435,14 +460,14 @@ echo "✅ レビューレポートを docs/tmp/design-review-report.md に出力
 
 ### 必須確認ケース
 
-1. **レビュー実施前**: URLとレビュー対象を確認
-2. **Critical問題発見時**: 即座にユーザーに報告
+1. **レビュー実施前**: URL とレビュー対象を確認
+2. **Critical 問題発見時**: 即座にユーザーに報告
 3. **パフォーマンス問題**: 具体的な改善案を提示
 
 ### 禁止事項
 
-- ❌ ユーザー確認なしでのCSSファイル変更
-- ❌ ユーザー確認なしでのHTML構造変更
+- ❌ ユーザー確認なしでの CSS ファイル変更
+- ❌ ユーザー確認なしでの HTML 構造変更
 - ❌ 本番環境での直接テスト（ローカル環境のみ）
 
 ### 推奨パターン
@@ -472,20 +497,20 @@ C) 別のページをレビューする
 どの対応を希望しますか？」
 ```
 
-## Playwright MCPツール活用例
+## Playwright MCP ツール活用例
 
 ### ツール一覧
 
-| ツール | 用途 |
-|--------|------|
-| `browser_navigate` | ページへの移動 |
-| `browser_snapshot` | アクセシビリティツリー取得 |
-| `browser_resize` | ブレークポイント変更 |
-| `browser_take_screenshot` | スクリーンショット取得 |
-| `browser_evaluate` | JavaScript実行 |
-| `browser_network_requests` | ネットワーク分析 |
-| `browser_click` | 要素クリック（インタラクション分析用） |
-| `browser_hover` | ホバー状態確認 |
+| ツール                     | 用途                                   |
+| -------------------------- | -------------------------------------- |
+| `browser_navigate`         | ページへの移動                         |
+| `browser_snapshot`         | アクセシビリティツリー取得             |
+| `browser_resize`           | ブレークポイント変更                   |
+| `browser_take_screenshot`  | スクリーンショット取得                 |
+| `browser_evaluate`         | JavaScript 実行                        |
+| `browser_network_requests` | ネットワーク分析                       |
+| `browser_click`            | 要素クリック（インタラクション分析用） |
+| `browser_hover`            | ホバー状態確認                         |
 
 ## 参考資料
 
