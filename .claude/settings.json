@@ -27,7 +27,14 @@
           }
         ]
       }
-    ]
+    ],
+    "Notification": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "~/.claude/hooks/notify.sh"
+      }]
+    }]
   },
   "tools": {
     "enabled": ["bash", "read", "edit", "write", "glob", "grep"]
@@ -157,7 +164,8 @@
       "Bash(gradle -v)",
       "Bash(cpan -v)",
       "Bash(cpanm --version)",
-      "Skill(*)"
+      "Skill(*)",
+      "WebFetch(domain:github.com)"
     ],
     "denied": [
       "Bash(rm -rf:*)",
