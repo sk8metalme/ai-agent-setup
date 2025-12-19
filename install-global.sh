@@ -183,8 +183,15 @@ echo "📥 Hooksをダウンロード中..."
 download_file "$REPO_URL/.claude/hooks/notify.sh" \
     "$CLAUDE_DIR/hooks/notify.sh" "notify.sh"
 
+download_file "$REPO_URL/.claude/hooks/protect-branch.sh" \
+    "$CLAUDE_DIR/hooks/protect-branch.sh" "protect-branch.sh"
+
+download_file "$REPO_URL/.claude/hooks/protect-branch.conf" \
+    "$CLAUDE_DIR/hooks/protect-branch.conf" "protect-branch.conf"
+
 if [[ "$PLAN_MODE" != true ]]; then
     chmod +x "$CLAUDE_DIR/hooks/notify.sh"
+    chmod +x "$CLAUDE_DIR/hooks/protect-branch.sh"
     echo -e "${GREEN}✅ Hooksのインストールが完了しました${NC}"
 fi
 
@@ -608,7 +615,7 @@ echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
 echo "   ├── skills/                # Skills（言語別・jujutsu・ci-cd・oss-license・stable-version・e2e-first-planning・design-review）"
 echo "   ├── agents/                # Agents（pr-resolver・oss-license-checker・stable-version-auditor・e2e-first-planner・design-reviewer）"
-echo "   ├── hooks/                 # Hooks（notify.sh）"
+echo "   ├── hooks/                 # Hooks（notify.sh, protect-branch.sh）"
 echo "   ├── security/              # セキュリティポリシー"
 echo "   └── team/                  # チーム標準"
 echo ""
