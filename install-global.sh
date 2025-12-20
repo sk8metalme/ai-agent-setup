@@ -136,6 +136,7 @@ ensure_dir "$CLAUDE_DIR/security"
 ensure_dir "$CLAUDE_DIR/skills"
 ensure_dir "$CLAUDE_DIR/agents"
 ensure_dir "$CLAUDE_DIR/projects"
+ensure_dir "$CLAUDE_DIR/hooks"
 
 # 言語選択
 echo ""
@@ -176,6 +177,23 @@ download_file "$REPO_URL/.claude/team/CLAUDE-team-standards.md" \
 # セキュリティ設定
 download_file "$REPO_URL/.claude/security/CLAUDE-security-policy.md" \
     "$CLAUDE_DIR/security/CLAUDE-security-policy.md" "セキュリティ設定"
+
+# Hooks
+echo "📥 Hooksをダウンロード中..."
+download_file "$REPO_URL/.claude/hooks/notify.sh" \
+    "$CLAUDE_DIR/hooks/notify.sh" "notify.sh"
+
+download_file "$REPO_URL/.claude/hooks/protect-branch.sh" \
+    "$CLAUDE_DIR/hooks/protect-branch.sh" "protect-branch.sh"
+
+download_file "$REPO_URL/.claude/hooks/protect-branch.conf" \
+    "$CLAUDE_DIR/hooks/protect-branch.conf" "protect-branch.conf"
+
+if [[ "$PLAN_MODE" != true ]]; then
+    chmod +x "$CLAUDE_DIR/hooks/notify.sh"
+    chmod +x "$CLAUDE_DIR/hooks/protect-branch.sh"
+    echo -e "${GREEN}✅ Hooksのインストールが完了しました${NC}"
+fi
 
 # Jujutsu Skill
 echo "📥 Jujutsu Skillをダウンロード中..."
@@ -402,7 +420,7 @@ install_claude_commands() {
     
     record_step "Claudeコマンドファイルを $commands_dir にダウンロード"
     
-    local commands=("dev.md" "documentation.md" "plan.md")
+    local commands=("dev.md" "documentation.md" "plan.md" "git_sync.md" "create_pr.md")
     
     for cmd in "${commands[@]}"; do
         local cmd_url="$REPO_URL/.claude/commands/$cmd"
@@ -441,7 +459,7 @@ install_cursor_commands() {
     
     record_step "Cursorコマンドファイルを $cursor_commands_dir にダウンロード"
     
-    local commands=("dev.md" "documentation.md" "plan.md")
+    local commands=("dev.md" "documentation.md" "plan.md" "git_sync.md" "create_pr.md")
     
     for cmd in "${commands[@]}"; do
         local cmd_url="$REPO_URL/.claude/commands/$cmd"
@@ -597,6 +615,7 @@ echo "   ├── commands/              # コマンドファイル"
 echo "   ├── base/                  # 基本設定"
 echo "   ├── skills/                # Skills（言語別・jujutsu・ci-cd・oss-license・stable-version・e2e-first-planning・design-review）"
 echo "   ├── agents/                # Agents（pr-resolver・oss-license-checker・stable-version-auditor・e2e-first-planner・design-reviewer）"
+echo "   ├── hooks/                 # Hooks（notify.sh, protect-branch.sh）"
 echo "   ├── security/              # セキュリティポリシー"
 echo "   └── team/                  # チーム標準"
 echo ""
