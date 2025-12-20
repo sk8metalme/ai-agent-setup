@@ -52,7 +52,7 @@ git fetch origin
 git pull
 
 # 5. マージ済みブランチを削除
-git branch --merged | grep -v "^\*" | grep -v "main\|master\|develop" | xargs -r git branch -d
+git branch --merged | grep -v "^\*" | grep -Ev "main|master|develop" | while read -r branch; do [ -n "$branch" ] && git branch -d "$branch"; done
 
 # 6. stashから変更を復元
 git stash pop
