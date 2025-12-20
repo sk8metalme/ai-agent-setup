@@ -420,7 +420,7 @@ install_claude_commands() {
     
     record_step "Claudeコマンドファイルを $commands_dir にダウンロード"
     
-    local commands=("dev.md" "documentation.md" "plan.md")
+    local commands=("dev.md" "documentation.md" "plan.md" "git_sync.md")
     
     for cmd in "${commands[@]}"; do
         local cmd_url="$REPO_URL/.claude/commands/$cmd"
@@ -459,7 +459,7 @@ install_cursor_commands() {
     
     record_step "Cursorコマンドファイルを $cursor_commands_dir にダウンロード"
     
-    local commands=("dev.md" "documentation.md" "plan.md")
+    local commands=("dev.md" "documentation.md" "plan.md" "git_sync.md")
     
     for cmd in "${commands[@]}"; do
         local cmd_url="$REPO_URL/.claude/commands/$cmd"
