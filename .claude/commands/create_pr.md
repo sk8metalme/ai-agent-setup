@@ -80,21 +80,30 @@ if [ -f "package.json" ]; then
 # Java (Maven)
 elif [ -f "pom.xml" ]; then
   version_file="pom.xml"
-  current_version=$(grep '<version>' pom.xml | head -1 | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+  # xmllintを優先、なければインデント検出でプロジェクトレベルの<version>を抽出
+  current_version=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml 2>/dev/null || \
+    grep '<version>' pom.xml | grep -v '<parent>' | head -1 | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
   echo "検出: Java Maven プロジェクト"
   echo "現在のバージョン: $current_version"
 
 # Java (Gradle)
 elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
-  version_file="build.gradle"
-  current_version=$(grep '^version' build.gradle 2>/dev/null | sed "s/version[= ]*['\"]\\(.*\\)['\"].*/\1/")
+  # build.gradle.ktsを優先、なければbuild.gradle
+  if [ -f "build.gradle.kts" ]; then
+    version_file="build.gradle.kts"
+    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle.kts | head -1 | sed 's/.*version\s*[=:]\s*['\''\"]\(.*\)['\''\"].*/\1/')
+  else
+    version_file="build.gradle"
+    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle | head -1 | sed "s/.*version\s*[=:]\s*['\"]\\(.*\\)['\"].*/\1/")
+  fi
   echo "検出: Java Gradle プロジェクト"
   echo "現在のバージョン: $current_version"
 
 # Python
 elif [ -f "pyproject.toml" ]; then
   version_file="pyproject.toml"
-  current_version=$(grep '^version' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+  # 単一引用符と二重引用符の両方に対応
+  current_version=$(grep '^version' pyproject.toml | sed "s/version\s*=\s*['\"]\\(.*\\)['\"].*/\1/")
   echo "検出: Python プロジェクト"
   echo "現在のバージョン: $current_version"
 
@@ -155,18 +164,38 @@ if [ -n "$version_file" ]; then
   echo "  - MINOR (0.x.0): 機能追加（後方互換性あり）"
   echo "  - PATCH (0.0.x): バグ修正、軽微な変更"
   echo ""
-  # AskUserQuestionで確認（スキップ / PATCH / MINOR / MAJOR）
-  # 更新する場合は該当ファイルを編集してコミット
+
+  # Claude Code実行時の処理:
+  # 1. AskUserQuestionツールで以下を確認:
+  #    - スキップ: バージョン更新しない
+  #    - PATCH: パッチバージョンを上げる
+  #    - MINOR: マイナーバージョンを上げる
+  #    - MAJOR: メジャーバージョンを上げる
+  #
+  # 2. ユーザーが更新を選択した場合:
+  #    a. 該当ファイルを編集してバージョンを更新
+  #    b. git add <version_file>
+  #    c. git commit -m "chore: bump version to <new_version>"
+  #
+  # 注意: このスクリプトはドキュメント例です。
+  # 実際の実行はClaude Codeが上記の手順に従って行います。
 fi
 
 # ステップ4: ターゲットブランチをユーザーに確認
-# AskUserQuestionで確認（デフォルト: main）
+# Claude Code実行時の処理:
+# AskUserQuestionツールで以下を確認:
+#   - main（推奨）: メインブランチにマージ
+#   - develop: 開発ブランチにマージ
+#   - その他: ユーザーが指定したブランチ
+# デフォルト: main
+target_branch="main"  # 実際はユーザーの選択によって決定
 
 # ステップ5: リモートにプッシュ
 git push -u origin "$current_branch"
 
 # ステップ6: PR作成
-gh pr create --base main --web
+# $target_branchは実際にはステップ4で確認したブランチ名
+gh pr create --base "$target_branch" --web
 ```
 
 ## PRタイトルとボディの生成
