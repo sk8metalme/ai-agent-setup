@@ -20,15 +20,25 @@ model: sonnet
    - コミット履歴を表示
    - 変更ファイル一覧を表示
 
-3. **ターゲットブランチの確認**
+3. **バージョン管理の確認**
+   - バージョン管理ファイルの存在確認（package.json, VERSION, pyproject.toml等）
+   - バージョンファイルが存在する場合、現在のバージョンを表示
+   - ユーザーにバージョン更新が必要か確認
+   - セマンティックバージョニングに基づく推奨：
+     - **MAJOR (x.0.0)**: 破壊的変更（後方互換性のない変更）
+     - **MINOR (0.x.0)**: 機能追加（後方互換性あり）
+     - **PATCH (0.0.x)**: バグ修正、軽微な変更
+   - 更新する場合はバージョンを更新してコミット
+
+4. **ターゲットブランチの確認**
    - ユーザーにターゲットブランチを確認
    - デフォルト: main
 
-4. **リモートへプッシュ**
+5. **リモートへプッシュ**
    - 現在のブランチをリモートにプッシュ
    - まだプッシュしていない場合は `-u origin [ブランチ名]`
 
-5. **PR作成**
+6. **PR作成**
    - `gh pr create` でPR作成
    - タイトル：最新のコミットメッセージから自動生成
    - 本文：変更内容のサマリーを自動生成
@@ -39,7 +49,7 @@ model: sonnet
 このコマンドを実行すると、以下の処理を順番に実行します。
 
 ```bash
-# 1. 現在のブランチを確認
+# ステップ1: 現在のブランチを確認
 current_branch=$(git branch --show-current)
 
 # main/masterブランチでないことを確認
@@ -48,21 +58,144 @@ if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
   exit 1
 fi
 
-# 2. git statusで未コミット変更を確認
+# ステップ2: 未コミット変更と差分の確認
 git status
 
-# 3. mainブランチとの差分を確認
+# mainブランチとの差分を確認
 git log main..HEAD --oneline
 git diff main...HEAD --stat
 
-# 4. ターゲットブランチをユーザーに確認
-# AskUserQuestionで確認（デフォルト: main）
+# ステップ3: バージョン管理ファイルの確認
+# 各言語のバージョンファイルを検出
+version_file=""
+current_version=""
 
-# 5. リモートにプッシュ
+# Node.js/TypeScript
+if [ -f "package.json" ]; then
+  version_file="package.json"
+  current_version=$(jq -r '.version' package.json 2>/dev/null || grep '"version"' package.json | sed 's/.*"version": "\(.*\)".*/\1/')
+  echo "検出: Node.js/TypeScript プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# Java (Maven)
+elif [ -f "pom.xml" ]; then
+  version_file="pom.xml"
+  # xmllintを優先、なければインデント検出でプロジェクトレベルの<version>を抽出
+  current_version=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml 2>/dev/null || \
+    grep '<version>' pom.xml | grep -v '<parent>' | head -1 | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+  echo "検出: Java Maven プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# Java (Gradle)
+elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+  # build.gradle.ktsを優先、なければbuild.gradle
+  if [ -f "build.gradle.kts" ]; then
+    version_file="build.gradle.kts"
+    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle.kts | head -1 | sed 's/.*version\s*[=:]\s*['\''\"]\(.*\)['\''\"].*/\1/')
+  else
+    version_file="build.gradle"
+    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle | head -1 | sed "s/.*version\s*[=:]\s*['\"]\\(.*\\)['\"].*/\1/")
+  fi
+  echo "検出: Java Gradle プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# Python
+elif [ -f "pyproject.toml" ]; then
+  version_file="pyproject.toml"
+  # 単一引用符と二重引用符の両方に対応
+  current_version=$(grep '^version' pyproject.toml | sed "s/version\s*=\s*['\"]\\(.*\\)['\"].*/\1/")
+  echo "検出: Python プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# PHP
+elif [ -f "composer.json" ]; then
+  version_file="composer.json"
+  current_version=$(jq -r '.version' composer.json 2>/dev/null || grep '"version"' composer.json | sed 's/.*"version": "\(.*\)".*/\1/')
+  echo "検出: PHP プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# Ansible
+elif [ -f "galaxy.yml" ]; then
+  version_file="galaxy.yml"
+  current_version=$(grep '^version:' galaxy.yml | awk '{print $2}')
+  echo "検出: Ansible Collection"
+  echo "現在のバージョン: $current_version"
+
+# RPM
+elif ls *.spec 1>/dev/null 2>&1; then
+  version_file=$(ls *.spec | head -1)
+  current_version=$(grep '^Version:' "$version_file" | awk '{print $2}')
+  echo "検出: RPM パッケージ"
+  echo "現在のバージョン: $current_version"
+
+# Rust
+elif [ -f "Cargo.toml" ]; then
+  version_file="Cargo.toml"
+  current_version=$(grep '^version' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+  echo "検出: Rust プロジェクト"
+  echo "現在のバージョン: $current_version"
+
+# Ruby
+elif ls *.gemspec 1>/dev/null 2>&1; then
+  version_file=$(ls *.gemspec | head -1)
+  current_version=$(grep "\.version" "$version_file" | sed "s/.*version[= ]*['\"]\\(.*\\)['\"].*/\1/")
+  echo "検出: Ruby Gem"
+  echo "現在のバージョン: $current_version"
+
+# 汎用バージョンファイル
+elif [ -f "VERSION" ]; then
+  version_file="VERSION"
+  current_version=$(cat VERSION)
+  echo "検出: VERSION ファイル"
+  echo "現在のバージョン: $current_version"
+
+elif [ -f "version.txt" ]; then
+  version_file="version.txt"
+  current_version=$(cat version.txt)
+  echo "検出: version.txt ファイル"
+  echo "現在のバージョン: $current_version"
+fi
+
+# バージョン更新の確認
+if [ -n "$version_file" ]; then
+  echo ""
+  echo "セマンティックバージョニング推奨:"
+  echo "  - MAJOR (x.0.0): 破壊的変更（後方互換性のない変更）"
+  echo "  - MINOR (0.x.0): 機能追加（後方互換性あり）"
+  echo "  - PATCH (0.0.x): バグ修正、軽微な変更"
+  echo ""
+
+  # Claude Code実行時の処理:
+  # 1. AskUserQuestionツールで以下を確認:
+  #    - スキップ: バージョン更新しない
+  #    - PATCH: パッチバージョンを上げる
+  #    - MINOR: マイナーバージョンを上げる
+  #    - MAJOR: メジャーバージョンを上げる
+  #
+  # 2. ユーザーが更新を選択した場合:
+  #    a. 該当ファイルを編集してバージョンを更新
+  #    b. git add <version_file>
+  #    c. git commit -m "chore: bump version to <new_version>"
+  #
+  # 注意: このスクリプトはドキュメント例です。
+  # 実際の実行はClaude Codeが上記の手順に従って行います。
+fi
+
+# ステップ4: ターゲットブランチをユーザーに確認
+# Claude Code実行時の処理:
+# AskUserQuestionツールで以下を確認:
+#   - main（推奨）: メインブランチにマージ
+#   - develop: 開発ブランチにマージ
+#   - その他: ユーザーが指定したブランチ
+# デフォルト: main
+target_branch="main"  # 実際はユーザーの選択によって決定
+
+# ステップ5: リモートにプッシュ
 git push -u origin "$current_branch"
 
-# 6. PR作成
-gh pr create --base main --web
+# ステップ6: PR作成
+# $target_branchは実際にはステップ4で確認したブランチ名
+gh pr create --base "$target_branch" --web
 ```
 
 ## PRタイトルとボディの生成
@@ -82,3 +215,14 @@ PRのタイトルとボディは以下のように生成されます:
 - main/masterブランチからは実行できません
 - 未コミットの変更がある場合は先にコミットしてください
 - `--web`オプションでブラウザが自動で開きます
+- バージョン管理ファイルが存在しない場合、バージョン更新ステップは自動的にスキップされます
+- サポートされるバージョンファイル：
+  - Node.js/TypeScript: `package.json`
+  - Java: `pom.xml` (Maven), `build.gradle` (Gradle)
+  - Python: `pyproject.toml`
+  - PHP: `composer.json`
+  - Ansible: `galaxy.yml`
+  - RPM: `*.spec`
+  - Rust: `Cargo.toml`
+  - Ruby: `*.gemspec`
+  - 汎用: `VERSION`, `version.txt`
