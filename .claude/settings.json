@@ -184,6 +184,7 @@
       "Bash(chmod 777:*)",
       "Bash(git reset --hard:*)",
       "Bash(git push --force:*)",
+      "Bash(gh pr merge:*)",
       "Bash(npm publish:*)",
       "Bash(composer global require:*)",
       "Bash(composer create-project:*)",
