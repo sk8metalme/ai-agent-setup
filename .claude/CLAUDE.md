@@ -1,29 +1,39 @@
-# プロジェクト設定（import構文使用版）
+# プロジェクト設定テンプレート
 
-このファイルは`@import`構文を使用して、モジュール化された設定を組み合わせています。
+このファイルはプロジェクトテンプレートです。実際のプロジェクトでは、必要なプラグインをインストールして使用してください。
 
-## 基本設定のインポート
+## 必要なプラグインのインストール
 
-@base/CLAUDE-base.md
+このプロジェクトテンプレートを使用するには、以下のプラグインをインストールしてください：
 
-## チーム標準のインポート
+### 基本プラグイン（推奨）
 
-@team/CLAUDE-team-standards.md
+```
+/plugin install team-standards@ai-agent-setup
+/plugin install development-toolkit@ai-agent-setup
+```
 
-## セキュリティポリシーのインポート
+### 言語別プラグイン（該当言語の場合のみ）
 
-@security/CLAUDE-security-policy.md
+```
+/plugin install lang-java-spring@ai-agent-setup  # Java + Spring Boot
+/plugin install lang-python@ai-agent-setup       # Python + FastAPI
+/plugin install lang-php@ai-agent-setup          # PHP + Slim
+/plugin install lang-perl@ai-agent-setup         # Perl + Mojolicious
+```
 
-## バージョン管理
+### その他の機能プラグイン（必要に応じて）
 
-### Jujutsuプロジェクトの場合
+```
+/plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu (jj) VCS
+/plugin install ci-cd-tools@ai-agent-setup       # CI/CD トラブルシューティング
+/plugin install design-review@ai-agent-setup     # UI/UX デザインレビュー
+/plugin install e2e-planning@ai-agent-setup      # E2Eファースト開発計画
+/plugin install oss-compliance@ai-agent-setup    # OSSライセンスチェック
+/plugin install version-audit@ai-agent-setup     # 技術スタックバージョン監査
+```
 
-以下の条件でjujutsu-workflowスキルを使用してください：
-- `.jj/` ディレクトリが存在する場合
-- `jj` コマンドを使用する場合
-- PR作成やブックマーク管理を行う場合
-
-スキル呼び出し: `/jujutsu-workflow`
+---
 
 ## プロジェクト固有の設定
 
@@ -44,53 +54,7 @@
 3. **パフォーマンス目標**
    - [目標値を記載]
 
-## 言語別開発支援
-
-### Java + Spring Boot開発の場合
-
-以下の条件でjava-springスキルを使用してください：
-- `.java` ファイルが存在する場合
-- `pom.xml` または `build.gradle` が存在する場合
-- Spring Boot関連の実装を行う場合
-
-スキル呼び出し: `/java-spring`
-
-### Python開発の場合
-
-以下の条件でpython-devスキルを使用してください：
-- `.py` ファイルが存在する場合
-- `requirements.txt` または `pyproject.toml` が存在する場合
-- Python関連の実装を行う場合
-
-スキル呼び出し: `/python-dev`
-
-### PHP開発の場合
-
-以下の条件でphp-devスキルを使用してください：
-- `.php` ファイルが存在する場合
-- `composer.json` が存在する場合
-- PHP関連の実装を行う場合
-
-スキル呼び出し: `/php-dev`
-
-### Perl開発の場合
-
-以下の条件でperl-devスキルを使用してください：
-- `.pl` または `.pm` ファイルが存在する場合
-- Perl関連の実装を行う場合
-
-スキル呼び出し: `/perl-dev`
-
-## サブエージェント
-
-### PRコメントresolveの場合
-
-以下の条件でpr-resolverエージェントを使用してください：
-- PRのレビューコメントをresolveする場合
-- `gh` CLIが利用可能な場合
-- GitHub PRの操作を行う場合
-
-エージェント呼び出し: `pr-resolver`
+---
 
 ## カスタム拡張
 
@@ -104,5 +68,5 @@
 
 ---
 
-注: このファイルは`@import`構文を使用して、複数の設定ファイルを組み合わせています。
-各インポートファイルは相対パスで指定されています。
+注: このファイルはプロジェクトテンプレートです。
+実際の設定はプラグインシステムによって提供されます。

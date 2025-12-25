@@ -7,5 +7,7 @@
   },
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
-  "keywords": ["e2e", "planning", "walking-skeleton", "architecture", "design"]
+  "keywords": ["e2e", "planning", "walking-skeleton", "architecture", "design"],
+  "agents": "./agents/",
+  "skills": "./skills/"
 }
