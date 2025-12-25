@@ -13,8 +13,10 @@
     "./commands/dev.md",
     "./commands/documentation.md",
     "./commands/create_pr.md",
-    "./commands/git_sync.md"
+    "./commands/git_sync.md",
+    "./commands/suggest-claude-md.md"
   ],
   "agents": "./agents/",
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "bin": "./bin/"
 }

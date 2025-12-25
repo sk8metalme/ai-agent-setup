@@ -4,9 +4,11 @@
 
 ## 📋 概要
 
-このプロジェクトでは、以下の配布方式を提供しています：
+このプロジェクトでは、**Claude Code公式プラグインシステム**を使用した配布方式を提供しています。
 
-### 🔌 プラグイン配布（推奨・最新）
+> **⚠️ 重要**: レガシースクリプト（install-global.sh / install-project.sh）は非推奨です。プラグインシステムへの移行をお願いします。詳細は [マイグレーションガイド](docs/migration-guide.md) をご覧ください。
+
+### 🔌 プラグイン配布（推奨）
 
 **Claude Code公式プラグインシステム**を使用した配布方式です。
 
@@ -61,16 +63,13 @@ claude plugin update team-standards@ai-agent-setup
 claude plugin update --all
 ```
 
-### 🌐 グローバル設定（Claude用・レガシー）
-- **配置場所**: `~/.claude/`
-- **用途**: チーム共通の基本設定、セキュリティポリシー、言語別設定
-- **特徴**: `@import`構文でモジュール化、一度設定すれば全プロジェクトで利用可能
-- **注**: プラグイン配布への移行を推奨
+### 📁 その他の設定ファイル
 
-### 📁 プロジェクト設定（Cursor/AGENTS.md用）
-- **配置場所**: プロジェクトルート
-- **用途**: プロジェクト固有の設定、開発チーム向け
-- **特徴**: `.cursor/rules/*.mdc`形式またはシンプルな`AGENTS.md`
+プラグインシステムの対象外ですが、以下のツール向け設定も提供しています：
+
+- **Cursor**: `.cursor/rules/*.mdc` 形式のProject Rules
+- **Cline**: `.clinerules/` ディレクトリのルールファイル
+- **AGENTS.md**: シンプルなAI設定ファイル
 
 ## 🤖 スキル & エージェント
 
@@ -97,48 +96,28 @@ claude plugin update --all
 
 ## 🚀 クイックスタート
 
-### グローバル設定（Claude用）
+### プラグインシステムを使ったインストール（推奨）
 
 ```bash
-# Claude グローバル設定を対話的にインストール（推奨）
-bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
+# 1. マーケットプレイスを追加
+/plugin marketplace add sk8metalme/ai-agent-setup
 
-# 非対話でインストールする場合（デフォルトを環境変数で指定）
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=5 bash
-# または
-LANGUAGE_CHOICE=5 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh)
+# 2. 基本プラグインをインストール（推奨）
+/plugin install team-standards@ai-agent-setup
+/plugin install development-toolkit@ai-agent-setup
 
-# 実行前に影響を確認したい場合
-bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh) --plan
-# または
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-global.sh | LANGUAGE_CHOICE=5 bash -s -- --plan
+# 3. 必要に応じて言語別プラグインをインストール
+/plugin install lang-python@ai-agent-setup  # Python開発の場合
+/plugin install lang-java-spring@ai-agent-setup  # Java開発の場合
+
+# 4. その他の機能プラグイン（必要に応じて）
+/plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu使用時
+/plugin install ci-cd-tools@ai-agent-setup  # CI/CDツール使用時
 ```
 
-- 手動実行時はテキストメニューで選択肢を確認できる対話モードの利用を推奨します。
-- 自動化など非対話で実行する場合は `LANGUAGE_CHOICE=1..5` で言語テンプレートを指定してください（未指定時は自動的に「すべて」を取得）。
-- **環境変数の渡し方**: `ENV=value bash` の形式で環境変数をbashプロセスに渡してください。パイプ使用時は `| ENV=value bash` の順序で記述。
-- 実行前に影響をレビューしたい場合は `--plan`（差分表示）を付与すると、既存環境との違いを可視化できます。
+### レガシースクリプト（非推奨）
 
-### プロジェクト設定（Cursor/AGENTS.md用）
-
-```bash
-# プロジェクト用設定を対話的にインストール（推奨）
-bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
-
-# 非対話でインストールする場合
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash
-# または
-PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh)
-
-# 実行前に影響を確認したい場合
-bash <(curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh) --plan
-# または
-curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/install-project.sh | PROJECT_CONFIG_TYPE=3 PROJECT_LANGUAGE_CHOICE=5 bash -s -- --plan
-```
-
-- 非対話で実行する場合は `PROJECT_CONFIG_TYPE=1..3` と `PROJECT_LANGUAGE_CHOICE=1..5` を指定してインストール対象を制御できます（未指定時は両方／すべてを取得）。
-- **環境変数の渡し方**: `ENV=value bash` の形式で環境変数をbashプロセスに渡してください。複数の環境変数は `ENV1=value1 ENV2=value2 bash` の形式。
-- 実行前の確認には `--plan`（詳細差分）を使用すると既存ファイルへの影響を把握できます。
+> **⚠️ 非推奨**: install-global.sh と install-project.sh は非推奨です。実行すると、プラグインシステムへの移行を促すメッセージが表示されます。既存ユーザーは [マイグレーションガイド](docs/migration-guide.md) を参照してください。
 
 ## 🎯 対応言語・フレームワーク
 
@@ -149,95 +128,55 @@ curl -fsSL https://raw.githubusercontent.com/sk8metalme/ai-agent-setup/main/inst
 | **Perl** | Mojolicious + Modern Perl | スクリプト・Web、モダンPerl機能 |
 | **Python** | FastAPI + Poetry | 高速API、型ヒント、非同期処理 |
 
-## 📁 インストール後のファイル配置
+## 📁 プラグインシステムによるファイル配置
 
-### グローバル設定（Claude）
+プラグインインストール後、Claude Codeが自動的に以下の場所にファイルを配置します：
+
+### ユーザーホームディレクトリ（グローバル設定）
+
+プラグインで管理されるファイルは `~/.claude/plugins/<plugin-name>/` に配置されます。
+
 ```
 ~/.claude/
-├── CLAUDE.md                    # メインエントリーポイント
-├── settings.json               # Claude Desktop/Web設定
-├── commands/                    # コマンドファイル
-│   ├── dev.md                  # 開発コマンド
-│   ├── documentation.md        # ドキュメント化コマンド
-│   └── plan.md                 # 計画コマンド
-├── base/CLAUDE-base.md         # 基本設定
-├── team/CLAUDE-team-standards.md # チーム標準
-├── security/CLAUDE-security-policy.md # セキュリティポリシー
-├── skills/                      # スキル（知識ライブラリ）
-│   ├── jujutsu/SKILL.md        # Jujutsuバージョン管理
-│   ├── ci-cd/SKILL.md          # CI/CDトラブルシューティング
-│   ├── oss-license/SKILL.md    # OSSライセンスガイド
-│   ├── stable-version/SKILL.md # バージョン管理ガイド
-│   ├── e2e-first-planning/SKILL.md # E2E計画ガイド
-│   ├── design-review/SKILL.md  # デザインレビューガイド
-│   ├── changelog/SKILL.md      # CHANGELOG生成ガイド
-│   ├── java-spring/SKILL.md    # Java開発支援
-│   ├── php/SKILL.md            # PHP開発支援
-│   ├── perl/SKILL.md           # Perl開発支援
-│   └── python/SKILL.md         # Python開発支援
-├── agents/                      # エージェント（実行アシスタント）
-│   ├── pr-resolver/AGENT.md    # PRコメントresolve
-│   ├── oss-license-checker/AGENT.md # ライセンス監査
-│   ├── stable-version-auditor/AGENT.md # バージョン監査
-│   ├── e2e-first-planner/AGENT.md # E2E計画生成
-│   ├── design-reviewer/AGENT.md # デザインレビュー
-│   └── changelog-generator/AGENT.md # CHANGELOG生成
-└── languages/
-    ├── java-spring/CLAUDE-java-spring.md
-    ├── php/CLAUDE-php.md
-    ├── perl/CLAUDE-perl.md
-    └── python/CLAUDE-python.md
-
-~/.cursor/commands/              # Cursor用コマンドファイル
-├── dev.md                      # 開発コマンド
-├── documentation.md            # ドキュメント化コマンド
-└── plan.md                     # 計画コマンド
-
-~/Documents/Cline/Rules/        # Cline用グローバルルール
-├── general.md                  # 全般的なルール
-├── jujutsu.md                  # Jujutsuルール（SSOT）
-├── java-spring.md              # Java固有
-├── php.md                      # PHP固有
-├── python.md                   # Python固有
-├── perl.md                     # Perl固有
-└── database.md                 # データベース設計
+├── plugins/                     # プラグイン管理ディレクトリ
+│   ├── team-standards/          # チーム標準プラグイン
+│   │   ├── base/CLAUDE-base.md
+│   │   ├── team/CLAUDE-team-standards.md
+│   │   ├── security/CLAUDE-security-policy.md
+│   │   └── hooks/
+│   ├── development-toolkit/     # 開発ツールキットプラグイン
+│   │   ├── commands/
+│   │   ├── skills/
+│   │   ├── agents/
+│   │   └── bin/
+│   ├── lang-python/             # Python開発プラグイン
+│   │   ├── skills/
+│   │   └── languages/
+│   └── ...                      # その他のプラグイン
+├── CLAUDE.md                    # ユーザー固有設定
+└── settings.json                # ユーザー固有設定
 ```
 
 ### 配布用テンプレート（本プロジェクト）
+
+このリポジトリ内の構造：
+
 ```
 ai-agent-setup/
-├── .cursor/                     # Cursor設定テンプレート
-│   └── rules/
-│       ├── general.mdc          # 全般的なルール
-│       ├── jujutsu.mdc          # Jujutsuルール（SSOT）
-│       ├── java-spring.mdc      # Java固有
-│       ├── php.mdc             # PHP固有
-│       ├── python.mdc          # Python固有
-│       ├── perl.mdc            # Perl固有
-│       └── database.mdc        # データベース設計
-├── .clinerules/                 # Cline設定テンプレート
-│   ├── general.md               # 全般的なルール
-│   ├── jujutsu.md               # Jujutsuルール
-│   ├── java-spring.md           # Java固有
-│   ├── php.md                  # PHP固有
-│   ├── python.md               # Python固有
-│   ├── perl.md                 # Perl固有
-│   └── database.md             # データベース設計
-├── .claude/                     # Claude設定テンプレート
-│   ├── CLAUDE.md               # メインエントリーポイント
-│   ├── settings.json           # Claude Desktop/Web設定
-│   ├── base/CLAUDE-base.md     # 基本設定
-│   ├── skills/                 # スキル（知識ライブラリ）
-│   ├── agents/                 # エージェント（実行アシスタント）
-│   ├── languages/              # 言語別設定
-│   ├── security/               # セキュリティポリシー
-│   └── team/                   # チーム標準
-├── project-config/             # プロジェクト用設定
-│   ├── claude-import/          # プロジェクト用Claude import
-│   └── claude-settings/        # プロジェクト用Claude settings
+├── plugins/                     # プラグインソース（SSoT）
+│   ├── team-standards/
+│   ├── development-toolkit/
+│   ├── lang-python/
+│   └── ...（全12個のプラグイン）
+├── .claude/                     # プロジェクトテンプレート（最小限）
+│   ├── CLAUDE.md               # プラグインインストールガイド
+│   ├── settings.json           # 基本設定
+│   └── README.md               # 設定説明
+├── .cursor/                     # Cursor設定
+├── .clinerules/                 # Cline設定
 ├── AGENTS.md                   # シンプル設定
-├── install-global.sh           # グローバル設定インストーラー
-└── install-project.sh          # プロジェクト設定インストーラー
+├── install-global.sh           # 非推奨（リダイレクト専用）
+└── install-project.sh          # 非推奨（リダイレクト専用）
 ```
 
 ### プロジェクト設定（Cursor + Claude）
@@ -372,6 +311,7 @@ my-project/
 
 ## 📚 ドキュメント
 
+- [マイグレーションガイド](docs/migration-guide.md) - レガシースクリプトからプラグインシステムへの移行方法
 - [シンプルガイド](docs/simple-guide.md) - 基本的な使い方
 - [グローバル設定ガイド](docs/global-config-guide.md) - グローバル設定の詳細
 - [Claude Import ガイド](docs/claude-import-guide.md) - @import構文の使い方
