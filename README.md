@@ -4,12 +4,68 @@
 
 ## 📋 概要
 
-このプロジェクトでは、以下の2つの配布方式を提供しています：
+このプロジェクトでは、以下の配布方式を提供しています：
 
-### 🌐 グローバル設定（Claude用）
+### 🔌 プラグイン配布（推奨・最新）
+
+**Claude Code公式プラグインシステム**を使用した配布方式です。
+
+#### インストール方法
+
+```bash
+# 1. マーケットプレイスを追加
+/plugin marketplace add sk8metalme/ai-agent-setup
+
+# 2. 必要なプラグインをインストール
+/plugin install team-standards@ai-agent-setup
+/plugin install jujutsu-workflow@ai-agent-setup
+/plugin install development-toolkit@ai-agent-setup
+```
+
+#### 利用可能なプラグイン
+
+**高優先度（必須・推奨）:**
+
+| プラグイン | 説明 |
+|-----------|------|
+| `team-standards` | チーム標準・セキュリティポリシー・基本設定（全員必須） |
+| `jujutsu-workflow` | Jujutsuバージョン管理ワークフロー |
+| `development-toolkit` | 開発ワークフロー統合（計画・PR・CHANGELOG） |
+
+**中優先度（機能別）:**
+
+| プラグイン | 説明 |
+|-----------|------|
+| `ci-cd-tools` | CI/CDトラブルシューティング・GitHub Actions支援 |
+| `oss-compliance` | OSSライセンスチェック・監査 |
+| `version-audit` | 技術スタックバージョン監査・EOLチェック |
+| `design-review` | UI/UXデザインレビュー・アクセシビリティチェック |
+| `e2e-planning` | E2Eファースト開発計画・Walking Skeleton設計 |
+
+**低優先度（言語別）:**
+
+| プラグイン | 説明 |
+|-----------|------|
+| `lang-java-spring` | Java + Spring Boot開発支援 |
+| `lang-python` | Python + FastAPI開発支援 |
+| `lang-php` | PHP + Slim Framework開発支援 |
+| `lang-perl` | Perl + Mojolicious開発支援 |
+
+#### 更新方法
+
+```bash
+# 特定プラグインを更新
+claude plugin update team-standards@ai-agent-setup
+
+# 全プラグインを更新
+claude plugin update --all
+```
+
+### 🌐 グローバル設定（Claude用・レガシー）
 - **配置場所**: `~/.claude/`
 - **用途**: チーム共通の基本設定、セキュリティポリシー、言語別設定
 - **特徴**: `@import`構文でモジュール化、一度設定すれば全プロジェクトで利用可能
+- **注**: プラグイン配布への移行を推奨
 
 ### 📁 プロジェクト設定（Cursor/AGENTS.md用）
 - **配置場所**: プロジェクトルート

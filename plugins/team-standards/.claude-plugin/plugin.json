@@ -1,0 +1,11 @@
+{
+  "name": "team-standards",
+  "description": "Team coding standards, security policies, and base configurations. Essential rules and guidelines for all team members.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["team", "standards", "security", "policy", "hooks"]
+}

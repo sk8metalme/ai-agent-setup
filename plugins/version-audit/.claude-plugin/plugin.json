@@ -1,0 +1,13 @@
+{
+  "name": "version-audit",
+  "description": "Technology stack version auditing and EOL checking. Identifies outdated dependencies, security vulnerabilities, and end-of-life software.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["version", "audit", "eol", "security", "dependencies", "vulnerabilities"],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

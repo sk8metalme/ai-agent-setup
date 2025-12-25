@@ -1,0 +1,11 @@
+{
+  "name": "lang-python",
+  "description": "Python + FastAPI development support. Modern Python development patterns, async programming, and API design.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["python", "fastapi", "async", "development"]
+}

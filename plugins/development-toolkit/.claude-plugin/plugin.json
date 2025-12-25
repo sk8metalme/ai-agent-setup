@@ -1,0 +1,20 @@
+{
+  "name": "development-toolkit",
+  "description": "Complete development workflow: planning, coding, PR management, and changelog generation. Essential tools for daily development work.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["development", "workflow", "pr", "changelog", "planning", "documentation"],
+  "commands": [
+    "./commands/plan.md",
+    "./commands/dev.md",
+    "./commands/documentation.md",
+    "./commands/create_pr.md",
+    "./commands/git_sync.md"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/"
+}

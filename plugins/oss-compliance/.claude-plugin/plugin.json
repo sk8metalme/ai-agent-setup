@@ -1,0 +1,13 @@
+{
+  "name": "oss-compliance",
+  "description": "OSS license compliance checking and auditing. Identifies license conflicts, tracks dependencies, and ensures legal compliance.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["oss", "license", "compliance", "legal", "audit", "dependencies"],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

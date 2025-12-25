@@ -1,0 +1,81 @@
+{
+  "name": "ai-agent-setup",
+  "owner": {
+    "name": "sk8metalme",
+    "email": "your-email@example.com"
+  },
+  "plugins": [
+    {
+      "name": "team-standards",
+      "source": "./plugins/team-standards",
+      "description": "Team coding standards, security policies, and base configurations",
+      "version": "1.0.0"
+    },
+    {
+      "name": "jujutsu-workflow",
+      "source": "./plugins/jujutsu-workflow",
+      "description": "Jujutsu version control workflow support",
+      "version": "1.0.0"
+    },
+    {
+      "name": "development-toolkit",
+      "source": "./plugins/development-toolkit",
+      "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
+      "version": "1.0.0"
+    },
+    {
+      "name": "ci-cd-tools",
+      "source": "./plugins/ci-cd-tools",
+      "description": "CI/CD troubleshooting and GitHub Actions support",
+      "version": "1.0.0"
+    },
+    {
+      "name": "oss-compliance",
+      "source": "./plugins/oss-compliance",
+      "description": "OSS license compliance checking and auditing",
+      "version": "1.0.0"
+    },
+    {
+      "name": "version-audit",
+      "source": "./plugins/version-audit",
+      "description": "Technology stack version auditing and EOL checking",
+      "version": "1.0.0"
+    },
+    {
+      "name": "design-review",
+      "source": "./plugins/design-review",
+      "description": "UI/UX design review and accessibility checking",
+      "version": "1.0.0"
+    },
+    {
+      "name": "e2e-planning",
+      "source": "./plugins/e2e-planning",
+      "description": "E2E-first development planning and Walking Skeleton design",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lang-java-spring",
+      "source": "./plugins/lang-java-spring",
+      "description": "Java + Spring Boot development support",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lang-python",
+      "source": "./plugins/lang-python",
+      "description": "Python + FastAPI development support",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lang-php",
+      "source": "./plugins/lang-php",
+      "description": "PHP + Slim Framework development support",
+      "version": "1.0.0"
+    },
+    {
+      "name": "lang-perl",
+      "source": "./plugins/lang-perl",
+      "description": "Perl + Mojolicious development support",
+      "version": "1.0.0"
+    }
+  ]
+}

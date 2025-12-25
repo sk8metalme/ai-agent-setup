@@ -1,0 +1,11 @@
+{
+  "name": "lang-php",
+  "description": "PHP + Slim Framework development support. Modern PHP development practices and RESTful API design.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["php", "slim", "framework", "development"]
+}
