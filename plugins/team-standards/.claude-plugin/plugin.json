@@ -9,9 +9,9 @@
   "license": "MIT",
   "keywords": ["team", "standards", "security", "policy", "hooks"],
   "resources": [
-    "./base/CLAUDE-base.md",
-    "./security/CLAUDE-security-policy.md",
-    "./team/CLAUDE-team-standards.md"
+    "../base/CLAUDE-base.md",
+    "../security/CLAUDE-security-policy.md",
+    "../team/CLAUDE-team-standards.md"
   ],
   "hooks": {
     "Notification": [
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh"
+            "command": "../hooks/notify.sh"
           }
         ]
       }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/protect-branch.sh"
+            "command": "../hooks/protect-branch.sh"
           }
         ]
       }
