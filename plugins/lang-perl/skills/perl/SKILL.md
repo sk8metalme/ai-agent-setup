@@ -10,10 +10,28 @@ allowed-tools: Read, Grep, Glob, Bash
 
 このファイルはPerl開発に特化した設定を定義します。
 
+## 公式ドキュメントリファレンス
+
+最新の安定版バージョンは以下の公式ドキュメントを参照してください：
+
+| 技術 | 公式ドキュメント | 用途 |
+|-----|----------------|------|
+| Perl | [Perl Downloads](https://www.perl.org/get.html) | バージョン確認・ダウンロード |
+| Perl Releases | [Perl Development](https://dev.perl.org/) | リリース情報 |
+| Mojolicious | [Mojolicious (MetaCPAN)](https://metacpan.org/dist/Mojolicious) | 最新版・リリース履歴 |
+| Dancer2 | [Dancer2 (MetaCPAN)](https://metacpan.org/dist/Dancer2) | 最新版・リリース履歴 |
+| DBIx::Class | [DBIx::Class (MetaCPAN)](https://metacpan.org/dist/DBIx-Class) | 最新版・リリース履歴 |
+| Moo | [Moo (MetaCPAN)](https://metacpan.org/dist/Moo) | 最新版・リリース履歴 |
+| Carton | [Carton (MetaCPAN)](https://metacpan.org/dist/Carton) | 最新版・リリース履歴 |
+
 ## Perl開発固有のルール
 
 ### バージョン要件
-- Perl 5.32以降（モダンPerlを推奨）
+
+最新の安定版バージョンは上記の公式ドキュメントリファレンスで確認してください。
+
+- Perl: 最新の安定版を使用（[公式サイト](https://www.perl.org/get.html)で確認）
+  - 参考: Perl 5.38以降を推奨（2025年12月時点）
 - strictとwarnings必須
 - utf8プラグマの使用
 - モダンPerlイディオムの活用

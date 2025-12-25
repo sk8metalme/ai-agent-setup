@@ -10,10 +10,31 @@ allowed-tools: Read, Grep, Glob, Bash
 
 このファイルはPython開発に特化した設定を定義します。
 
+## 公式ドキュメントリファレンス
+
+最新の安定版バージョンは以下の公式ドキュメントを参照してください：
+
+| 技術 | 公式ドキュメント | 用途 |
+|-----|----------------|------|
+| Python | [Python Downloads](https://www.python.org/downloads/) | バージョン確認・ダウンロード |
+| Python Status | [Python Developer's Guide](https://devguide.python.org/versions/) | サポート状況確認 |
+| FastAPI | [FastAPI (PyPI)](https://pypi.org/project/fastapi/) | 最新版・リリース履歴 |
+| Pydantic | [Pydantic (PyPI)](https://pypi.org/project/pydantic/) | 最新版・リリース履歴 |
+| Uvicorn | [Uvicorn (PyPI)](https://pypi.org/project/uvicorn/) | 最新版・リリース履歴 |
+| SQLAlchemy | [SQLAlchemy (PyPI)](https://pypi.org/project/SQLAlchemy/) | 最新版・リリース履歴 |
+| pytest | [pytest (PyPI)](https://pypi.org/project/pytest/) | 最新版・リリース履歴 |
+| ruff | [ruff (PyPI)](https://pypi.org/project/ruff/) | 最新版・リリース履歴 |
+| mypy | [mypy (PyPI)](https://pypi.org/project/mypy/) | 最新版・リリース履歴 |
+| uv | [uv GitHub](https://github.com/astral-sh/uv) | 公式リポジトリ |
+
 ## Python開発固有のルール
 
 ### バージョン要件
-- Python 3.10以降（推奨: Python 3.11+）
+
+最新の安定版バージョンは上記の公式ドキュメントリファレンスで確認してください。
+
+- Python: 最新の安定版を使用（[公式サイト](https://www.python.org/downloads/)で確認）
+  - 参考: Python 3.12以降を推奨（2025年12月時点）
 - 型ヒントを積極的に使用する
 - f-stringsを使用する
 - PEP 8に準拠する
@@ -106,11 +127,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 
+# 最新版は公式ドキュメントリファレンスのPyPIリンクで確認してください
 dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "pydantic>=2.5.0",
-    "sqlalchemy>=2.0.0",
+    "fastapi>=0.115.0",        # https://pypi.org/project/fastapi/ (参考値: 2025年12月時点)
+    "uvicorn[standard]>=0.30.0", # https://pypi.org/project/uvicorn/ (参考値: 2025年12月時点)
+    "pydantic>=2.10.0",        # https://pypi.org/project/pydantic/ (参考値: 2025年12月時点)
+    "sqlalchemy>=2.0.0",       # https://pypi.org/project/SQLAlchemy/ (参考値: 2025年12月時点)
     "alembic>=1.13.0",
     "passlib[bcrypt]>=1.7.4",
     "python-jose[cryptography]>=3.3.0",
@@ -118,12 +140,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# 最新版は公式ドキュメントリファレンスのPyPIリンクで確認してください
 dev = [
-    "pytest>=7.4.0",
+    "pytest>=8.0.0",           # https://pypi.org/project/pytest/ (参考値: 2025年12月時点)
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.1.0",
-    "ruff>=0.1.0",
-    "mypy>=1.7.0",
+    "ruff>=0.8.0",             # https://pypi.org/project/ruff/ (参考値: 2025年12月時点)
+    "mypy>=1.13.0",            # https://pypi.org/project/mypy/ (参考値: 2025年12月時点)
     "pre-commit>=3.5.0",
 ]
 

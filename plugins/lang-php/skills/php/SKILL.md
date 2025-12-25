@@ -10,10 +10,28 @@ allowed-tools: Read, Grep, Glob, Bash
 
 このファイルはPHP開発に特化した設定を定義します。
 
+## 公式ドキュメントリファレンス
+
+最新の安定版バージョンは以下の公式ドキュメントを参照してください：
+
+| 技術 | 公式ドキュメント | 用途 |
+|-----|----------------|------|
+| PHP | [PHP Downloads](https://www.php.net/downloads) | バージョン確認・ダウンロード |
+| PHP Supported Versions | [PHP Supported Versions](https://www.php.net/supported-versions.php) | サポート状況確認 |
+| Slim Framework | [Slim Framework](https://www.slimframework.com/) | 公式サイト |
+| Slim (Packagist) | [slim/slim](https://packagist.org/packages/slim/slim) | 最新版・リリース履歴 |
+| PHPUnit | [phpunit/phpunit](https://packagist.org/packages/phpunit/phpunit) | 最新版・リリース履歴 |
+| PHPStan | [phpstan/phpstan](https://packagist.org/packages/phpstan/phpstan) | 最新版・リリース履歴 |
+| Monolog | [monolog/monolog](https://packagist.org/packages/monolog/monolog) | 最新版・リリース履歴 |
+
 ## PHP開発固有のルール
 
 ### バージョン要件
-- PHP 8.2以降
+
+最新の安定版バージョンは上記の公式ドキュメントリファレンスで確認してください。
+
+- PHP: 最新の安定版を使用（[公式サイト](https://www.php.net/downloads)で確認）
+  - 参考: PHP 8.3以降を推奨（2025年12月時点）
 - strict_types宣言を必須とする
 - 型ヒントと戻り値の型を使用
 - null合体演算子を活用
@@ -58,7 +76,7 @@ phpunit.xml          # PHPUnit設定
     "description": "PHP Application",
     "type": "project",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "monolog/monolog": "^3.0",
         "slim/slim": "^4.0",
         "slim/psr7": "^1.0",
@@ -67,12 +85,13 @@ phpunit.xml          # PHPUnit設定
         "ext-pdo_oci": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "^11.0",
         "phake/phake": "^4.0",
-        "phpstan/phpstan": "^1.0",
+        "phpstan/phpstan": "^2.0",
         "squizlabs/php_codesniffer": "^3.0",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
+    "comment": "最新版は公式ドキュメントリファレンスのPackagistリンクで確認してください（参考値: 2025年12月時点）",
     "autoload": {
         "psr-4": {
             "App\\": "src/"

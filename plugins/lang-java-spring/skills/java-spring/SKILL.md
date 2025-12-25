@@ -10,12 +10,33 @@ allowed-tools: Read, Grep, Glob, Bash
 
 このファイルはJava + Spring Boot開発に特化した設定を定義します。
 
+## 公式ドキュメントリファレンス
+
+最新の安定版バージョンは以下の公式ドキュメントを参照してください：
+
+| 技術 | 公式ドキュメント | 用途 |
+|-----|----------------|------|
+| Java SE | [Oracle Java SE Support Roadmap](https://www.oracle.com/java/technologies/java-se-support-roadmap.html) | LTSバージョン確認 |
+| Adoptium (OpenJDK) | [Temurin Releases](https://adoptium.net/temurin/releases/) | OpenJDKダウンロード |
+| Spring Boot | [Spring Boot (English)](https://spring.io/projects/spring-boot#learn) | 公式ドキュメント（英語）|
+| Spring Boot (日本語) | [Spring Boot (日本語)](https://spring.pleiades.io/projects/spring-boot#learn) | 公式ドキュメント（日本語）|
+| Gradle | [Gradle Releases](https://gradle.org/releases/) | バージョン確認・ダウンロード |
+| MapStruct | [MapStruct](https://mapstruct.org/) | 公式サイト |
+| Error Prone | [Error Prone](https://errorprone.info/) | 公式サイト |
+| Spotless | [Spotless GitHub](https://github.com/diffplug/spotless) | 公式リポジトリ |
+
 ## Java開発固有のルール
 
 ### バージョン要件
-- Java 21 LTS以上（推奨: Java SE 25 LTS)
-- Spring Boot 4.0.x 以上
-- Gradle 8.x
+
+最新の安定版バージョンは上記の公式ドキュメントリファレンスで確認してください。
+
+- Java: Java SE LTS版を使用（[Java SE Support Roadmap](https://www.oracle.com/java/technologies/java-se-support-roadmap.html)で確認）
+  - 参考: Java 21 LTS以降を推奨（2025年12月時点）
+- Spring Boot: 最新の安定版を使用（[公式サイト](https://spring.io/projects/spring-boot#learn)で確認）
+  - 参考: Spring Boot 4.0.x以降を推奨（2025年12月時点）
+- Gradle: 最新の安定版を使用（[Gradle Releases](https://gradle.org/releases/)で確認）
+  - 参考: Gradle 8.x以降を推奨（2025年12月時点）
 - Rocky Linux 9
 
 ### コーディング標準
@@ -61,12 +82,13 @@ gradle.properties               # Gradleプロパティ
 
 ### build.gradle設定例
 ```gradle
+// 最新の安定版バージョンは公式ドキュメントリファレンスで確認してください
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.1'
+    id 'org.springframework.boot' version '4.0.1' // https://spring.io/projects/spring-boot#learn
     id 'io.spring.dependency-management' version '1.1.4'
-    id 'com.diffplug.spotless' version '6.23.3'
-    id 'net.ltgt.errorprone' version '3.1.0'
+    id 'com.diffplug.spotless' version '6.23.3' // https://github.com/diffplug/spotless
+    id 'net.ltgt.errorprone' version '3.1.0' // https://errorprone.info/
 }
 
 dependencies {
@@ -84,12 +106,14 @@ dependencies {
     // Lombok & MapStruct
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    // 最新版は https://mapstruct.org/ で確認
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final' // 参考値（2025年12月時点）
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     // Null安全性チェック
-    errorprone 'com.google.errorprone:error_prone_core:2.44.0'
-    errorprone 'com.uber.nullaway:nullaway:0.12.15'
+    // 最新版は https://errorprone.info/ で確認
+    errorprone 'com.google.errorprone:error_prone_core:2.44.0' // 参考値（2025年12月時点）
+    errorprone 'com.uber.nullaway:nullaway:0.12.15' // 参考値（2025年12月時点）
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
