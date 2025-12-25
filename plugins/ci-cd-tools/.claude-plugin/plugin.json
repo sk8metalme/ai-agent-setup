@@ -7,5 +7,6 @@
   },
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
-  "keywords": ["ci-cd", "github-actions", "troubleshooting", "deployment", "workflow"]
+  "keywords": ["ci-cd", "github-actions", "troubleshooting", "deployment", "workflow"],
+  "skills": ["./skills/ci-cd/SKILL.md"]
 }

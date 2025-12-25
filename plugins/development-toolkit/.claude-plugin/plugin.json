@@ -16,7 +16,28 @@
     "./commands/git_sync.md",
     "./commands/suggest-claude-md.md"
   ],
-  "agents": "./agents/",
-  "skills": "./skills/",
-  "bin": "./bin/"
+  "agents": ["./agents/changelog-generator/AGENT.md", "./agents/pr-resolver/AGENT.md"],
+  "skills": ["./skills/changelog/SKILL.md"],
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/suggest-claude-md-hook-global.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/suggest-claude-md-hook-global.sh"
+          }
+        ]
+      }
+    ]
+  }
 }

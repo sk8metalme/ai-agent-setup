@@ -8,6 +8,6 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["oss", "license", "compliance", "legal", "audit", "dependencies"],
-  "skills": "./skills/",
-  "agents": "./agents/"
+  "skills": ["./skills/oss-license/SKILL.md"],
+  "agents": ["./agents/oss-license-checker/AGENT.md"]
 }
