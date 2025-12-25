@@ -1,0 +1,12 @@
+{
+  "name": "lang-perl",
+  "description": "Perl + Mojolicious development support. Perl best practices and modern web application development.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["perl", "mojolicious", "development"],
+  "skills": "./skills"
+}

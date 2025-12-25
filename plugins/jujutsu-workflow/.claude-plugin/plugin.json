@@ -1,0 +1,12 @@
+{
+  "name": "jujutsu-workflow",
+  "description": "Jujutsu (jj) version control workflow support. Use when working with .jj directories or jj commands. Comprehensive guide for modern VCS.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["jujutsu", "jj", "version-control", "git-alternative", "vcs"],
+  "skills": "./skills/"
+}

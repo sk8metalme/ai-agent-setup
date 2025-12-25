@@ -1,0 +1,11 @@
+{
+  "name": "ci-cd-tools",
+  "description": "CI/CD troubleshooting and GitHub Actions support. Helps diagnose build failures, workflow issues, and deployment problems.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["ci-cd", "github-actions", "troubleshooting", "deployment", "workflow"]
+}

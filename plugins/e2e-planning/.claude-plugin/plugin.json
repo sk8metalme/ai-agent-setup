@@ -1,0 +1,11 @@
+{
+  "name": "e2e-planning",
+  "description": "E2E-first development planning and Walking Skeleton design. Guides end-to-end implementation strategy and minimal viable architecture.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["e2e", "planning", "walking-skeleton", "architecture", "design"]
+}
