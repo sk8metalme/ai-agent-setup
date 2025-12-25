@@ -7,5 +7,34 @@
   },
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
-  "keywords": ["team", "standards", "security", "policy", "hooks"]
+  "keywords": ["team", "standards", "security", "policy", "hooks"],
+  "resources": [
+    "../base/CLAUDE-base.md",
+    "../security/CLAUDE-security-policy.md",
+    "../team/CLAUDE-team-standards.md"
+  ],
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "../hooks/notify.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "../hooks/protect-branch.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
