@@ -7,5 +7,6 @@
   },
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
-  "keywords": ["java", "spring", "spring-boot", "development"]
+  "keywords": ["java", "spring", "spring-boot", "development"],
+  "skills": "./skills"
 }

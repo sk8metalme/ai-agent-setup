@@ -12,4 +12,4 @@ session_id=$(echo "$input" | jq -r '.session_id // ""' | cut -c1-8)
 project=$(basename "$cwd")
 
 # 通知を送信
-terminal-notifier -title "Claude Code [$project]" -subtitle "📁 $cwd" -message "$message" -group "$cwd:$event" -sound "default"
+terminal-notifier -title "Claude Code [$project]" -subtitle "📁 $cwd" -message "$message" -group "$cwd:$event:$session_id" -sound "default"

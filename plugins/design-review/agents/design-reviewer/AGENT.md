@@ -21,7 +21,7 @@ Web ページの UI デザインを自動的にレビューし、アクセシビ
 
 ## 参照すべきスキル
 
-実行前に必ず `.claude/skills/design-review/SKILL.md` を確認し、そのガイドラインに従ってデザインレビューを実施してください。
+実行前に必ず `plugins/design-review/skills/design-review/SKILL.md` を確認し、そのガイドラインに従ってデザインレビューを実施してください。
 
 ## 実行フロー
 

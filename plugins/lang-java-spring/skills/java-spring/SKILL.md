@@ -13,8 +13,8 @@ allowed-tools: Read, Grep, Glob, Bash
 ## Java開発固有のルール
 
 ### バージョン要件
-- Java 17 LTS以上（推奨: Java 21 LTS)
-- Spring Boot 3.2.x
+- Java 21 LTS以上（推奨: Java SE 25 LTS)
+- Spring Boot 4.0.x 以上
 - Gradle 8.x
 - Rocky Linux 9
 
@@ -63,7 +63,7 @@ gradle.properties               # Gradleプロパティ
 ```gradle
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
+    id 'org.springframework.boot' version '4.0.1'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'com.diffplug.spotless' version '6.23.3'
     id 'net.ltgt.errorprone' version '3.1.0'
@@ -88,8 +88,8 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     // Null安全性チェック
-    errorprone 'com.google.errorprone:error_prone_core:2.24.1'
-    errorprone 'com.uber.nullaway:nullaway:0.10.18'
+    errorprone 'com.google.errorprone:error_prone_core:2.44.0'
+    errorprone 'com.uber.nullaway:nullaway:0.12.15'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -197,9 +197,9 @@ class UserServiceTest {
         when(userRepository.findById(1L))
             .thenReturn(Optional.of(new User()));
 
-        UserDto result = userService.findById(1L);
+        Optional<UserDto> result = userService.findById(1L);
 
-        assertNotNull(result);
+        assertTrue(result.isPresent());
     }
 }
 ```

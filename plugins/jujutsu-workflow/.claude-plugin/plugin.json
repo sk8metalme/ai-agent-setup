@@ -7,5 +7,6 @@
   },
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
-  "keywords": ["jujutsu", "jj", "version-control", "git-alternative", "vcs"]
+  "keywords": ["jujutsu", "jj", "version-control", "git-alternative", "vcs"],
+  "skills": "./skills/"
 }

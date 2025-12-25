@@ -431,7 +431,6 @@ from typing import Dict, Any, Optional
 
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
-import secrets
 
 class SecuritySettings(BaseSettings):
     """セキュリティ設定（環境変数から取得）"""

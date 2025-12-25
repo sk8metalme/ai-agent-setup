@@ -91,17 +91,17 @@
 - リソースの効率的な利用
 
 ## 開発ツール
-- $ which npm
-/opt/homebrew/bin/npm
 
-- $ which jj
-/opt/homebrew/bin/jj
+以下のツールが必要です（`$PATH`に含まれていることを確認してください）：
+- `npm` - Node.jsパッケージマネージャー
+- `jj` - Jujutsuバージョン管理システム
+- `gh` - GitHub CLI
+- `node` - Node.jsランタイム
 
-- $ which gh
-/opt/homebrew/bin/gh
-
-- $ which node
-/opt/homebrew/bin/node
+確認コマンド:
+```bash
+which npm jj gh node
+```
 
 
 ## Codex 連携ガイド

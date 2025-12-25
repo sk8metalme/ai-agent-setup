@@ -96,9 +96,14 @@ if [ -f "package.json" ]; then
 # Java (Maven)
 elif [ -f "pom.xml" ]; then
   version_file="pom.xml"
-  # xmllintを優先、なければインデント検出でプロジェクトレベルの<version>を抽出
-  current_version=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml 2>/dev/null || \
-    grep '<version>' pom.xml | grep -v '<parent>' | head -1 | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+  # xmllintを使用してプロジェクトレベルの<version>を抽出（推奨）
+  # 注意: xmllintが利用できない場合、親プロジェクトのバージョンを誤って取得する可能性があります
+  current_version=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml 2>/dev/null)
+  if [ -z "$current_version" ]; then
+    # xmllintが利用できない場合の代替手段（制限あり）
+    # 親タグと同じ行にない<version>タグのみを抽出
+    current_version=$(awk '/<parent>/,/<\/parent>/ {next} /<version>/ {match($0, /<version>(.*)<\/version>/, arr); if (arr[1]) {print arr[1]; exit}}' pom.xml)
+  fi
   echo "検出: Java Maven プロジェクト"
   echo "現在のバージョン: $current_version"
 
