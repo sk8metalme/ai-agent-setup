@@ -39,7 +39,7 @@ echo "  /plugin install version-audit@ai-agent-setup     # 技術スタックバ
 echo ""
 echo -e "${GREEN}詳細情報:${NC}"
 echo "  README.md を参照してください"
-echo "  マイグレーションガイド: docs/migration-guide.md（準備中）"
+echo "  マイグレーションガイド: docs/migration-guide.md"
 echo ""
 echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
