@@ -8,26 +8,6 @@
     "temperature": 0
   },
   "hooks": {
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/bin/suggest-claude-md-hook.sh"
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/bin/suggest-claude-md-hook.sh"
-          }
-        ]
-      }
-    ],
     "Notification": [{
       "matcher": "",
       "hooks": [{
