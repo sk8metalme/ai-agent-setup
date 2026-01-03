@@ -11,5 +11,5 @@ session_id=$(echo "$input" | jq -r '.session_id // ""' | cut -c1-8)
 # プロジェクト名を取得
 project=$(basename "$cwd")
 
-# 通知を送信
-terminal-notifier -title "Claude Code [$project]" -subtitle "📁 $cwd" -message "$message" -group "$cwd:$event:$session_id" -sound "default"
+# 通知を送信（変数を適切にクォート）
+terminal-notifier -title "Claude Code [$project]" -subtitle "📁 $cwd" -message "$message" -group "${cwd}:${event}:${session_id}" -sound "default"

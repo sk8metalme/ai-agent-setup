@@ -22,9 +22,13 @@ backup_file() {
   if [[ -f "$file" ]]; then
     mkdir -p "$BACKUP_DIR"
     local basename=$(basename "$file")
-    cp "$file" "$BACKUP_DIR/${basename}.${TIMESTAMP}.bak"
+    if ! cp "$file" "$BACKUP_DIR/${basename}.${TIMESTAMP}.bak"; then
+      echo -e "${YELLOW}Warning: Failed to backup $file${NC}" >&2
+      return 1
+    fi
     echo -e "${YELLOW}Backed up:${NC} $file → $BACKUP_DIR/${basename}.${TIMESTAMP}.bak"
   fi
+  return 0
 }
 
 # ファイルコピー
@@ -55,9 +59,27 @@ copy_files() {
   for file in "$GLOBAL_DIR/hooks"/*; do
     if [[ -f "$file" ]]; then
       local basename=$(basename "$file")
+
+      # ファイルの整合性を確認（空ファイルでないこと）
+      if [[ ! -s "$file" ]]; then
+        echo -e "${YELLOW}Warning: Skipping empty file $file${NC}" >&2
+        continue
+      fi
+
       backup_file "$CLAUDE_DIR/hooks/$basename"
-      cp "$file" "$CLAUDE_DIR/hooks/"
-      [[ "$file" == *.sh ]] && chmod +x "$CLAUDE_DIR/hooks/$basename"
+
+      if ! cp "$file" "$CLAUDE_DIR/hooks/"; then
+        echo -e "${YELLOW}Warning: Failed to copy $file${NC}" >&2
+        continue
+      fi
+
+      # .shファイルのみchmod +xを実行（検証済み）
+      if [[ "$file" == *.sh ]]; then
+        if ! chmod +x "$CLAUDE_DIR/hooks/$basename"; then
+          echo -e "${YELLOW}Warning: Failed to make $basename executable${NC}" >&2
+        fi
+      fi
+
       echo "✓ Copied hooks/$basename"
     fi
   done
@@ -98,9 +120,29 @@ setup_settings_json() {
   if [[ -f "$CLAUDE_DIR/settings.json" ]]; then
     # jqでマージ
     if command -v jq &> /dev/null; then
-      echo "$hooks_config" | jq -s '.[0] * .[1]' "$CLAUDE_DIR/settings.json" - > /tmp/settings_merged.json
-      mv /tmp/settings_merged.json "$CLAUDE_DIR/settings.json"
-      echo "✓ Merged hooks configuration into settings.json"
+      # 安全な一時ファイルを作成
+      local temp_file
+      temp_file=$(mktemp) || {
+        echo -e "${YELLOW}Error: Failed to create temporary file${NC}" >&2
+        return 1
+      }
+
+      # jqでマージ（エラーハンドリング付き）
+      if echo "$hooks_config" | jq -s '.[0] * .[1]' "$CLAUDE_DIR/settings.json" - > "$temp_file" 2>/dev/null; then
+        # マージ成功：元のファイルを置き換え
+        if mv "$temp_file" "$CLAUDE_DIR/settings.json"; then
+          echo "✓ Merged hooks configuration into settings.json"
+        else
+          echo -e "${YELLOW}Error: Failed to update settings.json${NC}" >&2
+          rm -f "$temp_file"
+          return 1
+        fi
+      else
+        # jqマージ失敗：一時ファイルを削除
+        echo -e "${YELLOW}Error: jq merge failed. settings.json was not modified${NC}" >&2
+        rm -f "$temp_file"
+        return 1
+      fi
     else
       echo -e "${YELLOW}Warning: jq not found. Please manually add hooks to settings.json${NC}"
       echo "Hooks configuration:"
