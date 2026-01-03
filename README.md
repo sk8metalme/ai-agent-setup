@@ -4,9 +4,9 @@
 
 ## 📋 概要
 
-このプロジェクトでは、**Claude Code公式プラグインシステム**を使用した配布方式を提供しています。
+このプロジェクトでは、**Claude Code公式プラグインシステム**と**グローバル設定配布スクリプト**を提供しています。
 
-> **⚠️ 重要**: レガシースクリプト（install-global.sh / install-project.sh）は非推奨です。プラグインシステムへの移行をお願いします。詳細は [マイグレーションガイド](docs/migration-guide.md) をご覧ください。
+> **📌 グローバル設定のインストール**: プラグインで配布できないCLAUDE.mdとhooksは `install-global.sh` でインストールしてください。詳細は [グローバル設定](#-グローバル設定のインストール) セクションを参照してください。
 
 ### 🔌 プラグイン配布（推奨）
 
@@ -24,14 +24,11 @@ Claude Code のチャットで以下のコマンドを実行：
 
 既にマーケットプレイスを追加済みの場合、エラーメッセージが表示されます（問題ありません）。
 
-### ステップ2: 必須プラグインのインストール
+### ステップ2: 推奨プラグインのインストール
 
-基本的な開発環境を整えるため、以下の必須プラグインをインストール：
+基本的な開発環境を整えるため、以下のプラグインをインストール：
 
 ```bash
-# 必須: チーム標準とセキュリティポリシー（全員必須）
-/plugin install team-standards@ai-agent-setup
-
 # 推奨: 開発ワークフロー統合（計画、PR、CHANGELOG）
 /plugin install development-toolkit@ai-agent-setup
 ```
@@ -80,13 +77,12 @@ ls -la ~/.claude/plugins/cache/ai-agent-setup/
 
 #### 利用可能なプラグイン
 
-**高優先度（必須・推奨）:**
+**高優先度（推奨）:**
 
 | プラグイン | 説明 | 提供機能 | キーワード |
 |-----------|------|---------|-----------|
-| `team-standards` | チーム標準・セキュリティポリシー・基本設定（全員必須）<br>ブランチ保護、通知フックなど | 📁リソース: 3個<br>🪝フック: 2個 | team, standards, security, policy, hooks |
-| `development-toolkit` | 開発ワークフロー統合（計画・PR・CHANGELOG）<br>日常的な開発作業の必須ツール | 📋コマンド: 6個<br>📚スキル: 1個<br>🤖エージェント: 2個<br>🪝フック: 2個 | development, workflow, pr, changelog, planning |
-| `jujutsu-workflow` | Jujutsuバージョン管理ワークフロー<br>.jjディレクトリやjjコマンド使用時に必須 | 📚スキル: 1個<br>📄ドキュメント: 1個 | jujutsu, jj, version-control, git-alternative, vcs |
+| `development-toolkit` | 開発ワークフロー統合（計画・PR・CHANGELOG）<br>日常的な開発作業の推奨ツール | 📋コマンド: 6個<br>📚スキル: 1個<br>🤖エージェント: 2個<br>🪝フック: 2個 | development, workflow, pr, changelog, planning |
+| `jujutsu-workflow` | Jujutsuバージョン管理ワークフロー<br>.jjディレクトリやjjコマンド使用時に推奨 | 📚スキル: 1個<br>📄ドキュメント: 1個 | jujutsu, jj, version-control, git-alternative, vcs |
 
 **中優先度（機能別）:**
 
@@ -113,13 +109,13 @@ ls -la ~/.claude/plugins/cache/ai-agent-setup/
 
 ```bash
 # 特定のプラグインを更新
-/plugin update team-standards@ai-agent-setup
+/plugin update development-toolkit@ai-agent-setup
 
 # すべてのプラグインを一括更新
 /plugin update --all
 
 # 更新確認
-cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["team-standards@ai-agent-setup"][0].lastUpdated'
+cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["development-toolkit@ai-agent-setup"][0].lastUpdated'
 ```
 
 #### アンインストール方法
@@ -128,7 +124,7 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["team-standards@ai-a
 
 ```bash
 # 特定のプラグインをアンインストール
-/plugin uninstall team-standards@ai-agent-setup
+/plugin uninstall development-toolkit@ai-agent-setup
 
 # マーケットプレイスごと削除（すべてのプラグインが削除されます）
 /plugin marketplace remove ai-agent-setup
@@ -170,14 +166,32 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 
 ## 🚀 クイックスタート
 
-### プラグインシステムを使ったインストール（推奨）
+### 1. グローバル設定のインストール
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/sk8metalme/ai-agent-setup.git
+cd ai-agent-setup
+
+# グローバル設定（CLAUDE.md、hooks）をインストール
+./install-global.sh
+```
+
+これにより以下がインストールされます：
+- `~/.claude/CLAUDE.md` - @import記載済みのグローバル設定
+- `~/.claude/base/CLAUDE-base.md` - 基本コーディング原則
+- `~/.claude/security/CLAUDE-security-policy.md` - セキュリティポリシー
+- `~/.claude/team/CLAUDE-team-standards.md` - チーム開発標準
+- `~/.claude/hooks/*.sh` - hooksスクリプト
+- `~/.claude/settings.json` - hooks設定追加
+
+### 2. プラグインシステムを使ったインストール（推奨）
 
 ```bash
 # 1. マーケットプレイスを追加
 /plugin marketplace add sk8metalme/ai-agent-setup
 
-# 2. 基本プラグインをインストール（推奨）
-/plugin install team-standards@ai-agent-setup
+# 2. 推奨プラグインをインストール
 /plugin install development-toolkit@ai-agent-setup
 
 # 3. 必要に応じて言語別プラグインをインストール
@@ -188,10 +202,6 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 /plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu使用時
 /plugin install ci-cd-tools@ai-agent-setup  # CI/CDツール使用時
 ```
-
-### レガシースクリプト（非推奨）
-
-> **⚠️ 非推奨**: install-global.sh と install-project.sh は非推奨です。実行すると、プラグインシステムへの移行を促すメッセージが表示されます。既存ユーザーは [マイグレーションガイド](docs/migration-guide.md) を参照してください。
 
 ## 🎯 対応言語・フレームワーク
 
@@ -244,26 +254,7 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 ls -la ~/.claude/plugins/cache/ai-agent-setup/
 
 # 方法3: 特定プラグインの詳細を確認
-cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["team-standards@ai-agent-setup"]'
-```
-
-### プラグインファイルの実際の場所
-
-例：`team-standards@ai-agent-setup` (v1.0.0) をインストールした場合
-
-```
-~/.claude/plugins/cache/ai-agent-setup/team-standards/1.0.0/
-├── .claude-plugin/
-│   └── plugin.json              # プラグインメタデータ
-├── base/
-│   └── CLAUDE-base.md           # 基本設定
-├── security/
-│   └── CLAUDE-security-policy.md # セキュリティポリシー
-├── team/
-│   └── CLAUDE-team-standards.md  # チーム標準
-└── hooks/
-    ├── notify.sh                # 通知フック
-    └── protect-branch.sh        # ブランチ保護フック
+cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["development-toolkit@ai-agent-setup"]'
 ```
 
 ### トラブルシューティング
@@ -277,8 +268,8 @@ cat ~/.claude/plugins/installed_plugins.json
 # 2. Claude Codeを再起動
 
 # 3. プラグインを再インストール
-/plugin uninstall team-standards@ai-agent-setup
-/plugin install team-standards@ai-agent-setup
+/plugin uninstall development-toolkit@ai-agent-setup
+/plugin install development-toolkit@ai-agent-setup
 ```
 
 **マーケットプレイスが見つからない場合:**
@@ -307,12 +298,6 @@ cat ~/.claude/plugins/known_marketplaces.json
 │   ├── known_marketplaces.json                # 登録済みマーケットプレイス
 │   └── cache/                                 # プラグインキャッシュ
 │       └── ai-agent-setup/                    # マーケットプレイス名
-│           ├── team-standards/                # プラグイン名
-│           │   └── 1.0.0/                     # バージョン
-│           │       ├── base/CLAUDE-base.md
-│           │       ├── team/CLAUDE-team-standards.md
-│           │       ├── security/CLAUDE-security-policy.md
-│           │       └── hooks/
 │           ├── development-toolkit/
 │           │   └── 1.0.0/
 │           │       ├── commands/
@@ -324,7 +309,11 @@ cat ~/.claude/plugins/known_marketplaces.json
 │           │       ├── skills/
 │           │       └── languages/
 │           └── ...                            # その他のプラグイン
-├── CLAUDE.md                                  # ユーザー固有設定
+├── CLAUDE.md                                  # ユーザー固有設定（install-global.shでインストール）
+├── base/CLAUDE-base.md                        # 基本設定（install-global.shでインストール）
+├── security/CLAUDE-security-policy.md        # セキュリティポリシー（install-global.shでインストール）
+├── team/CLAUDE-team-standards.md             # チーム標準（install-global.shでインストール）
+├── hooks/                                     # hooksスクリプト（install-global.shでインストール）
 └── settings.json                              # Claude Code設定
 ```
 
@@ -334,11 +323,19 @@ cat ~/.claude/plugins/known_marketplaces.json
 
 ```
 ai-agent-setup/
+├── global/                      # グローバル設定（install-global.shで配布）
+│   ├── CLAUDE.md               # @import記載済みテンプレート
+│   ├── base/CLAUDE-base.md      # 基本設定
+│   ├── security/CLAUDE-security-policy.md # セキュリティポリシー
+│   ├── team/CLAUDE-team-standards.md      # チーム標準
+│   └── hooks/                   # hooksスクリプト
+│       ├── notify.sh
+│       ├── protect-branch.sh
+│       └── protect-branch.conf
 ├── plugins/                     # プラグインソース（SSoT）
-│   ├── team-standards/
 │   ├── development-toolkit/
 │   ├── lang-python/
-│   └── ...（全12個のプラグイン）
+│   └── ...（全11個のプラグイン）
 ├── .claude/                     # プロジェクトテンプレート（最小限）
 │   ├── CLAUDE.md               # プラグインインストールガイド
 │   ├── settings.json           # 基本設定
@@ -346,8 +343,8 @@ ai-agent-setup/
 ├── .cursor/                     # Cursor設定
 ├── .clinerules/                 # Cline設定
 ├── AGENTS.md                   # シンプル設定
-├── install-global.sh           # 非推奨（リダイレクト専用）
-└── install-project.sh          # 非推奨（リダイレクト専用）
+├── install-global.sh           # グローバル設定配布スクリプト
+└── install-project.sh          # プロジェクト設定配布スクリプト
 ```
 
 ### プロジェクト設定（Cursor + Claude）
