@@ -58,17 +58,21 @@ ai-agent-setup/
 
 | キー | 説明 | 必須 |
 |------|------|------|
-| `name` | プラグイン名 | ✅ |
+| `name` | プラグイン名（kebab-case） | ✅ |
 | `description` | 説明 | ✅ |
-| `version` | semver | ✅ |
-| `author` | `{ "name": "..." }` | - |
-| `repository` | URL | - |
-| `license` | MIT 等 | - |
-| `keywords` | 検索用配列 | - |
-| `skills` | スキルファイルパス配列 | - |
-| `agents` | エージェント定義配列 | - |
-| `hooks` | フック定義配列 | - |
-| `mcp_servers` | MCP サーバー配列 | - |
+| `version` | semver（例: "1.0.0"） | ✅ |
+| `author` | `{ "name": "...", "email": "...", "url": "..." }` | - |
+| `homepage` | プロジェクト/ドキュメントURL | - |
+| `repository` | ソースリポジトリURL | - |
+| `license` | SPDX識別子（例: "MIT"） | - |
+| `keywords` | 検索用キーワード配列 | - |
+| `category` | マーケットプレイス用カテゴリ | - |
+| `tags` | マーケットプレイス検索用タグ配列 | - |
+| `strict` | マニフェスト検証の強制（boolean） | - |
+| `commands` | コマンドマークダウンファイルパス配列 | - |
+| `agents` | エージェントファイルパス配列 | - |
+| `hooks` | フック設定（パスまたはオブジェクト） | - |
+| `mcpServers` | MCPサーバー設定またはパス | - |
 
 ### 使用禁止キー（エラーになる）
 
