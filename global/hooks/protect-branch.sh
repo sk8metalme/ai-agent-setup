@@ -27,8 +27,13 @@ BLOCK_MESSAGE="保護ブランチへの直接操作は禁止です。新しい�
 
 # 設定ファイルが存在すれば読み込む
 if [[ -f "$CONFIG_FILE" ]]; then
-    # shellcheck source=/dev/null
-    source "$CONFIG_FILE"
+    # セキュリティ検証：設定ファイルの所有者が現在のユーザーであることを確認
+    if [[ "$(stat -f '%u' "$CONFIG_FILE" 2>/dev/null || stat -c '%u' "$CONFIG_FILE" 2>/dev/null)" != "$(id -u)" ]]; then
+        log_debug "WARNING: Config file owner mismatch, skipping load"
+    else
+        # shellcheck source=/dev/null
+        source "$CONFIG_FILE"
+    fi
 fi
 
 log_debug "Hook started"

@@ -1,47 +1,195 @@
 #!/bin/bash
 
-# このスクリプトは非推奨です
-# プラグインシステムへ移行してください
+# グローバル設定（CLAUDE.md、hooks）をインストールするスクリプト
+# プラグインで配布できない設定をリポジトリから ~/.claude/ へコピーします
 
 set -e
 
+BACKUP_DIR="$HOME/.claude_backup"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+CLAUDE_DIR="$HOME/.claude"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+GLOBAL_DIR="$SCRIPT_DIR/global"
+
 # 色の定義
-YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo ""
-echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}⚠️  このスクリプトは非推奨です${NC}"
-echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo "Claude Code の公式プラグインシステムへ移行してください。"
-echo ""
-echo -e "${GREEN}推奨インストール方法:${NC}"
-echo ""
-echo "  # 基本プラグイン（推奨）"
-echo "  /plugin install team-standards@ai-agent-setup"
-echo "  /plugin install development-toolkit@ai-agent-setup"
-echo ""
-echo "  # 言語別プラグイン（該当言語の場合のみ）"
-echo "  /plugin install lang-java-spring@ai-agent-setup  # Java + Spring Boot"
-echo "  /plugin install lang-python@ai-agent-setup       # Python + FastAPI"
-echo "  /plugin install lang-php@ai-agent-setup          # PHP + Slim"
-echo "  /plugin install lang-perl@ai-agent-setup         # Perl + Mojolicious"
-echo ""
-echo "  # その他の機能プラグイン（必要に応じて）"
-echo "  /plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu (jj) VCS"
-echo "  /plugin install ci-cd-tools@ai-agent-setup       # CI/CD トラブルシューティング"
-echo "  /plugin install design-review@ai-agent-setup     # UI/UX デザインレビュー"
-echo "  /plugin install e2e-planning@ai-agent-setup      # E2Eファースト開発計画"
-echo "  /plugin install oss-compliance@ai-agent-setup    # OSSライセンスチェック"
-echo "  /plugin install version-audit@ai-agent-setup     # 技術スタックバージョン監査"
-echo ""
-echo -e "${GREEN}詳細情報:${NC}"
-echo "  README.md を参照してください"
-echo "  マイグレーションガイド: docs/migration-guide.md"
-echo ""
-echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
+# バックアップ関数
+backup_file() {
+  local file="$1"
+  if [[ -f "$file" ]]; then
+    mkdir -p "$BACKUP_DIR"
+    local basename=$(basename "$file")
+    if ! cp "$file" "$BACKUP_DIR/${basename}.${TIMESTAMP}.bak"; then
+      echo -e "${YELLOW}Warning: Failed to backup $file${NC}" >&2
+      return 1
+    fi
+    echo -e "${YELLOW}Backed up:${NC} $file → $BACKUP_DIR/${basename}.${TIMESTAMP}.bak"
+  fi
+  return 0
+}
 
-exit 1
+# ファイルコピー
+copy_files() {
+  echo -e "${GREEN}Copying files from $GLOBAL_DIR to $CLAUDE_DIR...${NC}"
+  echo ""
+
+  # CLAUDE.md
+  backup_file "$CLAUDE_DIR/CLAUDE.md"
+  cp "$GLOBAL_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+  echo "✓ Copied CLAUDE.md"
+
+  # CLAUDE-*.md
+  for dir in base security team; do
+    mkdir -p "$CLAUDE_DIR/$dir"
+    for file in "$GLOBAL_DIR/$dir"/*.md; do
+      if [[ -f "$file" ]]; then
+        local basename=$(basename "$file")
+        backup_file "$CLAUDE_DIR/$dir/$basename"
+        cp "$file" "$CLAUDE_DIR/$dir/"
+        echo "✓ Copied $dir/$basename"
+      fi
+    done
+  done
+
+  # hooks
+  mkdir -p "$CLAUDE_DIR/hooks"
+  for file in "$GLOBAL_DIR/hooks"/*; do
+    if [[ -f "$file" ]]; then
+      local basename=$(basename "$file")
+
+      # ファイルの整合性を確認（空ファイルでないこと）
+      if [[ ! -s "$file" ]]; then
+        echo -e "${YELLOW}Warning: Skipping empty file $file${NC}" >&2
+        continue
+      fi
+
+      backup_file "$CLAUDE_DIR/hooks/$basename"
+
+      if ! cp "$file" "$CLAUDE_DIR/hooks/"; then
+        echo -e "${YELLOW}Warning: Failed to copy $file${NC}" >&2
+        continue
+      fi
+
+      # .shファイルのみchmod +xを実行（検証済み）
+      if [[ "$file" == *.sh ]]; then
+        if ! chmod +x "$CLAUDE_DIR/hooks/$basename"; then
+          echo -e "${YELLOW}Warning: Failed to make $basename executable${NC}" >&2
+        fi
+      fi
+
+      echo "✓ Copied hooks/$basename"
+    fi
+  done
+}
+
+# settings.json設定
+setup_settings_json() {
+  echo ""
+  echo -e "${GREEN}Setting up settings.json...${NC}"
+  backup_file "$CLAUDE_DIR/settings.json"
+
+  local hooks_config='{
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/protect-branch.sh"
+          }
+        ]
+      }
+    ]
+  }
+}'
+
+  if [[ -f "$CLAUDE_DIR/settings.json" ]]; then
+    # jqでマージ
+    if command -v jq &> /dev/null; then
+      # 安全な一時ファイルを作成
+      local temp_file
+      temp_file=$(mktemp) || {
+        echo -e "${YELLOW}Error: Failed to create temporary file${NC}" >&2
+        return 1
+      }
+
+      # jqでマージ（エラーハンドリング付き）
+      if echo "$hooks_config" | jq -s '.[0] * .[1]' "$CLAUDE_DIR/settings.json" - > "$temp_file" 2>/dev/null; then
+        # マージ成功：元のファイルを置き換え
+        if mv "$temp_file" "$CLAUDE_DIR/settings.json"; then
+          echo "✓ Merged hooks configuration into settings.json"
+        else
+          echo -e "${YELLOW}Error: Failed to update settings.json${NC}" >&2
+          rm -f "$temp_file"
+          return 1
+        fi
+      else
+        # jqマージ失敗：一時ファイルを削除
+        echo -e "${YELLOW}Error: jq merge failed. settings.json was not modified${NC}" >&2
+        rm -f "$temp_file"
+        return 1
+      fi
+    else
+      echo -e "${YELLOW}Warning: jq not found. Please manually add hooks to settings.json${NC}"
+      echo "Hooks configuration:"
+      echo "$hooks_config"
+    fi
+  else
+    echo "$hooks_config" > "$CLAUDE_DIR/settings.json"
+    echo "✓ Created settings.json with hooks configuration"
+  fi
+}
+
+# メイン処理
+main() {
+  echo ""
+  echo "==================================="
+  echo "  グローバル設定セットアップ"
+  echo "==================================="
+  echo ""
+
+  if [[ ! -d "$GLOBAL_DIR" ]]; then
+    echo -e "${YELLOW}Error: global/ directory not found${NC}"
+    echo "Please run this script from the ai-agent-setup repository root."
+    exit 1
+  fi
+
+  copy_files
+  setup_settings_json
+
+  echo ""
+  echo "==================================="
+  echo "  セットアップ完了"
+  echo "==================================="
+  echo ""
+  if [[ -d "$BACKUP_DIR" ]]; then
+    echo -e "${YELLOW}Backups:${NC} $BACKUP_DIR/"
+    echo ""
+  fi
+  echo -e "${GREEN}インストールされたファイル:${NC}"
+  echo "  - $CLAUDE_DIR/CLAUDE.md"
+  echo "  - $CLAUDE_DIR/base/CLAUDE-base.md"
+  echo "  - $CLAUDE_DIR/security/CLAUDE-security-policy.md"
+  echo "  - $CLAUDE_DIR/team/CLAUDE-team-standards.md"
+  echo "  - $CLAUDE_DIR/hooks/notify.sh"
+  echo "  - $CLAUDE_DIR/hooks/protect-branch.sh"
+  echo "  - $CLAUDE_DIR/hooks/protect-branch.conf"
+  echo "  - $CLAUDE_DIR/settings.json (hooks設定追加)"
+  echo ""
+}
+
+main "$@"
