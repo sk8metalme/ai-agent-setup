@@ -8,6 +8,5 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["php", "slim", "framework", "development"],
-  "skills": ["./skills/php/SKILL.md"],
-  "languages": ["./languages/CLAUDE-php.md"]
+  "skills": ["./skills/php/SKILL.md"]
 }
