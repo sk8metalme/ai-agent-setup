@@ -32,7 +32,10 @@ model: sonnet
    - mainブランチとの差分を確認
    - コミット履歴を表示
    - 変更ファイル一覧を表示
-   - `/review` でコードレビューを実行
+   - review-dojo-mcpが利用可能な場合：
+     - `generate_pr_checklist`で過去のレビュー知見を取得
+     - 取得した知見をレビューの参考情報として表示
+   - `/review` でコードレビューを実行（review-dojo-mcpの知見を考慮）
    - `/security-review` でセキュリティレビューを実行
    - 指摘があればユーザーに修正確認→修正→再レビュー（ループ）
 
@@ -133,18 +136,44 @@ git status
 git log main..HEAD --oneline
 git diff main...HEAD --stat
 
-# ステップ2.5: コードレビュー・セキュリティレビュー
+# ステップ2.5: コードレビュー・セキュリティレビュー（review-dojo-mcp統合）
 # Claude Code実行時の処理:
-# 1. git diff main...HEAD の結果を取得
-# 2. /review スキルでコードレビューを実行
-# 3. /security-review スキルでセキュリティレビューを実行
-# 4. 指摘事項がある場合:
+# 1. 変更ファイルリストを取得
+#    changed_files=$(git diff main...HEAD --name-only)
+#
+# 2. review-dojo-mcpが利用可能かチェック
+#    MCPツール "mcp__review-dojo__generate_pr_checklist" が利用可能か確認
+#
+# 3. review-dojo-mcpが利用可能な場合:
+#    a. MCPSearchツールで "generate_pr_checklist" を検索・ロード
+#       MCPSearch(query: "select:mcp__review-dojo__generate_pr_checklist")
+#    b. generate_pr_checklist を実行して過去のレビュー知見を取得
+#       入力: 変更ファイルリスト
+#       出力: 過去のレビュー知見に基づくチェックリスト
+#    c. 取得した知見を表示し、レビューの参考情報として活用
+#       echo "=== 過去のレビュー知見（review-dojo-mcp） ==="
+#       echo "<generated_checklist>"
+#       echo "=========================================="
+#
+# 4. review-dojo-mcpが利用不可の場合:
+#    → スキップして次へ進む（従来通りのレビュー）
+#
+# 5. /review スキルでコードレビューを実行
+#    - review-dojo-mcpの知見がある場合は、それを考慮してレビュー
+#
+# 6. /security-review スキルでセキュリティレビューを実行
+#
+# 7. 指摘事項がある場合:
 #    a. AskUserQuestionツールで修正するか確認
 #       - 修正する: 修正を実施し、ステップ2.5を再実行
 #       - スキップ: 次のステップへ進む
-# 5. 指摘事項がない場合: 次のステップへ進む
 #
-# 注意: このループは指摘事項がなくなるまで繰り返される
+# 8. 指摘事項がない場合: 次のステップへ進む
+#
+# 注意:
+# - このループは指摘事項がなくなるまで繰り返される
+# - review-dojo-mcpはオプショナル機能（利用不可でもエラーにならない）
+# - MCPツールのインストール: https://github.com/sk8metalme/review-dojo-mcp
 
 # ステップ3: バージョン更新の実施
 # Claude Code実行時の処理:
@@ -198,3 +227,5 @@ PRのタイトルとボディは以下のように生成されます:
 - **ステップ0で事前にターゲットブランチとバージョン更新方針を確認します**
 - バージョン管理ファイルが存在しない場合、バージョン更新の質問は表示されません
 - サポートされるバージョンファイル：package.json, pom.xml, build.gradle, pyproject.toml, composer.json, galaxy.yml, *.spec, Cargo.toml, *.gemspec, VERSION, version.txt
+- **review-dojo-mcpが利用可能な場合、過去のレビュー知見を参照して品質向上を図ります**（オプショナル機能）
+  - インストール方法: https://github.com/sk8metalme/review-dojo-mcp
