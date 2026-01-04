@@ -88,6 +88,15 @@ Error: Plugin has an invalid manifest file.
 Validation errors: Unrecognized key(s) in object: 'docs'
 ```
 
+### バージョン管理
+
+プラグイン関連のファイル（plugin.json, commands/, agents/, skills/, hooks/）を修正した場合は、必ずバージョンを更新すること。
+
+**Semantic Versioning:**
+- **MAJOR** (x.0.0): 破壊的変更（既存機能の削除・変更）
+- **MINOR** (0.x.0): 後方互換の新機能追加
+- **PATCH** (0.0.x): バグ修正・ドキュメント修正
+
 ## 開発原則
 
 - TDD 推奨、カバレッジ 95%+ 目標
