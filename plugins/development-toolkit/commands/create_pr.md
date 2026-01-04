@@ -10,6 +10,12 @@ model: sonnet
 
 ## 実行内容
 
+0. **事前確認フェーズ（ユーザー確認項目を最初にまとめて実施）**
+   - ターゲットブランチの確認（main / develop / その他）
+   - バージョンファイルの存在確認
+   - バージョン更新方針の確認（バージョンファイルがある場合のみ）
+     - スキップ / PATCH / MINOR / MAJOR
+
 1. **現在の状態確認**
    - 現在のブランチを確認（main/masterでないことを確認）
    - 未コミットの変更を確認
@@ -26,30 +32,25 @@ model: sonnet
    - mainブランチとの差分を確認
    - コミット履歴を表示
    - 変更ファイル一覧を表示
-   - `/review` でコードレビューを実行
+   - review-dojo-mcpが利用可能な場合：
+     - `generate_pr_checklist`で過去のレビュー知見を取得
+     - 取得した知見をレビューの参考情報として表示
+   - `/review` でコードレビューを実行（review-dojo-mcpの知見を考慮）
    - `/security-review` でセキュリティレビューを実行
    - 指摘があればユーザーに修正確認→修正→再レビュー（ループ）
 
-3. **バージョン管理の確認**
-   - バージョン管理ファイルの存在確認（package.json, VERSION, pyproject.toml等）
-   - バージョンファイルが存在する場合、現在のバージョンを表示
-   - ユーザーにバージョン更新が必要か確認
-   - セマンティックバージョニングに基づく推奨：
-     - **MAJOR (x.0.0)**: 破壊的変更（後方互換性のない変更）
-     - **MINOR (0.x.0)**: 機能追加（後方互換性あり）
-     - **PATCH (0.0.x)**: バグ修正、軽微な変更
-   - 更新する場合はバージョンを更新してコミット
+3. **バージョン更新の実施**
+   - ステップ0で決めた方針に基づいてバージョンを更新
+   - 更新する場合はバージョンファイルを編集してコミット
+   - スキップの場合は次のステップへ
 
-4. **ターゲットブランチの確認**
-   - ユーザーにターゲットブランチを確認
-   - デフォルト: main
-
-5. **リモートへプッシュ**
+4. **リモートへプッシュ**
    - 現在のブランチをリモートにプッシュ
    - まだプッシュしていない場合は `-u origin [ブランチ名]`
 
-6. **PR作成**
+5. **PR作成**
    - `gh pr create` でPR作成
+   - ターゲットブランチ：ステップ0で確認したブランチ
    - タイトル：最新のコミットメッセージから自動生成
    - 本文：変更内容のサマリーを自動生成
    - ブラウザでPRページを自動で開く
@@ -59,6 +60,23 @@ model: sonnet
 このコマンドを実行すると、以下の処理を順番に実行します。
 
 ```bash
+# ステップ0: 事前確認フェーズ
+# Claude Code実行時の処理:
+# 1. バージョンファイルの存在を確認（package.json, pom.xml, build.gradle, pyproject.toml等）
+# 2. AskUserQuestionツールで以下を一度にまとめて確認:
+#    質問1: ターゲットブランチを選択してください
+#      - main（推奨）
+#      - develop
+#      - その他（ユーザー入力）
+#    質問2: バージョン更新方針を選択してください（バージョンファイルがある場合のみ表示）
+#      - スキップ（バージョン更新しない）
+#      - PATCH（バグ修正、軽微な変更）
+#      - MINOR（機能追加、後方互換性あり）
+#      - MAJOR（破壊的変更、後方互換性なし）
+# 3. ユーザーの選択を変数に保存:
+#    target_branch="<ユーザーの選択>"
+#    version_update="<ユーザーの選択>"  # skip/patch/minor/major
+
 # ステップ1: 現在のブランチを確認
 current_branch=$(git branch --show-current)
 
@@ -118,154 +136,74 @@ git status
 git log main..HEAD --oneline
 git diff main...HEAD --stat
 
-# ステップ2.5: コードレビュー・セキュリティレビュー
+# ステップ2.5: コードレビュー・セキュリティレビュー（review-dojo-mcp統合）
 # Claude Code実行時の処理:
-# 1. git diff main...HEAD の結果を取得
-# 2. /review スキルでコードレビューを実行
-# 3. /security-review スキルでセキュリティレビューを実行
-# 4. 指摘事項がある場合:
+# 1. 変更ファイルリストを取得
+#    changed_files=$(git diff main...HEAD --name-only)
+#
+# 2. review-dojo-mcpが利用可能かチェック
+#    MCPツール "mcp__review-dojo__generate_pr_checklist" が利用可能か確認
+#
+# 3. review-dojo-mcpが利用可能な場合:
+#    a. MCPSearchツールで "generate_pr_checklist" を検索・ロード
+#       MCPSearch(query: "select:mcp__review-dojo__generate_pr_checklist")
+#    b. generate_pr_checklist を実行して過去のレビュー知見を取得
+#       入力: 変更ファイルリスト
+#       出力: 過去のレビュー知見に基づくチェックリスト
+#    c. 取得した知見を表示し、レビューの参考情報として活用
+#       echo "=== 過去のレビュー知見（review-dojo-mcp） ==="
+#       echo "<generated_checklist>"
+#       echo "=========================================="
+#
+# 4. review-dojo-mcpが利用不可の場合:
+#    → スキップして次へ進む（従来通りのレビュー）
+#
+# 5. /review スキルでコードレビューを実行
+#    - review-dojo-mcpの知見がある場合は、それを考慮してレビュー
+#
+# 6. /security-review スキルでセキュリティレビューを実行
+#
+# 7. 指摘事項がある場合:
 #    a. AskUserQuestionツールで修正するか確認
 #       - 修正する: 修正を実施し、ステップ2.5を再実行
 #       - スキップ: 次のステップへ進む
-# 5. 指摘事項がない場合: 次のステップへ進む
 #
-# 注意: このループは指摘事項がなくなるまで繰り返される
+# 8. 指摘事項がない場合: 次のステップへ進む
+#
+# 注意:
+# - このループは指摘事項がなくなるまで繰り返される
+# - review-dojo-mcpはオプショナル機能（利用不可でもエラーにならない）
+# - MCPツールのインストール: https://github.com/sk8metalme/review-dojo-mcp
 
-# ステップ3: バージョン管理ファイルの確認
-# 各言語のバージョンファイルを検出
-version_file=""
-current_version=""
-
-# Node.js/TypeScript
-if [ -f "package.json" ]; then
-  version_file="package.json"
-  current_version=$(jq -r '.version' package.json 2>/dev/null || grep '"version"' package.json | sed 's/.*"version": "\(.*\)".*/\1/')
-  echo "検出: Node.js/TypeScript プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# Java (Maven)
-elif [ -f "pom.xml" ]; then
-  version_file="pom.xml"
-  # xmllintを使用してプロジェクトレベルの<version>を抽出（推奨）
-  # 注意: xmllintが利用できない場合、親プロジェクトのバージョンを誤って取得する可能性があります
-  current_version=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml 2>/dev/null)
-  if [ -z "$current_version" ]; then
-    # xmllintが利用できない場合の代替手段（制限あり）
-    # 親タグと同じ行にない<version>タグのみを抽出
-    current_version=$(awk '/<parent>/,/<\/parent>/ {next} /<version>/ {match($0, /<version>(.*)<\/version>/, arr); if (arr[1]) {print arr[1]; exit}}' pom.xml)
-  fi
-  echo "検出: Java Maven プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# Java (Gradle)
-elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
-  # build.gradle.ktsを優先、なければbuild.gradle
-  if [ -f "build.gradle.kts" ]; then
-    version_file="build.gradle.kts"
-    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle.kts | head -1 | sed 's/.*version\s*[=:]\s*['\''\"]\(.*\)['\''\"].*/\1/')
-  else
-    version_file="build.gradle"
-    current_version=$(grep -E '^\s*version\s*[=:]' build.gradle | head -1 | sed "s/.*version\s*[=:]\s*['\"]\\(.*\\)['\"].*/\1/")
-  fi
-  echo "検出: Java Gradle プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# Python
-elif [ -f "pyproject.toml" ]; then
-  version_file="pyproject.toml"
-  # 単一引用符と二重引用符の両方に対応
-  current_version=$(grep '^version' pyproject.toml | sed "s/version\s*=\s*['\"]\\(.*\\)['\"].*/\1/")
-  echo "検出: Python プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# PHP
-elif [ -f "composer.json" ]; then
-  version_file="composer.json"
-  current_version=$(jq -r '.version' composer.json 2>/dev/null || grep '"version"' composer.json | sed 's/.*"version": "\(.*\)".*/\1/')
-  echo "検出: PHP プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# Ansible
-elif [ -f "galaxy.yml" ]; then
-  version_file="galaxy.yml"
-  current_version=$(grep '^version:' galaxy.yml | awk '{print $2}')
-  echo "検出: Ansible Collection"
-  echo "現在のバージョン: $current_version"
-
-# RPM
-elif ls *.spec 1>/dev/null 2>&1; then
-  version_file=$(ls *.spec | head -1)
-  current_version=$(grep '^Version:' "$version_file" | awk '{print $2}')
-  echo "検出: RPM パッケージ"
-  echo "現在のバージョン: $current_version"
-
-# Rust
-elif [ -f "Cargo.toml" ]; then
-  version_file="Cargo.toml"
-  current_version=$(grep '^version' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
-  echo "検出: Rust プロジェクト"
-  echo "現在のバージョン: $current_version"
-
-# Ruby
-elif ls *.gemspec 1>/dev/null 2>&1; then
-  version_file=$(ls *.gemspec | head -1)
-  current_version=$(grep "\.version" "$version_file" | sed "s/.*version[= ]*['\"]\\(.*\\)['\"].*/\1/")
-  echo "検出: Ruby Gem"
-  echo "現在のバージョン: $current_version"
-
-# 汎用バージョンファイル
-elif [ -f "VERSION" ]; then
-  version_file="VERSION"
-  current_version=$(cat VERSION)
-  echo "検出: VERSION ファイル"
-  echo "現在のバージョン: $current_version"
-
-elif [ -f "version.txt" ]; then
-  version_file="version.txt"
-  current_version=$(cat version.txt)
-  echo "検出: version.txt ファイル"
-  echo "現在のバージョン: $current_version"
-fi
-
-# バージョン更新の確認
-if [ -n "$version_file" ]; then
-  echo ""
-  echo "セマンティックバージョニング推奨:"
-  echo "  - MAJOR (x.0.0): 破壊的変更（後方互換性のない変更）"
-  echo "  - MINOR (0.x.0): 機能追加（後方互換性あり）"
-  echo "  - PATCH (0.0.x): バグ修正、軽微な変更"
-  echo ""
-
-  # Claude Code実行時の処理:
-  # 1. AskUserQuestionツールで以下を確認:
-  #    - スキップ: バージョン更新しない
-  #    - PATCH: パッチバージョンを上げる
-  #    - MINOR: マイナーバージョンを上げる
-  #    - MAJOR: メジャーバージョンを上げる
-  #
-  # 2. ユーザーが更新を選択した場合:
-  #    a. 該当ファイルを編集してバージョンを更新
-  #    b. git add <version_file>
-  #    c. git commit -m "chore: bump version to <new_version>"
-  #
-  # 注意: このスクリプトはドキュメント例です。
-  # 実際の実行はClaude Codeが上記の手順に従って行います。
-fi
-
-# ステップ4: ターゲットブランチをユーザーに確認
+# ステップ3: バージョン更新の実施
 # Claude Code実行時の処理:
-# AskUserQuestionツールで以下を確認:
-#   - main（推奨）: メインブランチにマージ
-#   - develop: 開発ブランチにマージ
-#   - その他: ユーザーが指定したブランチ
-# デフォルト: main
-target_branch="main"  # 実際はユーザーの選択によって決定
+# ステップ0で決めた version_update の値に基づいて処理
+# 1. version_update が "skip" の場合: 何もしない
+# 2. version_update が "patch", "minor", "major" の場合:
+#    a. バージョンファイルを検出（Node.js/TypeScript, Java, Python, PHP, Ansible, RPM, Rust, Ruby等）
+#    b. 現在のバージョンを読み取り
+#    c. セマンティックバージョニングに従って新しいバージョンを計算
+#       例: 1.2.3 → patch: 1.2.4, minor: 1.3.0, major: 2.0.0
+#    d. バージョンファイルを編集して新しいバージョンに更新
+#    e. git add <version_file>
+#    f. git commit -m "chore: bump version to <new_version>"
+#
+# サポートされるバージョンファイル:
+# - Node.js/TypeScript: package.json
+# - Java: pom.xml (Maven), build.gradle/build.gradle.kts (Gradle)
+# - Python: pyproject.toml
+# - PHP: composer.json
+# - Ansible: galaxy.yml
+# - RPM: *.spec
+# - Rust: Cargo.toml
+# - Ruby: *.gemspec
+# - 汎用: VERSION, version.txt
 
-# ステップ5: リモートにプッシュ
+# ステップ4: リモートにプッシュ
 git push -u origin "$current_branch"
 
-# ステップ6: PR作成
-# $target_branchは実際にはステップ4で確認したブランチ名
+# ステップ5: PR作成
+# $target_branchはステップ0で確認したブランチ名を使用
 gh pr create --base "$target_branch" --title "コミット履歴をまとめた概要を端的に説明したタイトル" --body "コミット履歴のサマリー、変更ファイル一覧、テストプラン（必要に応じて）"
 ```
 
@@ -286,14 +224,8 @@ PRのタイトルとボディは以下のように生成されます:
 - main/masterブランチからは実行できません
 - 未コミットの変更がある場合は先にコミットしてください
 - `--web`オプションでブラウザが自動で開きます
-- バージョン管理ファイルが存在しない場合、バージョン更新ステップは自動的にスキップされます
-- サポートされるバージョンファイル：
-  - Node.js/TypeScript: `package.json`
-  - Java: `pom.xml` (Maven), `build.gradle` (Gradle)
-  - Python: `pyproject.toml`
-  - PHP: `composer.json`
-  - Ansible: `galaxy.yml`
-  - RPM: `*.spec`
-  - Rust: `Cargo.toml`
-  - Ruby: `*.gemspec`
-  - 汎用: `VERSION`, `version.txt`
+- **ステップ0で事前にターゲットブランチとバージョン更新方針を確認します**
+- バージョン管理ファイルが存在しない場合、バージョン更新の質問は表示されません
+- サポートされるバージョンファイル：package.json, pom.xml, build.gradle, pyproject.toml, composer.json, galaxy.yml, *.spec, Cargo.toml, *.gemspec, VERSION, version.txt
+- **review-dojo-mcpが利用可能な場合、過去のレビュー知見を参照して品質向上を図ります**（オプショナル機能）
+  - インストール方法: https://github.com/sk8metalme/review-dojo-mcp
