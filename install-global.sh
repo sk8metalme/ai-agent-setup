@@ -112,6 +112,15 @@ setup_settings_json() {
             "command": "~/.claude/hooks/protect-branch.sh"
           }
         ]
+      },
+      {
+        "matcher": "Read|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/protect-secrets.sh"
+          }
+        ]
       }
     ]
   }
@@ -154,6 +163,33 @@ setup_settings_json() {
   fi
 }
 
+# 秘密情報セットアップ
+setup_secrets() {
+  echo ""
+  echo -e "${GREEN}Setting up secrets management...${NC}"
+
+  # ~/.secrets/ ディレクトリ作成
+  if [[ ! -d "$HOME/.secrets" ]]; then
+    mkdir -p "$HOME/.secrets"
+    chmod 700 "$HOME/.secrets"
+    echo "✓ Created ~/.secrets/ directory (permission: 700)"
+  else
+    echo "✓ ~/.secrets/ directory already exists"
+    # パーミッション確認と修正
+    if [[ $(stat -f "%p" "$HOME/.secrets" 2>/dev/null || stat -c "%a" "$HOME/.secrets" 2>/dev/null) != *700 ]]; then
+      chmod 700 "$HOME/.secrets"
+      echo "✓ Fixed ~/.secrets/ permission to 700"
+    fi
+  fi
+
+  # templates/ ディレクトリコピー（オプション）
+  if [[ -d "$GLOBAL_DIR/templates" ]]; then
+    mkdir -p "$CLAUDE_DIR/templates"
+    cp -r "$GLOBAL_DIR/templates/"* "$CLAUDE_DIR/templates/" 2>/dev/null || true
+    echo "✓ Copied templates to ~/.claude/templates/"
+  fi
+}
+
 # メイン処理
 main() {
   echo ""
@@ -170,6 +206,7 @@ main() {
 
   copy_files
   setup_settings_json
+  setup_secrets
 
   echo ""
   echo "==================================="
@@ -188,7 +225,11 @@ main() {
   echo "  - $CLAUDE_DIR/hooks/notify.sh"
   echo "  - $CLAUDE_DIR/hooks/protect-branch.sh"
   echo "  - $CLAUDE_DIR/hooks/protect-branch.conf"
+  echo "  - $CLAUDE_DIR/hooks/protect-secrets.sh (秘密情報保護)"
+  echo "  - $CLAUDE_DIR/hooks/protect-secrets.conf"
   echo "  - $CLAUDE_DIR/settings.json (hooks設定追加)"
+  echo "  - $CLAUDE_DIR/templates/ (テンプレート)"
+  echo "  - $HOME/.secrets/ (秘密情報ディレクトリ)"
   echo ""
 }
 

@@ -24,6 +24,15 @@
             "command": "~/.claude/hooks/protect-branch.sh"
           }
         ]
+      },
+      {
+        "matcher": "Read|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/protect-secrets.sh"
+          }
+        ]
       }
     ]
   },
@@ -198,7 +207,57 @@
       "Bash(service:*)",
       "Bash(kill -9:*)",
       "Bash(killall:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Read(~/.secrets/*)",
+      "Read(~/.secrets/**/*)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.aws/config)",
+      "Read(~/.ssh/id_*)",
+      "Read(~/.ssh/config)",
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.development)",
+      "Read(**/.env.production)",
+      "Read(**/.env.staging)",
+      "Read(**/.env.test)",
+      "Read(**/.env.*)",
+      "Read(**/credentials.json)",
+      "Read(**/secrets.yaml)",
+      "Read(**/secrets.yml)",
+      "Read(**/service-account.json)",
+      "Read(**/.netrc)",
+      "Read(**/.npmrc)",
+      "Read(**/.pypirc)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.pfx)",
+      "Read(**/id_rsa*)",
+      "Read(**/id_ed25519*)",
+      "Bash(cat:*/.env*)",
+      "Bash(cat:*credentials*)",
+      "Bash(cat:*secret*)",
+      "Bash(cat:*password*)",
+      "Bash(cat:*token*)",
+      "Bash(cat:*.pem*)",
+      "Bash(cat:*.key*)",
+      "Bash(cat:~/.aws/*)",
+      "Bash(cat:~/.ssh/*)",
+      "Bash(less:*/.env*)",
+      "Bash(less:*credentials*)",
+      "Bash(less:*secret*)",
+      "Bash(more:*/.env*)",
+      "Bash(more:*credentials*)",
+      "Bash(head:*/.env*)",
+      "Bash(head:*credentials*)",
+      "Bash(tail:*/.env*)",
+      "Bash(tail:*credentials*)",
+      "Bash(grep:*/.env*)",
+      "Bash(grep:*credentials*)",
+      "Bash(awk:*/.env*)",
+      "Bash(awk:*credentials*)",
+      "Bash(sed:*/.env*)",
+      "Bash(sed:*credentials*)"
     ]
   },
   "git": {

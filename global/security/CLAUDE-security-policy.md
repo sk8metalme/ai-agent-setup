@@ -80,4 +80,32 @@
 
 ---
 
+## Claude Code 秘密情報管理
+
+Claude Codeで秘密情報を安全に管理するための多層防御アプローチが実装されています。
+
+### 基本原則
+
+**秘密情報は「Claude Codeがアクセスできない場所」に置く**
+
+- ~/.secrets/ ディレクトリを使用（プロジェクトディレクトリ外）
+- PreToolUse Hookによるアクセスブロック
+- deny設定による追加の防御層
+
+### 詳細ガイド
+
+development-toolkit プラグインの `/secrets-guard` スキルを参照：
+
+```bash
+# プラグインをインストール
+/plugin install development-toolkit@ai-agent-setup
+
+# スキルを確認
+# plugins/development-toolkit/skills/secrets-guard/SKILL.md
+```
+
+参考: [Issue #39 - 秘密情報管理](https://github.com/sk8metalme/ai-agent-setup/issues/39)
+
+---
+
 セキュリティは全員の責任です。疑問がある場合は、セキュリティチームに相談してください。

@@ -210,6 +210,7 @@ michiが無い場合：
 | `/oss-license` | oss-compliance | ライセンス確認ガイド |
 | `/stable-version` | version-audit | LTS/EOL確認 |
 | `/jujutsu-workflow` | jujutsu-workflow | jj VCS操作 |
+| `/secrets-guard` | development-toolkit | 秘密情報管理（多層防御） |
 
 ---
 

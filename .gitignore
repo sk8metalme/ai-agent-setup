@@ -13,6 +13,26 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.*
+!.env.example
+!.env.template
+
+# Secrets
+.secrets/
+secrets/
+credentials/
+credential/
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+*.ppk
+service-account.json
+.netrc
+.npmrc
+.pypirc
 
 # Logs
 *.log
