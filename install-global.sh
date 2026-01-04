@@ -176,7 +176,8 @@ setup_secrets() {
   else
     echo "✓ ~/.secrets/ directory already exists"
     # パーミッション確認と修正
-    if [[ $(stat -f "%p" "$HOME/.secrets" 2>/dev/null || stat -c "%a" "$HOME/.secrets" 2>/dev/null) != *700 ]]; then
+    local current_perm=$(stat -f "%p" "$HOME/.secrets" 2>/dev/null || stat -c "%a" "$HOME/.secrets" 2>/dev/null)
+    if [[ "${current_perm: -3}" != "700" ]]; then
       chmod 700 "$HOME/.secrets"
       echo "✓ Fixed ~/.secrets/ permission to 700"
     fi

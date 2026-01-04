@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/protect-secrets.conf"
 
 # デフォルト設定
-SECRETS_PATTERNS=".env|\.secrets|credentials|credential|private[_-]?key|api[_-]?key|password|passwd|token|secret"
+SECRETS_PATTERNS="\.env|\.secrets|credentials|credential|private[_-]?key|api[_-]?key|password|passwd|token|secret"
 SECRETS_EXTENSIONS="\.pem|\.key|\.p12|\.pfx|id_rsa|id_ed25519|\.ppk"
 SECRETS_FILES="\.netrc|\.npmrc|\.pypirc|service-account\.json|keystore"
 BLOCK_MESSAGE="秘密情報ファイルへのアクセスはブロックされました。"
@@ -48,10 +48,18 @@ if [[ -z "$tool_input" ]]; then
 fi
 
 # JSONからfile_pathを抽出（Read toolの場合）
-file_path=$(echo "$tool_input" | grep -oE '"file_path"\s*:\s*"[^"]*"' | sed 's/"file_path"\s*:\s*"\([^"]*\)"/\1/' || echo "")
+if command -v jq &>/dev/null; then
+    file_path=$(echo "$tool_input" | jq -r '.file_path // empty' 2>/dev/null || echo "")
+else
+    file_path=$(echo "$tool_input" | grep -oE '"file_path"\s*:\s*"[^"]*"' | sed 's/"file_path"\s*:\s*"\([^"]*\)"/\1/' || echo "")
+fi
 
 # Bashコマンドの場合、commandを抽出
-bash_command=$(echo "$tool_input" | grep -oE '"command"\s*:\s*"[^"]*"' | sed 's/"command"\s*:\s*"\([^"]*\)"/\1/' || echo "")
+if command -v jq &>/dev/null; then
+    bash_command=$(echo "$tool_input" | jq -r '.command // empty' 2>/dev/null || echo "")
+else
+    bash_command=$(echo "$tool_input" | grep -oE '"command"\s*:\s*"[^"]*"' | sed 's/"command"\s*:\s*"\([^"]*\)"/\1/' || echo "")
+fi
 
 log_debug "Extracted file_path: ${file_path:-NONE}"
 log_debug "Extracted bash_command: ${bash_command:-NONE}"
@@ -59,7 +67,8 @@ log_debug "Extracted bash_command: ${bash_command:-NONE}"
 # ファイルパスが秘密情報パターンにマッチするかチェック
 check_secrets_pattern() {
     local path="$1"
-    local path_lower=$(echo "$path" | tr '[:upper:]' '[:lower:]')
+    local path_lower
+    path_lower=$(echo "$path" | tr '[:upper:]' '[:lower:]')
 
     # パターンマッチ
     if echo "$path_lower" | grep -qE "$SECRETS_PATTERNS"; then
@@ -98,12 +107,12 @@ fi
 
 # Bash tool のチェック（cat, less, more, head, tail, vim, nano等でのファイル読み取り）
 if [[ -n "$bash_command" ]]; then
-    # 読み取り系コマンドのパターン
-    read_commands="cat |less |more |head |tail |vim |nano |vi |emacs |grep |awk |sed "
+    # 読み取り系コマンドのパターン（パイプ区切り）
+    read_commands="cat|less|more|head|tail|vim|nano|vi|emacs|grep|awk|sed"
 
     # コマンドが読み取り系かチェック
-    for cmd in $read_commands; do
-        if echo "$bash_command" | grep -qE "^${cmd}| ${cmd}"; then
+    for cmd in ${read_commands//|/ }; do
+        if echo "$bash_command" | grep -qE "(^|[|;&])\s*${cmd}\b"; then
             # コマンドライン全体に対して秘密情報パターンをチェック
             if check_secrets_pattern "$bash_command"; then
                 log_debug "BLOCKED: Bash read command on secrets: $bash_command"
