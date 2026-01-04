@@ -15,6 +15,12 @@ model: sonnet
    - 未コミットの変更を確認
    - git statusを表示
 
+1.5. **Git追跡対象の検証**
+   - 未追跡ファイル（untracked files）のスキャン
+   - ステージング済みファイルのスキャン
+   - 危険パターン（秘密情報、ビルド成果物、OS生成ファイル、一時ファイル）との照合
+   - 問題検出時にユーザーへ確認（.gitignoreに追加/個別確認/無視/中止）
+
 2. **変更内容の確認**
    - mainブランチとの差分を確認
    - コミット履歴を表示
@@ -60,6 +66,49 @@ if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
   echo "Error: main/masterブランチからはPRを作成できません"
   exit 1
 fi
+
+# ステップ1.5: Git追跡対象の検証
+# Git管理に不要なファイルが含まれていないか検証
+
+# 未追跡ファイルの取得
+untracked_files=$(git ls-files --others --exclude-standard)
+
+# ステージング済みファイルの取得
+staged_files=$(git diff --cached --name-only)
+
+# Claude Code実行時の処理:
+# 1. 未追跡ファイルとステージング済みファイルに対して危険パターンとの照合を実施
+# 2. 危険パターン（すべて同等に警告）:
+#    - 秘密情報: .env, .env.* (!.env.example, !.env.template), .secrets/, secrets/,
+#                credentials/, *.pem, *.key, *.p12, *.pfx, *.ppk, id_rsa*, id_ed25519*,
+#                service-account.json, .netrc, .npmrc, .pypirc
+#    - ビルド成果物・依存関係: node_modules/, dist/, build/, *.tsbuildinfo
+#    - OS・エディタ生成ファイル: .DS_Store, Thumbs.db, .vscode/, .idea/,
+#                                *.swp, *.swo, *~
+#    - 一時ファイル: *.log, *.tmp, *.bak, .temp/, docs/tmp/
+#
+# 3. 問題が検出された場合:
+#    a. 警告メッセージと該当ファイル一覧を表示
+#    b. AskUserQuestionツールで以下の選択肢を提示:
+#       - A: .gitignoreに追加して続行
+#         → 検出されたパターンを .gitignore に追加
+#         → git add .gitignore を実行
+#         → 既にステージングされている危険ファイルは git reset HEAD <file> で除外
+#       - B: 個別に確認
+#         → 各ファイルについて追加/除外/維持を選択
+#       - C: 警告を無視して続行
+#         → 警告内容をコンソールに記録して次のステップへ進む
+#       - D: 中止
+#         → PR作成を中止
+#
+# 4. 問題がない場合:
+#    → 次のステップへ進む
+#
+# エッジケース対応:
+# - .gitignore が存在しない場合: ファイルを新規作成（ユーザー確認後）
+# - パターンが既に .gitignore に存在: 重複追加しない
+# - 未追跡ファイルがない場合: スキップして次へ
+# - 大量ファイル（100件以上）: 要約表示 + 詳細はコンソールへ
 
 # ステップ2: 未コミット変更と差分の確認
 git status
