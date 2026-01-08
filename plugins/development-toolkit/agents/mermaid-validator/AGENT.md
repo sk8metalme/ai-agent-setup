@@ -76,7 +76,7 @@ done
 # シーケンス図の矢印記法チェック
 grep -E 'sequenceDiagram' /tmp/extracted-mermaid.txt && {
     # 不正な矢印記法を検出（->, -->, -x ではなく ->>, -->>, ->> を使用すべき）
-    grep -E '([A-Za-z]+)->([A-Za-z]+):' /tmp/extracted-mermaid.txt && echo "WARNING: Use '->' instead of '->'"
+    grep -E '([A-Za-z]+)->([A-Za-z]+):' /tmp/extracted-mermaid.txt && echo "WARNING: Use '->>' instead of '->'"
 }
 ```
 
@@ -135,7 +135,8 @@ sed -i 's/\([A-Za-z][A-Za-z]*\)-->\([A-Za-z][A-Za-z]*\):/\1-->\2:/g' "$FILE"
 ```bash
 # 簡易的な修正例（実際にはコンテキストに応じて調整が必要）
 # 1対多の場合
-sed -i 's/\([A-Z_]\+\)\s*->\s*\([A-Z_]\+\)/\1 ||--o{ \2/g' "$FILE"
+# POSIX互換: [A-Z_]+ → [A-Z_][A-Z_0-9]* （BSD sed対応、数字を含むエンティティ名に対応）
+sed -i 's/\([A-Z_][A-Z_0-9]*\)\s*->\s*\([A-Z_][A-Z_0-9]*\)/\1 ||--o{ \2/g' "$FILE"
 ```
 
 ### Step 5: 検証レポート出力
