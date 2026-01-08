@@ -3,6 +3,7 @@ name: pr-resolver
 description: |
   PR上で対応済みのレビューコメントをresolveする実行エージェント。
   GitHub GraphQL APIを使用してresolve処理を実行。
+  PRレビューコメントへの対応完了後に PROACTIVELY 使用してください。
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -25,29 +26,31 @@ PRのレビューコメント（スレッド）で対応済みのものをresolv
 gh pr view <PR番号> --json number,title,state
 ```
 
-### 2. CI/CDステータス確認
-
-```bash
-gh pr checks <PR番号>
-```
-
-- すべてのチェックがpassしていることを確認
-- 失敗しているチェックがある場合は、resolveを進める前にユーザーに警告
-- 詳細は「CI/CDステータス確認」セクション（下記）を参照
-
-### 3. 未resolveスレッド一覧取得
+### 2. 未resolveスレッド一覧取得
 
 GitHub GraphQL APIでreviewThreadsを取得（`isResolved: false`）
 
-### 4. ユーザー確認
+### 3. CI/CDステータス確認
+
+CI／CDステータスを確認し、失敗しているjobがあれば、原因調査
+
+### 4. 未resolveスレッドについて対応するかどうか判断する
+
+tasks.mdを参考に、今後のタスクとして対応予定のものなのか、それとも、今すぐに対応すべき課題なのかを判断する
+
+### 5. CI/CDステータスが失敗だった時の対応
+
+失敗しているjobについてログを確認し、事実ベースで解決策を検討
+
+### 　6. ユーザー確認
 
 resolveするスレッドを提示し、確認を得る。
 
-### 5. resolve実行
+### 7. resolve実行
 
 `resolveReviewThread` mutationを実行。
 
-### 6. 結果報告
+### 8. 結果報告
 
 resolve済みスレッド数とステータスを報告。
 
