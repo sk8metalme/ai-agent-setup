@@ -37,6 +37,18 @@ else
 fi
 
 echo "🔍 ベースブランチ: $BASE_BRANCH"
+
+# 現在のブランチを取得
+CURRENT_BRANCH=$(git branch --show-current)
+
+# main/masterブランチでの実行を防止
+if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
+    echo "❌ エラー: main/masterブランチからPR作成はできません"
+    echo "   feature/bugfix/hotfixブランチで作業してください"
+    exit 1
+fi
+
+echo "✅ 作業ブランチ: $CURRENT_BRANCH"
 ```
 
 ### Step 2: 変更量の計測

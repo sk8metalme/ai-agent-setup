@@ -60,7 +60,14 @@ grep -E 'C4(Context|Container|Component)' /tmp/extracted-mermaid.txt
 grep -E '^\s*title:' /tmp/extracted-mermaid.txt && echo "ERROR: 'title:' should be 'title' (no colon)"
 
 # Rel()の引数チェック（4つの引数が必須）
-grep -E 'Rel\(' /tmp/extracted-mermaid.txt | grep -v 'Rel([^,]+,[^,]+,[^,]+,[^,]+)' && echo "WARNING: Rel() requires 4 arguments"
+# 注: 簡易チェック。引数内のカンマは検出できないため、完全な検証はパーサーに委譲すべき
+grep -E 'Rel\(' /tmp/extracted-mermaid.txt | while read -r line; do
+    # カンマの数をカウント（3つのカンマ = 4つの引数）
+    comma_count=$(echo "$line" | tr -cd ',' | wc -c)
+    if [ "$comma_count" -lt 3 ]; then
+        echo "WARNING: Rel() requires 4 arguments - $line"
+    fi
+done
 ```
 
 #### 3.2 シーケンス図の検証
@@ -108,8 +115,11 @@ sed -i 's/^\s*title:\s*/    title /g' "$FILE"
 
 ```bash
 # "->" → "->>"（同期呼び出し）
-# ただし、既に "-->" の場合は修正しない
-sed -i 's/\([A-Za-z]\+\)->\([A-Za-z]\+\):/\1->>\2:/g' "$FILE"
+# ただし、既に "-->" や "->>" の場合は修正しない
+# POSIX互換: \+ ではなく \{1,\} を使用（BSD sed対応）
+sed -i 's/\([A-Za-z][A-Za-z]*\)->\([A-Za-z][A-Za-z]*\):/\1->>\2:/g' "$FILE"
+# さらに安全に: 既に "-->" のケースを除外
+sed -i 's/\([A-Za-z][A-Za-z]*\)-->\([A-Za-z][A-Za-z]*\):/\1-->\2:/g' "$FILE"
 ```
 
 #### 修正ルール3: サブグラフのインデント修正
