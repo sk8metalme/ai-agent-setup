@@ -79,7 +79,6 @@
       "Bash(tr:*)",
       "Bash(file:*)",
       "Bash(stat:*)",
-      "Bash(tree:*)",
       "Bash(diff:*)",
       "Bash(cmp:*)",
       "Bash(md5sum:*)",
