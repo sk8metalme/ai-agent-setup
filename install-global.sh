@@ -85,46 +85,52 @@ copy_files() {
   done
 }
 
+# statusLine 依存ツールの確認
+check_statusline_deps() {
+  local missing_deps=()
+
+  # bun の確認
+  if ! command -v bun &> /dev/null; then
+    missing_deps+=("bun")
+  fi
+
+  # ccusage の確認
+  if ! command -v ccusage &> /dev/null && ! npm list -g ccusage &> /dev/null 2>&1; then
+    missing_deps+=("ccusage")
+  fi
+
+  if [ ${#missing_deps[@]} -gt 0 ]; then
+    echo ""
+    echo -e "${YELLOW}⚠️  statusLine に必要なツールがインストールされていません:${NC}"
+    for dep in "${missing_deps[@]}"; do
+      case $dep in
+        bun)
+          echo "  - bun: curl -fsSL https://bun.sh/install | bash"
+          ;;
+        ccusage)
+          echo "  - ccusage: npm install -g ccusage"
+          ;;
+      esac
+    done
+    echo ""
+    echo "インストール後、statusLine が正常に動作します。"
+    echo "スキップする場合、statusLine は無効になります。"
+  else
+    echo -e "${GREEN}✓ statusLine 依存ツール確認完了${NC}"
+  fi
+}
+
 # settings.json設定
 setup_settings_json() {
   echo ""
   echo -e "${GREEN}Setting up settings.json...${NC}"
   backup_file "$CLAUDE_DIR/settings.json"
 
-  local hooks_config='{
-  "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/protect-branch.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Read|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/protect-secrets.sh"
-          }
-        ]
-      }
-    ]
-  }
-}'
+  # settings.template.json が存在するか確認
+  if [[ ! -f "$GLOBAL_DIR/settings.template.json" ]]; then
+    echo -e "${YELLOW}Warning: settings.template.json not found. Skipping common settings merge.${NC}"
+    return 1
+  fi
 
   if [[ -f "$CLAUDE_DIR/settings.json" ]]; then
     # jqでマージ
@@ -136,11 +142,11 @@ setup_settings_json() {
         return 1
       }
 
-      # jqでマージ（エラーハンドリング付き）
-      if echo "$hooks_config" | jq -s '.[0] * .[1]' "$CLAUDE_DIR/settings.json" - > "$temp_file" 2>/dev/null; then
+      # settings.template.json を既存の settings.json にマージ（深いマージ）
+      if jq -s '.[0] * .[1]' "$CLAUDE_DIR/settings.json" "$GLOBAL_DIR/settings.template.json" > "$temp_file" 2>/dev/null; then
         # マージ成功：元のファイルを置き換え
         if mv "$temp_file" "$CLAUDE_DIR/settings.json"; then
-          echo "✓ Merged hooks configuration into settings.json"
+          echo "✓ Merged common settings into settings.json"
         else
           echo -e "${YELLOW}Error: Failed to update settings.json${NC}" >&2
           rm -f "$temp_file"
@@ -153,13 +159,19 @@ setup_settings_json() {
         return 1
       fi
     else
-      echo -e "${YELLOW}Warning: jq not found. Please manually add hooks to settings.json${NC}"
-      echo "Hooks configuration:"
-      echo "$hooks_config"
+      echo -e "${YELLOW}Warning: jq not found. Please manually merge settings.template.json${NC}"
+      return 1
     fi
   else
-    echo "$hooks_config" > "$CLAUDE_DIR/settings.json"
-    echo "✓ Created settings.json with hooks configuration"
+    # settings.json が存在しない場合は template.json をコピー
+    cp "$GLOBAL_DIR/settings.template.json" "$CLAUDE_DIR/settings.json"
+    echo "✓ Created settings.json from settings.template.json"
+  fi
+
+  # settings.local.example.json を初回のみコピー（上書きしない）
+  if [[ -f "$GLOBAL_DIR/settings.local.example.json" ]] && [[ ! -f "$CLAUDE_DIR/settings.local.example.json" ]]; then
+    cp "$GLOBAL_DIR/settings.local.example.json" "$CLAUDE_DIR/settings.local.example.json"
+    echo "✓ Copied settings.local.example.json (customize as needed)"
   fi
 }
 
@@ -206,6 +218,7 @@ main() {
   fi
 
   copy_files
+  check_statusline_deps
   setup_settings_json
   setup_secrets
 
@@ -228,7 +241,8 @@ main() {
   echo "  - $CLAUDE_DIR/hooks/protect-branch.conf"
   echo "  - $CLAUDE_DIR/hooks/protect-secrets.sh (秘密情報保護)"
   echo "  - $CLAUDE_DIR/hooks/protect-secrets.conf"
-  echo "  - $CLAUDE_DIR/settings.json (hooks設定追加)"
+  echo "  - $CLAUDE_DIR/settings.json (共通設定をマージ)"
+  echo "  - $CLAUDE_DIR/settings.local.example.json (環境依存設定サンプル)"
   echo "  - $CLAUDE_DIR/templates/ (テンプレート)"
   echo "  - $HOME/.secrets/ (秘密情報ディレクトリ)"
   echo ""
