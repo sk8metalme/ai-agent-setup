@@ -153,7 +153,7 @@ setup_settings_json() {
     local temp_file
     temp_file=$(mktemp) || { echo -e "${YELLOW}Error: 一時ファイル作成に失敗${NC}" >&2; return 1; }
 
-    if jq -s '.[0] * .[1]' "$settings" "$template" > "$temp_file" 2>/dev/null && mv "$temp_file" "$settings"; then
+    if jq -s '.[0] * .[1]' "$template" "$settings" > "$temp_file" 2>/dev/null && mv "$temp_file" "$settings"; then
       echo "✓ Merged common settings into settings.json"
     else
       rm -f "$temp_file"
