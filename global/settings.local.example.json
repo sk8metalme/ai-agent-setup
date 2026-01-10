@@ -1,0 +1,18 @@
+{
+  "env": {
+    "MAX_THINKING_TOKENS": "31999",
+    "ANTHROPIC_MODEL": "opusplan"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(terminal-notifier:*)",
+      "Bash(say:*)"
+    ],
+    "defaultMode": "plan"
+  },
+  "language": "日本語で回答",
+  "theme": "dark",
+  "ai": {
+    "temperature": 0
+  }
+}

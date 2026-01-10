@@ -173,7 +173,7 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 git clone https://github.com/sk8metalme/ai-agent-setup.git
 cd ai-agent-setup
 
-# グローバル設定（CLAUDE.md、hooks）をインストール
+# グローバル設定（CLAUDE.md、hooks、settings.json）をインストール
 ./install-global.sh
 ```
 
@@ -182,8 +182,42 @@ cd ai-agent-setup
 - `~/.claude/base/CLAUDE-base.md` - 基本コーディング原則
 - `~/.claude/security/CLAUDE-security-policy.md` - セキュリティポリシー
 - `~/.claude/team/CLAUDE-team-standards.md` - チーム開発標準
-- `~/.claude/hooks/*.sh` - hooksスクリプト
-- `~/.claude/settings.json` - hooks設定追加
+- `~/.claude/hooks/*.sh` - hooksスクリプト（通知、ブランチ保護、秘密情報保護）
+- `~/.claude/settings.json` - 共通設定をマージ（permissions, hooks, git, security 等）
+- `~/.claude/settings.local.example.json` - 環境依存設定サンプル（env, theme 等）
+
+#### statusLine 依存ツール
+
+`settings.template.json` には statusLine 設定が含まれています。以下のツールが必要です：
+
+```bash
+# bun のインストール（推奨）
+curl -fsSL https://bun.sh/install | bash
+
+# ccusage のインストール（Claude Code 使用量表示）
+npm install -g ccusage
+```
+
+これらのツールがインストールされていない場合、`install-global.sh` が通知してインストール方法を案内します。
+
+#### 別PC での設定同期
+
+複数PCで同じ設定を使用する場合：
+
+```bash
+# PC-A で設定変更後
+cd ~/Work/git/ai-agent-setup
+git add global/
+git commit -m "feat: update claude settings"
+git push
+
+# PC-B で同期
+cd ~/Work/git/ai-agent-setup
+git pull
+./install-global.sh
+```
+
+**注意**: プラグインは手動でインストールする必要があります（settings.json の `enabledPlugins` は自動追加されません）。
 
 ### 2. プラグインシステムを使ったインストール（推奨）
 
