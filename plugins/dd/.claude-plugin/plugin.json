@@ -1,0 +1,22 @@
+{
+  "name": "dd",
+  "description": "再帰的な深堀りで要件を明確化。「深堀り」「検討して」「ultrathink」「よく考えて」「他にはないか」等のキーワードで起動。推測を排除し品質向上。",
+  "version": "1.1.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": [
+    "deep-dive",
+    "requirements",
+    "questioning",
+    "ultrathink"
+  ],
+  "commands": [
+    "./commands/dd.md"
+  ],
+  "skills": [
+    "./skills/dd/SKILL.md"
+  ]
+}
