@@ -76,6 +76,12 @@
       "source": "./plugins/lang-perl",
       "description": "Perl + Mojolicious development support",
       "version": "1.0.0"
+    },
+    {
+      "name": "dd",
+      "source": "./plugins/dd",
+      "description": "Deep-dive skill for recursive requirement exploration",
+      "version": "1.2.1"
     }
   ]
 }
