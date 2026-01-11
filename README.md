@@ -195,13 +195,16 @@ cd ai-agent-setup
 npm install -g ccstatusline
 ```
 
-ccstatusline は以下の情報を statusLine に表示します：
-- モデル名（Sonnet 4.5など）
-- コンテキスト使用量（トークン数と割合）
-- Gitブランチ名
-- Git変更状況
+statusLine では以下の情報を表示します：
+- **現在のディレクトリ**: 作業ディレクトリの最後の2セグメント（例: `git/ai-agent-setup`）
+- **モデル名**: Sonnet 4.5など
+- **コンテキスト使用量**: トークン数と割合
+- **Gitブランチ名**: 現在のブランチ
+- **Git変更状況**: 追加・削除行数
 
-設定のカスタマイズは `~/.config/ccstatusline/settings.json` で可能です。
+表示例: `git/ai-agent-setup | Model: Sonnet 4.5 | Ctx: 25k (12%) | ⎇ main | +10 -5`
+
+ccstatusline のカスタマイズは `~/.config/ccstatusline/settings.json` で可能です。
 
 これらのツールがインストールされていない場合、`install-global.sh` が通知してインストール方法を案内します。
 

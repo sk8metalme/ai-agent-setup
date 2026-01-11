@@ -253,7 +253,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "ccstatusline",
+    "command": "~/.claude/hooks/statusline.sh",
     "padding": 0
   },
   "git": {
