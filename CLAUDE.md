@@ -97,6 +97,35 @@ Validation errors: Unrecognized key(s) in object: 'docs'
 - **MINOR** (0.x.0): 後方互換の新機能追加
 - **PATCH** (0.0.x): バグ修正・ドキュメント修正
 
+### Commands vs Skills（v2.1.0+）
+
+Claude Code v2.1.0 以降、Skills がスラッシュコマンドメニューに自動表示されるようになりました。
+
+**機能比較:**
+
+| 機能 | Commands | Skills |
+|------|----------|--------|
+| スラッシュコマンド呼び出し | ✅ | ✅ |
+| トリガーキーワード自動起動 | ❌ | ✅ |
+| `agent` / `model` / `context: fork` | ❌ | ✅ |
+| `user-invocable: false`（内部専用） | ❌ | ✅ |
+
+**推奨:** 新規プラグインは **Skills-only** で作成
+
+```json
+{
+  "name": "example-plugin",
+  "version": "1.0.0",
+  "skills": ["./skills/example/SKILL.md"]
+}
+```
+
+Commands はレガシー互換性維持目的でのみ使用を検討してください。
+
+**実例:** dd plugin v1.2.0 で `commands/dd.md` を削除し Skills-only に統合（177行削減）
+
+**参考:** [Commit 870624f](https://github.com/anthropics/claude-code/commit/870624fc1581a70590e382f263e2972b3f1e56f5) - Skills のスラッシュコマンドメニュー対応
+
 ## 開発原則
 
 - TDD 推奨、カバレッジ 95%+ 目標
