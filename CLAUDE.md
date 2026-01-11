@@ -29,8 +29,9 @@ grep -h '"docs"\|"languages"' plugins/*/.claude-plugin/plugin.json || echo "✅ 
 
 ```
 ai-agent-setup/
-├── plugins/                  # プラグインソース（11個）
+├── plugins/                  # プラグインソース（13個）
 │   ├── development-toolkit/  # 開発ワークフロー（/plan, /dev, /create_pr）
+│   ├── dd/                   # 深堀りスキル（ultrathink、要件明確化）
 │   ├── jujutsu-workflow/     # Jujutsu VCS サポート
 │   ├── lang-java-spring/     # Java + Spring Boot
 │   ├── lang-python/          # Python + FastAPI

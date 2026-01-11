@@ -1,6 +1,6 @@
 # AI Agent Setup
 
-生成AIエージェント（Claude、Cursor、Cline）の設定ファイルを簡単に配布・セットアップできるシステムです。
+Claude Code の設定ファイルを簡単に配布・セットアップできるシステムです。
 
 ## 📋 概要
 
@@ -29,6 +29,9 @@ Claude Code のチャットで以下のコマンドを実行：
 基本的な開発環境を整えるため、以下のプラグインをインストール：
 
 ```bash
+# 推奨: 要件を深堀りして明確化（ultrathink機能）
+/plugin install dd@ai-agent-setup
+
 # 推奨: 開発ワークフロー統合（計画、PR、CHANGELOG）
 /plugin install development-toolkit@ai-agent-setup
 ```
@@ -81,6 +84,7 @@ ls -la ~/.claude/plugins/cache/ai-agent-setup/
 
 | プラグイン | 説明 | 提供機能 | キーワード |
 |-----------|------|---------|-----------|
+| `dd` | 再帰的な深堀りで要件を明確化<br>推測を排除し、品質・信頼性を向上 | 📚スキル: 1個 | deep-dive, requirements, questioning, ultrathink |
 | `development-toolkit` | 開発ワークフロー統合（計画・PR・CHANGELOG）<br>日常的な開発作業の推奨ツール | 📋コマンド: 6個<br>📚スキル: 1個<br>🤖エージェント: 2個<br>🪝フック: 2個 | development, workflow, pr, changelog, planning |
 | `jujutsu-workflow` | Jujutsuバージョン管理ワークフロー<br>.jjディレクトリやjjコマンド使用時に推奨 | 📚スキル: 1個<br>📄ドキュメント: 1個 | jujutsu, jj, version-control, git-alternative, vcs |
 
@@ -133,17 +137,10 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins["development-toolkit
 cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 ```
 
-### 📁 その他の設定ファイル
-
-プラグインシステムの対象外ですが、以下のツール向け設定も提供しています：
-
-- **Cursor**: `.cursor/rules/*.mdc` 形式のProject Rules
-- **Cline**: `.clinerules/` ディレクトリのルールファイル
-- **AGENTS.md**: シンプルなAI設定ファイル
-
 ## 🤖 スキル & エージェント
 
 ### スキル（知識ライブラリ）
+- **dd**: 再帰的な深堀りで要件を明確化、推測を排除
 - **jujutsu**: Jujutsuバージョン管理のベストプラクティス
 - **ci-cd**: GitHub Actions/Screwdriverのトラブルシューティング
 - **oss-license**: OSSライセンスコンプライアンスガイド
@@ -376,38 +373,24 @@ ai-agent-setup/
 │       └── protect-branch.conf
 ├── plugins/                     # プラグインソース（SSoT）
 │   ├── development-toolkit/
+│   ├── dd/                      # 深堀りスキル
 │   ├── lang-python/
-│   └── ...（全11個のプラグイン）
+│   └── ...（全13個のプラグイン）
 ├── .claude/                     # プロジェクトテンプレート（最小限）
 │   ├── CLAUDE.md               # プラグインインストールガイド
 │   ├── settings.json           # 基本設定
 │   └── README.md               # 設定説明
-├── .cursor/                     # Cursor設定
-├── .clinerules/                 # Cline設定
-├── AGENTS.md                   # シンプル設定
 ├── install-global.sh           # グローバル設定配布スクリプト
 └── install-project.sh          # プロジェクト設定配布スクリプト
 ```
 
-### プロジェクト設定（Cursor + Claude）
+### プロジェクト設定（Claude Code）
 ```
 my-project/
-├── .cursor/
-│   ├── rules/                # Project Rules（推奨）
-│   │   ├── general.mdc       # 全般的なルール
-│   │   ├── java-spring.mdc   # Java固有
-│   │   ├── php.mdc          # PHP固有
-│   │   ├── perl.mdc         # Perl固有
-│   │   ├── python.mdc       # Python固有
-│   │   └── database.mdc     # データベース設計
-│   └── commands/             # 🆕 コマンドファイル
-│       ├── dev.md           # 開発コマンド
-│       ├── documentation.md # ドキュメント化コマンド
-│       └── plan.md          # 計画コマンド
 ├── .claude/                  # Claude設定（プロジェクト固有）
 │   ├── CLAUDE.md             # メインエントリーポイント
-│   ├── settings.json         # Claude Desktop/Web設定
-│   ├── commands/             # 🆕 コマンドファイル
+│   ├── settings.json         # Claude Code設定
+│   ├── commands/             # コマンドファイル
 │   │   ├── dev.md           # 開発コマンド
 │   │   ├── documentation.md # ドキュメント化コマンド
 │   │   └── plan.md          # 計画コマンド
@@ -417,15 +400,6 @@ my-project/
 │   ├── languages/            # 言語別設定
 │   ├── security/             # セキュリティポリシー
 │   └── team/                 # チーム標準
-├── .clinerules/              # Cline設定（プロジェクト固有）
-│   ├── general.md            # 全般的なルール
-│   ├── jujutsu.md            # Jujutsuルール
-│   ├── java-spring.md        # Java固有
-│   ├── php.md               # PHP固有
-│   ├── python.md            # Python固有
-│   ├── perl.md              # Perl固有
-│   └── database.md          # データベース設計
-├── AGENTS.md                 # シンプルな代替手段
 └── src/                      # ソースコード
 ```
 
@@ -449,7 +423,6 @@ my-project/
 - **@dev**: TDD開発、コードレビュー、リファクタリング支援
 - **@documentation**: 世界レベルのドキュメント化戦略・テンプレート
 - **@plan**: プロジェクト計画、要件定義、リスク管理
-- **Claude・Cursor両対応**: 同一コマンドを両環境で利用可能
 - **実践的テンプレート**: 即座に使える包括的なドキュメント体系
 
 ### スキル & エージェント
@@ -506,27 +479,12 @@ my-project/
 - pytest + pytest-asyncio
 - SQLAlchemy（MySQL/PostgreSQL）
 
-## ⚙️ Cursor User Rules 推奨設定
-
-以下をCursorの設定（`Cmd/Ctrl + ,` → Cursor Settings → Rules）に追加することを推奨します：
-
-```
-# User Rules 推奨設定
-
-1. タスクが完了したら、ターミナルからsayコマンドを実行して、音声で通知してください。
-2. 回答は常に日本語で行ってください。
-```
-
-これにより、プロジェクト固有の設定と組み合わせて、より一貫した開発体験が得られます。
-
 ## 📚 ドキュメント
 
 - [マイグレーションガイド](docs/migration-guide.md) - レガシースクリプトからプラグインシステムへの移行方法
 - [シンプルガイド](docs/simple-guide.md) - 基本的な使い方
 - [グローバル設定ガイド](docs/global-config-guide.md) - グローバル設定の詳細
 - [Claude Import ガイド](docs/claude-import-guide.md) - @import構文の使い方
-- [Cursor公式ガイド](docs/cursor-official-guide.md) - Project Rules仕様
-- [**Clineルールガイド**](docs/cline-guide.md) - Cline（VSCode拡張）用ルール設定
 
 
 ## 🏢 エンタープライズ向け
