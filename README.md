@@ -191,12 +191,17 @@ cd ai-agent-setup
 `settings.template.json` には statusLine 設定が含まれています。以下のツールが必要です：
 
 ```bash
-# bun のインストール（推奨）
-curl -fsSL https://bun.sh/install | bash
-
-# ccusage のインストール（Claude Code 使用量表示）
-npm install -g ccusage
+# ccstatusline のインストール（Claude Code ステータス表示）
+npm install -g ccstatusline
 ```
+
+ccstatusline は以下の情報を statusLine に表示します：
+- モデル名（Sonnet 4.5など）
+- コンテキスト使用量（トークン数と割合）
+- Gitブランチ名
+- Git変更状況
+
+設定のカスタマイズは `~/.config/ccstatusline/settings.json` で可能です。
 
 これらのツールがインストールされていない場合、`install-global.sh` が通知してインストール方法を案内します。
 

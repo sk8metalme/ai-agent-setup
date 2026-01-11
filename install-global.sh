@@ -107,15 +107,9 @@ check_statusline_deps() {
 
   echo ""
 
-  # bun の確認
-  if ! command -v bun &> /dev/null; then
-    echo "  - bun: curl -fsSL https://bun.sh/install | bash"
-    missing=1
-  fi
-
-  # ccusage の確認
-  if ! command -v ccusage &> /dev/null && ! npm list -g ccusage &> /dev/null 2>&1; then
-    echo "  - ccusage: npm install -g ccusage"
+  # ccstatusline の確認
+  if ! command -v ccstatusline &> /dev/null && ! npm list -g ccstatusline &> /dev/null 2>&1; then
+    echo "  - ccstatusline: npm install -g ccstatusline"
     missing=1
   fi
 
