@@ -99,25 +99,18 @@ Validation errors: Unrecognized key(s) in object: 'docs'
 
 ### Commands vs Skills（v2.1.0+）
 
-**重要な変更（2026-01-07）:**
-
-Claude Code v2.1.0 以降、**Skills がスラッシュコマンドメニューに自動表示**されるようになりました。これにより、Commands と Skills を分ける必要性が大幅に減少しました。
+Claude Code v2.1.0 以降、Skills がスラッシュコマンドメニューに自動表示されるようになりました。
 
 **機能比較:**
 
 | 機能 | Commands | Skills |
 |------|----------|--------|
-| スラッシュコマンド呼び出し | ✅ | ✅（v2.1.0+） |
+| スラッシュコマンド呼び出し | ✅ | ✅ |
 | トリガーキーワード自動起動 | ❌ | ✅ |
-| `agent` フィールド | ❌ | ✅ |
-| `model` フィールド | ❌ | ✅（Haiku/Sonnet/Opus選択） |
-| `context: fork` | ❌ | ✅（独立コンテキスト） |
-| `user-invocable: false` | ❌ | ✅（内部専用スキル） |
-| Hot-reload対応 | ✅ | ✅ |
+| `agent` / `model` / `context: fork` | ❌ | ✅ |
+| `user-invocable: false`（内部専用） | ❌ | ✅ |
 
-**推奨アーキテクチャ:**
-
-新規プラグインは **Skills-only** で作成することを推奨します。
+**推奨:** 新規プラグインは **Skills-only** で作成
 
 ```json
 {
@@ -127,35 +120,11 @@ Claude Code v2.1.0 以降、**Skills がスラッシュコマンドメニュー�
 }
 ```
 
-Commands は以下の場合のみ使用を検討：
-- レガシープラグインの互換性維持
-- 明示的にコマンド専用の機能が必要な場合
+Commands はレガシー互換性維持目的でのみ使用を検討してください。
 
-**実例: dd plugin の統合**
+**実例:** dd plugin v1.2.0 で `commands/dd.md` を削除し Skills-only に統合（177行削減）
 
-dd plugin（再帰的深堀りスキル）は、当初 Commands + Skills の構成でしたが、v1.2.0 で Skills-only に統合しました：
-
-- **Before (v1.0.0-1.1.0)**:
-  ```
-  plugins/dd/
-  ├── commands/dd.md          # /dd コマンド定義
-  └── skills/dd/SKILL.md      # スキル本体
-  ```
-
-- **After (v1.2.0)**:
-  ```
-  plugins/dd/
-  └── skills/dd/SKILL.md      # スキルのみ（/dd で呼び出し可能）
-  ```
-
-この変更により：
-- ファイル数削減（177行のdd.mdを削除）
-- メンテナンス性向上（重複排除）
-- 機能は変わらず（スラッシュコマンド呼び出しは引き続き可能）
-
-**参考:**
-- [Commit 870624f](https://github.com/anthropics/claude-code/commit/870624fc1581a70590e382f263e2972b3f1e56f5): Skills をスラッシュコマンドメニューに追加（v2.1.0）
-- PR #55: dd plugin の Commands 削除例
+**参考:** [Commit 870624f](https://github.com/anthropics/claude-code/commit/870624fc1581a70590e382f263e2972b3f1e56f5) - Skills のスラッシュコマンドメニュー対応
 
 ## 開発原則
 
