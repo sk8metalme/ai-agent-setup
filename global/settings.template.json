@@ -253,7 +253,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "echo \"$(pwd | sed \"s|^$HOME|~|\") [$(git branch --show-current 2>/dev/null || echo '-')] | $(bun x ccusage statusline)\"",
+    "command": "~/.claude/hooks/statusline.sh",
     "padding": 0
   },
   "git": {
