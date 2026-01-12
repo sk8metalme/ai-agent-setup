@@ -2,8 +2,10 @@
 
 [Brief 1-2 sentence description of what this library does]
 
-**Language**: [TypeScript/Python/Go/Rust]
-**Package Manager**: [npm/PyPI/crates.io/Go modules]
+**Language**: TypeScript
+**Package Manager**: npm
+
+> **Note**: This template is TypeScript/npm-specific. For other languages (Python/Go/Rust/PHP/Java/Perl), refer to language-specific templates or adapt the commands accordingly.
 
 ## Quick Start (Development)
 
@@ -45,7 +47,7 @@ npm test -- --watch             # Run tests in watch mode (TDD)
 
 ## Project Structure
 
-```
+```text
 src/
 ├── index.ts                # Public API (exports)
 ├── core/                   # Core functionality
