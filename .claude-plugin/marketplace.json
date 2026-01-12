@@ -8,7 +8,7 @@
       "name": "development-toolkit",
       "source": "./plugins/development-toolkit",
       "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "skills": [
         "./skills/changelog/SKILL.md",
         "./skills/secrets-guard/SKILL.md",
