@@ -23,15 +23,32 @@ cat ~/.claude/plugins/installed_plugins.json | jq '.plugins | keys'
 
 # プラグインマニフェスト検証エラーの確認
 grep -h '"docs"\|"languages"' plugins/*/.claude-plugin/plugin.json || echo "✅ OK"
+
+# プラグイン名の一貫性チェック（marketplace.json と plugin.json の name が一致するか）
+for plugin_dir in plugins/*/; do
+  plugin_name=$(basename "$plugin_dir")
+  json_name=$(cat "$plugin_dir/.claude-plugin/plugin.json" 2>/dev/null | jq -r '.name // empty')
+  marketplace_name=$(cat .claude-plugin/marketplace.json | jq -r ".plugins[] | select(.source == \"./plugins/$plugin_name\") | .name")
+  if [ -n "$json_name" ] && [ "$json_name" != "$marketplace_name" ]; then
+    echo "❌ 不一致: ディレクトリ=$plugin_name, plugin.json=$json_name, marketplace.json=$marketplace_name"
+  fi
+done
+echo "✅ チェック完了"
+
+# marketplace.json の source パスが実在するか確認
+jq -r '.plugins[] | .source' .claude-plugin/marketplace.json | while read src; do
+  [ -d "${src#./}" ] || echo "❌ ディレクトリなし: $src"
+done
+echo "✅ ディレクトリ存在確認完了"
 ```
 
 ## アーキテクチャ
 
 ```
 ai-agent-setup/
-├── plugins/                  # プラグインソース（13個）
+├── plugins/                  # プラグインソース（12個）
 │   ├── development-toolkit/  # 開発ワークフロー（/plan, /dev, /create_pr）
-│   ├── dd/                   # 深堀りスキル（ultrathink、要件明確化）
+│   ├── deep-dive/            # 深堀りスキル（ultrathink、要件明確化）
 │   ├── jujutsu-workflow/     # Jujutsu VCS サポート
 │   ├── lang-java-spring/     # Java + Spring Boot
 │   ├── lang-python/          # Python + FastAPI
@@ -98,6 +115,54 @@ Validation errors: Unrecognized key(s) in object: 'docs'
 - **MINOR** (0.x.0): 後方互換の新機能追加
 - **PATCH** (0.0.x): バグ修正・ドキュメント修正
 
+### プラグイン名変更時のチェックリスト
+
+プラグインのディレクトリ名や name を変更する際は、以下のすべてのファイルで一貫性を保つこと。
+
+**問題事例（deep-dive プラグイン）:**
+- ディレクトリ名を `dd/` → `deep-dive/` に変更
+- `plugin.json` の `"name": "deep-dive"` に変更
+- しかし、**marketplace.json が古い "dd" のまま**だった
+- 結果: マーケットプレイスでプラグインが見つからない（`Plugin "deep-dive" not found in any marketplace`）
+
+**必須チェック項目:**
+
+| # | ファイル | 確認内容 | 例 |
+|---|---------|---------|-----|
+| 1 | `plugins/<name>/` | ディレクトリ名 | `plugins/deep-dive/` |
+| 2 | `plugins/<name>/.claude-plugin/plugin.json` | `"name"` キー | `"name": "deep-dive"` |
+| 3 | **`.claude-plugin/marketplace.json`** | `"name"` と `"source"` | `"name": "deep-dive"`, `"source": "./plugins/deep-dive"` |
+| 4 | `CLAUDE.md` | アーキテクチャ図、実例記載 | `├── deep-dive/` |
+| 5 | `README.md` | インストールコマンド、テーブル、説明 | `/plugin install deep-dive@ai-agent-setup` |
+| 6 | `global/CLAUDE.md` | プラグインガイド（該当する場合） | `/plugin install deep-dive@ai-agent-setup` |
+
+**最重要:** **`.claude-plugin/marketplace.json`** の更新忘れに注意！これがないとマーケットプレイスで検索できません。
+
+**検証コマンド:**
+
+```bash
+# プラグイン名の一貫性チェック（新旧名が混在していないか確認）
+OLD_NAME="dd"
+NEW_NAME="deep-dive"
+
+# marketplace.json に古い名前が残っていないか
+grep -n "\"$OLD_NAME\"" .claude-plugin/marketplace.json
+
+# plugin.json が正しいか
+cat plugins/$NEW_NAME/.claude-plugin/plugin.json | jq '.name'
+
+# README.md/CLAUDE.md に古い名前が残っていないか
+grep -n "$OLD_NAME" README.md CLAUDE.md
+
+# マーケットプレイス更新後の動作確認
+/plugin marketplace refresh
+/plugin install $NEW_NAME@ai-agent-setup
+```
+
+**バージョン更新の推奨:**
+- プラグイン名変更は破壊的変更のため、**MAJOR バージョンアップ**を推奨
+- ただし、まだ広く使われていない場合は MINOR/PATCH でも可
+
 ### Commands vs Skills（v2.1.0+）
 
 Claude Code v2.1.0 以降、Skills がスラッシュコマンドメニューに自動表示されるようになりました。
@@ -123,7 +188,7 @@ Claude Code v2.1.0 以降、Skills がスラッシュコマンドメニューに
 
 Commands はレガシー互換性維持目的でのみ使用を検討してください。
 
-**実例:** dd plugin v1.2.0 で `commands/dd.md` を削除し Skills-only に統合（177行削減）
+**実例:** deep-dive plugin v1.2.0 で `commands/dd.md` を削除し Skills-only に統合（177行削減）
 
 **参考:** [Commit 870624f](https://github.com/anthropics/claude-code/commit/870624fc1581a70590e382f263e2972b3f1e56f5) - Skills のスラッシュコマンドメニュー対応
 
