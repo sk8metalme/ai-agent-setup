@@ -28,18 +28,5 @@
     "./skills/mermaid-validator/SKILL.md",
     "./skills/guardrail-builder/SKILL.md",
     "./skills/claude-md-creator/SKILL.md"
-  ],
-  "hooks": {
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${PLUGIN_DIR}/scripts/guardrail-builder-hook.sh"
-          }
-        ]
-      }
-    ]
-  }
+  ]
 }
