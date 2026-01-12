@@ -35,8 +35,8 @@ model: sonnet
    - review-dojo-mcpが利用可能な場合：
      - `generate_pr_checklist`で過去のレビュー知見を取得
      - 取得した知見をレビューの参考情報として表示
-   - `/review` でコードレビューを実行（review-dojo-mcpの知見を考慮）
-   - `/security-review` でセキュリティレビューを実行
+   - `code-simplifier:code-simplifier` エージェントでコード簡素化・リファクタリング
+   - `/security-review` でセキュリティレビューを実行（code-simplifier の後）
    - 指摘があればユーザーに修正確認→修正→再レビュー（ループ）
 
 3. **バージョン更新の実施**
@@ -158,8 +158,10 @@ git diff main...HEAD --stat
 # 4. review-dojo-mcpが利用不可の場合:
 #    → スキップして次へ進む（従来通りのレビュー）
 #
-# 5. /review スキルでコードレビューを実行
-#    - review-dojo-mcpの知見がある場合は、それを考慮してレビュー
+# 5. code-simplifier:code-simplifier エージェントでコード簡素化を実行
+#    - Task tool を使用して code-simplifier エージェントを起動
+#    - 最近変更したコードを対象に簡素化・リファクタリング
+#    - 変更があった場合は自動コミット
 #
 # 6. /security-review スキルでセキュリティレビューを実行
 #
@@ -202,9 +204,10 @@ git diff main...HEAD --stat
 # ステップ4: リモートにプッシュ
 git push -u origin "$current_branch"
 
-# ステップ5: PR作成
+# ステップ5: PR作成 + ブラウザオープン
 # $target_branchはステップ0で確認したブランチ名を使用
-gh pr create --base "$target_branch" --title "コミット履歴をまとめた概要を端的に説明したタイトル" --body "コミット履歴のサマリー、変更ファイル一覧、テストプラン（必要に応じて）"
+# --webオプションでPR作成完了後、自動的にブラウザでPRページを開く
+gh pr create --base "$target_branch" --title "コミット履歴をまとめた概要を端的に説明したタイトル" --body "コミット履歴のサマリー、変更ファイル一覧、テストプラン（必要に応じて）" --web
 ```
 
 ## PRタイトルとボディの生成
@@ -223,7 +226,7 @@ PRのタイトルとボディは以下のように生成されます:
 - 事前に`gh auth login`で認証してください
 - main/masterブランチからは実行できません
 - 未コミットの変更がある場合は先にコミットしてください
-- `--web`オプションでブラウザが自動で開きます
+- PR作成完了後、自動的にブラウザでPRページを開きます
 - **ステップ0で事前にターゲットブランチとバージョン更新方針を確認します**
 - バージョン管理ファイルが存在しない場合、バージョン更新の質問は表示されません
 - サポートされるバージョンファイル：package.json, pom.xml, build.gradle, pyproject.toml, composer.json, galaxy.yml, *.spec, Cargo.toml, *.gemspec, VERSION, version.txt
