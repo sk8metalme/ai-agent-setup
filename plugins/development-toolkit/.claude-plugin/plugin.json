@@ -1,7 +1,7 @@
 {
   "name": "development-toolkit",
   "description": "Complete development workflow: planning, coding, PR management, and changelog generation. Essential tools for daily development work.",
-  "version": "1.5.6",
+  "version": "1.6.0",
   "author": {
     "name": "sk8metalme"
   },
@@ -25,6 +25,7 @@
   "skills": [
     "./skills/changelog",
     "./skills/secrets-guard",
-    "./skills/mermaid-validator"
+    "./skills/mermaid-validator",
+    "./skills/guardrail-builder"
   ]
 }

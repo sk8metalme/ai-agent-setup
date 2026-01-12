@@ -8,11 +8,12 @@
       "name": "development-toolkit",
       "source": "./plugins/development-toolkit",
       "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
-      "version": "1.5.6",
+      "version": "1.6.0",
       "skills": [
         "./skills/changelog",
         "./skills/secrets-guard",
-        "./skills/mermaid-validator"
+        "./skills/mermaid-validator",
+        "./skills/guardrail-builder"
       ]
     },
     {
