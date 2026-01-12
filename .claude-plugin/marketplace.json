@@ -1,23 +1,57 @@
 {
   "name": "ai-agent-setup",
   "owner": {
-    "name": "sk8metalme",
-    "email": "your-email@example.com"
+    "name": "sk8metalme"
   },
   "plugins": [
+    {
+      "name": "development-toolkit",
+      "source": "./plugins/development-toolkit",
+      "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
+      "version": "1.5.1",
+      "skills": ["./skills/changelog", "./skills/secrets-guard", "./skills/mermaid-validator"]
+    },
+    {
+      "name": "deep-dive",
+      "source": "./plugins/deep-dive",
+      "description": "Deep-dive skill for recursive requirement exploration",
+      "version": "1.3.0",
+      "skills": ["./skills/deep-dive"]
+    },
+    {
+      "name": "lang-java-spring",
+      "source": "./plugins/lang-java-spring",
+      "description": "Java + Spring Boot development support",
+      "version": "1.0.0",
+      "skills": ["./skills/java-spring"]
+    },
+    {
+      "name": "lang-python",
+      "source": "./plugins/lang-python",
+      "description": "Python + FastAPI development support",
+      "version": "1.0.0",
+      "skills": ["./skills/python"]
+    },
+    {
+      "name": "lang-php",
+      "source": "./plugins/lang-php",
+      "description": "PHP + Slim Framework development support",
+      "version": "1.0.0",
+      "skills": ["./skills/php"]
+    },
+    {
+      "name": "lang-perl",
+      "source": "./plugins/lang-perl",
+      "description": "Perl + Mojolicious development support",
+      "version": "1.0.0",
+      "skills": ["./skills/perl"]
+    },
     {
       "name": "jujutsu-workflow",
       "source": "./plugins/jujutsu-workflow",
       "description": "Jujutsu version control workflow support",
       "version": "1.0.0",
       "skills": ["./skills/jujutsu"]
-    },
-    {
-      "name": "development-toolkit",
-      "source": "./plugins/development-toolkit",
-      "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
-      "version": "1.0.0",
-      "skills": ["./skills/changelog", "./skills/secrets-guard", "./skills/mermaid-validator"]
     },
     {
       "name": "ci-cd-tools",
@@ -53,41 +87,6 @@
       "description": "E2E-first development planning and Walking Skeleton design",
       "version": "1.0.0",
       "skills": ["./skills/e2e-first-planning"]
-    },
-    {
-      "name": "lang-java-spring",
-      "source": "./plugins/lang-java-spring",
-      "description": "Java + Spring Boot development support",
-      "version": "1.0.0",
-      "skills": ["./skills/java-spring"]
-    },
-    {
-      "name": "lang-python",
-      "source": "./plugins/lang-python",
-      "description": "Python + FastAPI development support",
-      "version": "1.0.0",
-      "skills": ["./skills/python"]
-    },
-    {
-      "name": "lang-php",
-      "source": "./plugins/lang-php",
-      "description": "PHP + Slim Framework development support",
-      "version": "1.0.0",
-      "skills": ["./skills/php"]
-    },
-    {
-      "name": "lang-perl",
-      "source": "./plugins/lang-perl",
-      "description": "Perl + Mojolicious development support",
-      "version": "1.0.0",
-      "skills": ["./skills/perl"]
-    },
-    {
-      "name": "deep-dive",
-      "source": "./plugins/deep-dive",
-      "description": "Deep-dive skill for recursive requirement exploration",
-      "version": "1.3.0",
-      "skills": ["./skills/deep-dive"]
     }
   ]
 }
