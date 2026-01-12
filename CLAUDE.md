@@ -163,6 +163,56 @@ grep -n "$OLD_NAME" README.md CLAUDE.md
 - プラグイン名変更は破壊的変更のため、**MAJOR バージョンアップ**を推奨
 - ただし、まだ広く使われていない場合は MINOR/PATCH でも可
 
+### marketplace.json での skills 登録（必須）
+
+**重要**: プラグインの skills を機能させるには、**2箇所**に定義が必要：
+
+| ファイル | 用途 | 必須 |
+|---------|------|------|
+| `plugins/<name>/.claude-plugin/plugin.json` | プラグイン本体の定義 | ✅ |
+| `.claude-plugin/marketplace.json` | マーケットプレイス経由でのスキル登録 | ✅ |
+
+**よくある間違い:**
+- plugin.json にだけ skills を定義 → マーケットプレイス経由だと「Unknown skill」エラー
+
+**正しい設定例:**
+
+`.claude-plugin/marketplace.json`:
+```json
+{
+  "plugins": [
+    {
+      "name": "my-plugin",
+      "source": "./plugins/my-plugin",
+      "version": "1.0.0",
+      "skills": ["./skills/my-skill/SKILL.md"]
+    }
+  ]
+}
+```
+
+**重要**: `skills` 配列は必須です。`source` からの相対パスで `SKILL.md` まで含めた完全パス形式で指定してください。
+
+### marketplace.json と plugin.json の version 同期
+
+**重要**: marketplace.json の version は plugin.json と**必ず一致**させること。
+
+不一致があると、マーケットプレイスに古いバージョンが表示され、ユーザーが混乱する。
+
+**チェックコマンド:**
+```bash
+# 全プラグインの version 一致確認
+for plugin_dir in plugins/*/; do
+  plugin_name=$(basename "$plugin_dir")
+  plugin_ver=$(jq -r '.version' "$plugin_dir/.claude-plugin/plugin.json" 2>/dev/null)
+  market_ver=$(jq -r ".plugins[] | select(.name == \"$plugin_name\") | .version" .claude-plugin/marketplace.json)
+  if [ "$plugin_ver" != "$market_ver" ]; then
+    echo "❌ $plugin_name: plugin.json=$plugin_ver, marketplace.json=$market_ver"
+  fi
+done
+echo "✅ バージョン確認完了"
+```
+
 ### Commands vs Skills（v2.1.0+）
 
 Claude Code v2.1.0 以降、Skills がスラッシュコマンドメニューに自動表示されるようになりました。
