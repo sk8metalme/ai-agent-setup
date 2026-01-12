@@ -1,5 +1,5 @@
 ---
-name: dd
+name: deep-dive
 description: |
   再帰的な質問で要件・課題を深堀りし、推測をなくし、品質・信頼性を向上させるスキル。
   トリガーキーワード: 「深堀り」「検討して」「ultrathink」「よく考えて」「他にはないか」「他の案は？」
@@ -7,7 +7,7 @@ description: |
 allowed-tools: AskUserQuestion, Read, Grep, Glob
 ---
 
-# dd (Deep Dive) スキル
+# deep-dive (Deep Dive) スキル
 
 ## 目的
 
@@ -26,7 +26,7 @@ allowed-tools: AskUserQuestion, Read, Grep, Glob
 - 「よく考えて」
 - 「他にはないか」「他の案は？」
 
-または `/dd [トピック]` コマンドで明示的に呼び出し。
+または `/deep-dive [トピック]` コマンドで明示的に呼び出し。
 
 ## 基本ワークフロー
 
