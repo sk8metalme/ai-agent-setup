@@ -107,19 +107,23 @@ python scripts/check_claude_md.py /path/to/CLAUDE.md
 
 プロジェクトタイプに応じた詳細なガイダンス:
 
-| ファイル | 説明 |
-|---------|------|
-| `best-practices.md` | CLAUDE.md作成のベストプラクティス集 |
-| `structure-guide.md` | CLAUDE.mdの構造設計ガイド |
-| `development-workflow.md` | TDD、E2Eテストを含む開発フロー |
-| `quality-assurance.md` | テスト方法、リント、品質担保施策 |
-| `ci-cd-guide.md` | CI/CD設定のベストプラクティス |
-| `project-structure.md` | プロジェクト構造パターン |
-| `version-control.md` | Git/Jujutsuバージョン管理戦略 |
-| `common-patterns.md` | よく使われる設定パターン集 |
-| `examples.md` | 良いCLAUDE.mdの実例 |
+| ファイル | 説明 | 使用場面 |
+|---------|------|---------|
+| `best-practices.md` | CLAUDE.md作成のベストプラクティス集 | 原則・アンチパターンを確認したい時 |
+| `structure-guide.md` | CLAUDE.mdの構造設計ガイド | セクション構成を決めたい時 |
+| `examples.md` | 良いCLAUDE.mdの実例 | 完成イメージを確認したい時 |
+| `common-patterns.md` | よく使われる設定パターン集 | 特定セクションのスニペットが必要な時 |
+| `development-workflow.md` | TDD、E2Eテストを含む開発フロー | 開発フローセクションの詳細 |
+| `quality-assurance.md` | テスト方法、リント、品質担保施策 | テスト・品質セクションの詳細 |
+| `ci-cd-guide.md` | CI/CD設定のベストプラクティス | CI/CDセクションの詳細 |
+| `project-structure.md` | プロジェクト構造パターン | ディレクトリ構成の参考 |
+| `version-control.md` | Git/Jujutsuバージョン管理戦略 | バージョン管理セクションの詳細 |
 
-必要に応じてこれらのドキュメントを参照してください。
+**推奨参照順序**:
+1. `examples.md` - 完成イメージを把握
+2. `best-practices.md` - 原則を理解
+3. `structure-guide.md` - 構成を決定
+4. 各詳細ガイド - 必要なセクションのみ参照
 
 ### Assets (Templates)
 

@@ -52,6 +52,13 @@ class ValidationResult:
             self.score -= 2
         self.score = max(0, self.score)
 
+    def count_by_severity(self) -> Dict[Severity, int]:
+        """Count issues by severity level"""
+        counts = {severity: 0 for severity in Severity}
+        for issue in self.issues:
+            counts[issue.severity] += 1
+        return counts
+
 
 class ClaudeMdChecker:
     """CLAUDE.md validator"""
@@ -235,8 +242,11 @@ class ClaudeMdChecker:
             ))
 
         # Check for very short sections (heading followed immediately by another heading)
-        for i in range(len(self.lines) - 1):
-            if self.lines[i].strip().startswith('#') and self.lines[i+1].strip().startswith('#'):
+        line_count = len(self.lines)
+        for i in range(line_count - 1):
+            current_line = self.lines[i].strip()
+            next_line = self.lines[i + 1].strip()
+            if current_line.startswith('#') and next_line.startswith('#'):
                 result.add_issue(Issue(
                     severity=Severity.WARNING,
                     category="Content Quality",
@@ -297,15 +307,12 @@ def print_report(result: ValidationResult, file_path: Path):
                 print(f"   Suggestion: {issue.suggestion}")
             print()
 
-    error_count = sum(1 for i in result.issues if i.severity == Severity.ERROR)
-    warning_count = sum(1 for i in result.issues if i.severity == Severity.WARNING)
-    info_count = sum(1 for i in result.issues if i.severity == Severity.INFO)
-
+    counts = result.count_by_severity()
     print("=" * 80)
     print(f"Total Issues: {len(result.issues)}")
-    print(f"  Errors: {error_count}")
-    print(f"  Warnings: {warning_count}")
-    print(f"  Info: {info_count}")
+    print(f"  Errors: {counts[Severity.ERROR]}")
+    print(f"  Warnings: {counts[Severity.WARNING]}")
+    print(f"  Info: {counts[Severity.INFO]}")
     print("=" * 80)
 
 
@@ -332,8 +339,8 @@ def main():
     print_report(result, file_path)
 
     # Exit code based on errors
-    error_count = sum(1 for i in result.issues if i.severity == Severity.ERROR)
-    sys.exit(1 if error_count > 0 else 0)
+    counts = result.count_by_severity()
+    sys.exit(1 if counts[Severity.ERROR] > 0 else 0)
 
 
 if __name__ == "__main__":
