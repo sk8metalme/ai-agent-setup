@@ -9,84 +9,84 @@
       "source": "./plugins/development-toolkit",
       "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
       "version": "1.5.1",
-      "skills": ["./skills/changelog", "./skills/secrets-guard", "./skills/mermaid-validator"]
+      "skills": ["./skills/changelog/SKILL.md", "./skills/secrets-guard/SKILL.md", "./skills/mermaid-validator/SKILL.md"]
     },
     {
       "name": "deep-dive",
       "source": "./plugins/deep-dive",
       "description": "Deep-dive skill for recursive requirement exploration",
       "version": "1.3.0",
-      "skills": ["./skills/deep-dive"]
+      "skills": ["./skills/deep-dive/SKILL.md"]
     },
     {
       "name": "lang-java-spring",
       "source": "./plugins/lang-java-spring",
       "description": "Java + Spring Boot development support",
       "version": "1.0.0",
-      "skills": ["./skills/java-spring"]
+      "skills": ["./skills/java-spring/SKILL.md"]
     },
     {
       "name": "lang-python",
       "source": "./plugins/lang-python",
       "description": "Python + FastAPI development support",
       "version": "1.0.0",
-      "skills": ["./skills/python"]
+      "skills": ["./skills/python/SKILL.md"]
     },
     {
       "name": "lang-php",
       "source": "./plugins/lang-php",
       "description": "PHP + Slim Framework development support",
       "version": "1.0.0",
-      "skills": ["./skills/php"]
+      "skills": ["./skills/php/SKILL.md"]
     },
     {
       "name": "lang-perl",
       "source": "./plugins/lang-perl",
       "description": "Perl + Mojolicious development support",
       "version": "1.0.0",
-      "skills": ["./skills/perl"]
+      "skills": ["./skills/perl/SKILL.md"]
     },
     {
       "name": "jujutsu-workflow",
       "source": "./plugins/jujutsu-workflow",
       "description": "Jujutsu version control workflow support",
       "version": "1.0.0",
-      "skills": ["./skills/jujutsu"]
+      "skills": ["./skills/jujutsu/SKILL.md"]
     },
     {
       "name": "ci-cd-tools",
       "source": "./plugins/ci-cd-tools",
       "description": "CI/CD troubleshooting and GitHub Actions support",
       "version": "1.0.0",
-      "skills": ["./skills/ci-cd"]
+      "skills": ["./skills/ci-cd/SKILL.md"]
     },
     {
       "name": "oss-compliance",
       "source": "./plugins/oss-compliance",
       "description": "OSS license compliance checking and auditing",
       "version": "1.0.0",
-      "skills": ["./skills/oss-license"]
+      "skills": ["./skills/oss-license/SKILL.md"]
     },
     {
       "name": "version-audit",
       "source": "./plugins/version-audit",
       "description": "Technology stack version auditing and EOL checking",
       "version": "1.0.0",
-      "skills": ["./skills/stable-version"]
+      "skills": ["./skills/stable-version/SKILL.md"]
     },
     {
       "name": "design-review",
       "source": "./plugins/design-review",
       "description": "UI/UX design review and accessibility checking",
       "version": "1.0.0",
-      "skills": ["./skills/design-review"]
+      "skills": ["./skills/design-review/SKILL.md"]
     },
     {
       "name": "e2e-planning",
       "source": "./plugins/e2e-planning",
       "description": "E2E-first development planning and Walking Skeleton design",
       "version": "1.0.0",
-      "skills": ["./skills/e2e-first-planning"]
+      "skills": ["./skills/e2e-first-planning/SKILL.md"]
     }
   ]
 }

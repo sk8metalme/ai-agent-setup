@@ -177,19 +177,21 @@ grep -n "$OLD_NAME" README.md CLAUDE.md
 
 **正しい設定例:**
 
+`.claude-plugin/marketplace.json`:
 ```json
-// .claude-plugin/marketplace.json
 {
   "plugins": [
     {
       "name": "my-plugin",
       "source": "./plugins/my-plugin",
       "version": "1.0.0",
-      "skills": ["./skills/my-skill"]  // ← これが必須！
+      "skills": ["./skills/my-skill/SKILL.md"]
     }
   ]
 }
 ```
+
+**重要**: `skills` 配列は必須です。`source` からの相対パスで `SKILL.md` まで含めた完全パス形式で指定してください。
 
 ### marketplace.json と plugin.json の version 同期
 
