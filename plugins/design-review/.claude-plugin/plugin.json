@@ -8,6 +8,6 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["design", "ui", "ux", "accessibility", "a11y", "review"],
-  "skills": ["./skills/design-review/SKILL.md"],
+  "skills": ["./skills/design-review"],
   "agents": ["./agents/design-reviewer/AGENT.md"]
 }

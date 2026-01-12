@@ -8,5 +8,5 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["perl", "mojolicious", "development"],
-  "skills": ["./skills/perl/SKILL.md"]
+  "skills": ["./skills/perl"]
 }

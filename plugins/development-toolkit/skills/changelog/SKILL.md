@@ -1,8 +1,6 @@
 ---
 name: changelog
-description: |
-  CHANGELOGとリリースノート生成ガイド。
-  Conventional Commits、Keep a Changelog形式、セマンティックバージョニング対応。
+description: "CHANGELOG and release notes generation guide. Supports Conventional Commits, Keep a Changelog format, and Semantic Versioning."
 allowed-tools: Bash, Read, Grep, Glob
 ---
 

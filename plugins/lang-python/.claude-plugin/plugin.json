@@ -8,5 +8,5 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["python", "fastapi", "async", "development"],
-  "skills": ["./skills/python/SKILL.md"]
+  "skills": ["./skills/python"]
 }

@@ -1,7 +1,7 @@
 {
   "name": "deep-dive",
   "description": "再帰的な深堀りで要件を明確化。「深堀り」「検討して」「ultrathink」「よく考えて」「他にはないか」等のキーワードで起動。推測を排除し品質向上。",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": {
     "name": "sk8metalme"
   },
@@ -14,6 +14,6 @@
     "ultrathink"
   ],
   "skills": [
-    "./skills/deep-dive/SKILL.md"
+    "./skills/deep-dive"
   ]
 }

@@ -8,6 +8,6 @@
   "repository": "https://github.com/sk8metalme/ai-agent-setup",
   "license": "MIT",
   "keywords": ["version", "audit", "eol", "security", "dependencies", "vulnerabilities"],
-  "skills": ["./skills/stable-version/SKILL.md"],
+  "skills": ["./skills/stable-version"],
   "agents": ["./agents/stable-version-auditor/AGENT.md"]
 }

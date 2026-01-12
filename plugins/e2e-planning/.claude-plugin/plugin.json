@@ -9,5 +9,5 @@
   "license": "MIT",
   "keywords": ["e2e", "planning", "walking-skeleton", "architecture", "design"],
   "agents": ["./agents/e2e-first-planner/AGENT.md"],
-  "skills": ["./skills/e2e-first-planning/SKILL.md"]
+  "skills": ["./skills/e2e-first-planning"]
 }

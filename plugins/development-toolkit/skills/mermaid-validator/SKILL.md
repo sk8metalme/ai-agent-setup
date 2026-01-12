@@ -1,8 +1,6 @@
 ---
 name: mermaid-validator
-description: |
-  Mermaid図の構文検証と修正を行うスキル。
-  architecture.md生成時のパースエラーを防止。
+description: "Mermaid図の構文検証と修正を行うスキル。architecture.md生成時のパースエラーを防止。C4モデル、シーケンス図、グラフ構文をサポート。"
 allowed-tools: Bash, Read, Grep, Glob, WebFetch, Edit, Write
 ---
 
