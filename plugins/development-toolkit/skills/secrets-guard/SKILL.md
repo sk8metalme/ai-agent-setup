@@ -1,3 +1,11 @@
+---
+name: secrets-guard
+description: |
+  Claude Codeで秘密情報を安全に管理するための多層防御アプローチガイド。
+  APIトークン、DB認証情報、SSH鍵などを保護する3層防御戦略。
+allowed-tools: Read, Grep
+---
+
 # 秘密情報管理（Secrets Guard）
 
 Claude Codeで秘密情報を安全に管理するための多層防御アプローチガイド。

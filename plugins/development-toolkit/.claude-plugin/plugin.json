@@ -1,7 +1,7 @@
 {
   "name": "development-toolkit",
   "description": "Complete development workflow: planning, coding, PR management, and changelog generation. Essential tools for daily development work.",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "author": {
     "name": "sk8metalme"
   },
