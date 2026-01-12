@@ -242,6 +242,237 @@ Commands はレガシー互換性維持目的でのみ使用を検討してく�
 
 **参考:** [Commit 870624f](https://github.com/anthropics/claude-code/commit/870624fc1581a70590e382f263e2972b3f1e56f5) - Skills のスラッシュコマンドメニュー対応
 
+### Skills パス形式の注意点（重要）
+
+**Claude Code は skills パスを「ディレクトリパス」として解釈し、その中の `SKILL.md` を自動的に探索します。**
+
+| 項目 | 正しい形式 ✅ | 間違った形式 ❌ |
+|------|------------|--------------|
+| plugin.json | `"./skills/changelog"` | `"./skills/changelog/SKILL.md"` |
+| marketplace.json | `"./skills/changelog"` | `"./skills/changelog/SKILL.md"` |
+| 結果 | Skills が正常に読み込まれる | "Unknown skill" エラー |
+
+**よくあるエラー:**
+```
+Unknown skill: changelog
+```
+
+**原因:** パスに `/SKILL.md` を含めている
+
+**解決方法:** ディレクトリパスのみを指定
+
+```json
+// ❌ 動かない
+{
+  "skills": [
+    "./skills/changelog/SKILL.md"
+  ]
+}
+
+// ✅ 正しい
+{
+  "skills": [
+    "./skills/changelog"
+  ]
+}
+```
+
+**公式リポジトリとの比較:**
+
+[anthropics/skills](https://github.com/anthropics/skills) の plugin.json:
+```json
+{
+  "skills": [
+    "./skills/pdf",
+    "./skills/pptx",
+    "./skills/docx"
+  ]
+}
+```
+
+**重要:** すべてディレクトリパスのみ。`SKILL.md` を含めない。
+
+**検証コマンド:**
+```bash
+# skills パスに SKILL.md が含まれていないか確認
+jq -r '.skills[]' plugins/*/.claude-plugin/plugin.json | grep -i 'SKILL\.md' && echo "❌ エラー: SKILL.md を削除してください" || echo "✅ OK"
+
+# marketplace.json も同様に確認
+jq -r '.plugins[].skills[]?' .claude-plugin/marketplace.json | grep -i 'SKILL\.md' && echo "❌ エラー: SKILL.md を削除してください" || echo "✅ OK"
+```
+
+**参考:** [Issue #49 コメント](https://github.com/sk8metalme/ai-agent-setup/issues/49) - Skills パス形式の問題発見と修正
+
+---
+
+### SessionEnd フックの設定方法
+
+**重要:** plugin.json の `hooks` 設定は**現在非対応**です。フックを使用するには **~/.claude/settings.json** で手動登録が必要です。
+
+#### 1. フックスクリプトの配置
+
+プラグインのフックスクリプトは `scripts/` ディレクトリに配置します：
+
+```bash
+plugins/
+└── my-plugin/
+    └── scripts/
+        └── my-hook.sh  # フックスクリプト
+```
+
+#### 2. settings.json への登録
+
+**~/.claude/settings.json** に以下の形式で追加：
+
+```json
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/plugins/<owner>_<plugin-name>_<version>/scripts/my-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**実例: guardrail-builder (development-toolkit v1.6.0):**
+
+```json
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/plugins/sk8metalme_development-toolkit_1.6.0/scripts/guardrail-builder-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### 3. プラグインパスの確認方法
+
+インストール済みプラグインのパスは以下で確認できます：
+
+```bash
+# インストール済みプラグイン一覧
+cat ~/.claude/plugins/installed_plugins.json | jq -r '.plugins | keys[]'
+
+# 特定プラグインのパス
+ls -la ~/.claude/plugins/ | grep development-toolkit
+```
+
+**出力例:**
+```
+drwxr-xr-x  sk8metalme_development-toolkit_1.6.0
+```
+
+#### 4. フックスクリプトのベストプラクティス
+
+**無限ループ対策（必須）:**
+
+SessionEnd フック内で claude コマンドを実行すると、再度 SessionEnd フックが発火して無限ループになります。環境変数でガードしてください：
+
+```bash
+#!/bin/bash
+
+# 無限ループ対策
+if [ "${MY_HOOK_RUNNING:-}" = "1" ]; then
+    echo "Already running. Skipping." >&2
+    exit 0
+fi
+export MY_HOOK_RUNNING=1
+
+# フック処理
+# ...
+```
+
+**プロジェクトルート検出:**
+
+フックは Claude Code のワーキングディレクトリとは異なる場所で実行される可能性があります。以下の順序で検出してください：
+
+```bash
+PROJECT_ROOT=""
+
+# 1) 環境変数 CLAUDE_PROJECT_DIR
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
+    PROJECT_ROOT="${CLAUDE_PROJECT_DIR/#\~/$HOME}"
+fi
+
+# 2) ~/.claude/settings.json の project_dir
+if [ -z "$PROJECT_ROOT" ]; then
+    SETTINGS_FILE="$HOME/.claude/settings.json"
+    if [ -f "$SETTINGS_FILE" ]; then
+        PROJECT_DIR_FROM_SETTINGS=$(jq -r '.project_dir // ""' "$SETTINGS_FILE")
+        if [ -n "$PROJECT_DIR_FROM_SETTINGS" ]; then
+            PROJECT_ROOT="${PROJECT_DIR_FROM_SETTINGS/#\~/$HOME}"
+        fi
+    fi
+fi
+
+# 3) git root
+if [ -z "$PROJECT_ROOT" ]; then
+    GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
+    if [ -n "$GIT_ROOT" ]; then
+        PROJECT_ROOT="$GIT_ROOT"
+    fi
+fi
+
+# 4) pwd（最終フォールバック）
+if [ -z "$PROJECT_ROOT" ]; then
+    PROJECT_ROOT="$(pwd)"
+fi
+```
+
+#### 5. 動作確認
+
+```bash
+# Claude Code を正常終了
+# → フックが実行され、処理結果が表示される（development-toolkit の場合は macOS 通知）
+
+# ログ確認（development-toolkit の例）
+tail -f ~/.claude/logs/guardrail-builder-*.log
+```
+
+#### 6. トラブルシューティング
+
+**Q: フックが実行されない**
+
+A: 以下を確認：
+- settings.json の JSON 構文が正しいか（jq でバリデーション）
+- フックスクリプトに実行権限があるか（`chmod +x`）
+- プラグインパスが正しいか（バージョン番号を含む完全パス）
+
+```bash
+# JSON 構文チェック
+jq . ~/.claude/settings.json > /dev/null && echo "✅ OK" || echo "❌ JSON エラー"
+
+# 実行権限確認
+ls -la ~/.claude/plugins/sk8metalme_development-toolkit_1.6.0/scripts/*.sh
+```
+
+**Q: 無限ループになる**
+
+A: フックスクリプト内で環境変数ガードを追加（上記「無限ループ対策」参照）
+
+**参考:**
+- guardrail-builder 実装: `plugins/development-toolkit/scripts/guardrail-builder-hook.sh`
+- [Issue #49](https://github.com/sk8metalme/ai-agent-setup/issues/49) - guardrail-builder 実装計画
+
+---
+
 ## 開発原則
 
 - TDD 推奨、カバレッジ 95%+ 目標
