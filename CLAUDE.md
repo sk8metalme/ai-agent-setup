@@ -307,79 +307,31 @@ jq -r '.plugins[].skills[]?' .claude-plugin/marketplace.json | grep -i 'SKILL\.m
 
 ### SessionEnd フックの設定方法
 
-**重要:** plugin.json の `hooks` 設定は**現在非対応**です。フックを使用するには **~/.claude/settings.json** で手動登録が必要です。
+**guardrail-builder** は `install-global.sh` でデフォルト有効になります。
 
-#### 1. フックスクリプトの配置
-
-プラグインのフックスクリプトは `scripts/` ディレクトリに配置します：
+#### セットアップ
 
 ```bash
-plugins/
-└── my-plugin/
-    └── scripts/
-        └── my-hook.sh  # フックスクリプト
+# グローバル設定をインストール
+./install-global.sh
+
+# 確認
+ls -la ~/.claude/hooks/guardrail-builder-hook.sh
+cat ~/.claude/settings.json | jq '.hooks.SessionEnd'
 ```
 
-#### 2. settings.json への登録
-
-**~/.claude/settings.json** に以下の形式で追加：
-
-```json
-{
-  "hooks": {
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/plugins/<owner>_<plugin-name>_<version>/scripts/my-hook.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-**実例: guardrail-builder (development-toolkit v1.6.0):**
-
-```json
-{
-  "hooks": {
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/plugins/sk8metalme_development-toolkit_1.6.0/scripts/guardrail-builder-hook.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### 3. プラグインパスの確認方法
-
-インストール済みプラグインのパスは以下で確認できます：
+#### 動作確認
 
 ```bash
-# インストール済みプラグイン一覧
-cat ~/.claude/plugins/installed_plugins.json | jq -r '.plugins | keys[]'
+# Claude Code を正常終了
+# → 新しいターミナルウィンドウで guardrail-builder が実行される
+# → macOS 通知で結果が表示される
 
-# 特定プラグインのパス
-ls -la ~/.claude/plugins/ | grep development-toolkit
+# ログ確認
+tail -f ~/.claude/logs/guardrail-builder-*.log
 ```
 
-**出力例:**
-```
-drwxr-xr-x  sk8metalme_development-toolkit_1.6.0
-```
-
-#### 4. フックスクリプトのベストプラクティス
+#### フックスクリプトのベストプラクティス
 
 **無限ループ対策（必須）:**
 
@@ -436,31 +388,21 @@ if [ -z "$PROJECT_ROOT" ]; then
 fi
 ```
 
-#### 5. 動作確認
-
-```bash
-# Claude Code を正常終了
-# → フックが実行され、処理結果が表示される（development-toolkit の場合は macOS 通知）
-
-# ログ確認（development-toolkit の例）
-tail -f ~/.claude/logs/guardrail-builder-*.log
-```
-
-#### 6. トラブルシューティング
+#### トラブルシューティング
 
 **Q: フックが実行されない**
 
 A: 以下を確認：
-- settings.json の JSON 構文が正しいか（jq でバリデーション）
+- `~/.claude/hooks/guardrail-builder-hook.sh` が存在するか
+- settings.json の JSON 構文が正しいか（`jq . ~/.claude/settings.json`）
 - フックスクリプトに実行権限があるか（`chmod +x`）
-- プラグインパスが正しいか（バージョン番号を含む完全パス）
 
 ```bash
 # JSON 構文チェック
-jq . ~/.claude/settings.json > /dev/null && echo "✅ OK" || echo "❌ JSON エラー"
+jq . ~/.claude/settings.json > /dev/null && echo "OK" || echo "JSON エラー"
 
 # 実行権限確認
-ls -la ~/.claude/plugins/sk8metalme_development-toolkit_1.6.0/scripts/*.sh
+ls -la ~/.claude/hooks/guardrail-builder-hook.sh
 ```
 
 **Q: 無限ループになる**
@@ -468,8 +410,7 @@ ls -la ~/.claude/plugins/sk8metalme_development-toolkit_1.6.0/scripts/*.sh
 A: フックスクリプト内で環境変数ガードを追加（上記「無限ループ対策」参照）
 
 **参考:**
-- guardrail-builder 実装: `plugins/development-toolkit/scripts/guardrail-builder-hook.sh`
-- [Issue #49](https://github.com/sk8metalme/ai-agent-setup/issues/49) - guardrail-builder 実装計画
+- guardrail-builder 実装: `global/hooks/guardrail-builder-hook.sh`
 
 ---
 

@@ -9,6 +9,12 @@
   - plugin.json: プラグイン本体の定義
   - marketplace.json: マーケットプレイス経由でのスキル登録（これがないと "Unknown skill" エラー）
 
+- **2026-01-13** guardrail-builderはグローバルSessionEndフック実装（v1.7.0）
+  - `global/hooks/guardrail-builder-hook.sh` で定義
+  - `install-global.sh` でデフォルト有効化
+  - `~/.claude/settings.json` の hooks.SessionEnd に登録
+  - 注: v1.8.0のプラグインhooks.jsonアプローチは試験後、グローバル配布に置き換え
+
 ## エラー対応
 
 - **2026-01-13** Claude Code の skills パスは `/SKILL.md` を含めると「Unknown skill」エラーになる
@@ -38,6 +44,16 @@
   - 特に marketplace.json の更新忘れに注意（これがないとマーケットプレイスで検索できない）
   - 実例: deep-dive プラグインで dd → deep-dive に変更時に発生
 
+- **2026-01-13** スキルStopフックはライフサイクルスコープの制約がある
+  - スキルのフロントマター（SKILL.md）で定義したStopフックは、**スキルがアクティブな時のみ**実行される
+  - 単にプラグインを読み込んだだけでは発火しない（スキルを明示的に呼び出す必要がある）
+  - 完全自動化には**グローバルSessionEndフック**（`install-global.sh`）を使用する
+
+- **2026-01-13** AppleScript内のhere-string (`<<<`) は変数展開が不安定
+  - 問題: `claude --resume \"$SESSION_ID\" -p <<<'/guardrail-builder'` がAppleScript do script内で動作しない
+  - 原因: here-stringのエスケープが複雑になり、変数展開が失敗
+  - 解決: `echo '/guardrail-builder' | claude --resume \"$SESSION_ID\" -p` を使用（標準パイプ）
+
 ## コーディング規約
 
 - **2026-01-13** プラグイン関連ファイルを修正したら必ずバージョンを更新する
@@ -49,6 +65,12 @@
 - **2026-01-13** main/master ブランチへの直接 push/commit は禁止
   - 作業は feature/, bugfix/, hotfix/ ブランチで行う
   - force push は厳禁
+
+- **2026-01-13** プラグインhooks.jsonの構造（Phase 2で試験、v1.8.0→v1.7.0で削除）
+  - `plugins/<name>/hooks/hooks.json` にフック定義を配置
+  - `plugin.json` に `"hooks": "./hooks/hooks.json"` を追加
+  - `${CLAUDE_PLUGIN_ROOT}` でプラグインルートディレクトリを参照
+  - 注: グローバル配布アプローチ（`~/.claude/hooks/`）に置き換えられた
 
 ## Tips
 
@@ -75,6 +97,17 @@
 - **2026-01-13** 公式 anthropics/skills リポジトリを参考にする
   - Skills の正しいパス形式、ディレクトリ構造を確認できる
   - URL: https://github.com/anthropics/skills
+
+- **2026-01-13** `claude --plugin-dir` でローカルプラグインを直接読み込んでテスト可能
+  - マーケットプレイス経由不要、開発中の変更を即座にテスト
+  - プラグインキャッシュを気にせず最新版を読み込める
+  - 例: `claude --plugin-dir ./plugins/development-toolkit`
+  - 開発ワークフローとして理想的
+
+- **2026-01-13** SessionEnd vs Stop フックの違い
+  - SessionEnd: セッション終了後に発火、常時有効（プラグインインストール時から）、会話コンテキストへのアクセス対象外
+  - Stop: 応答終了時に発火、スキルライフサイクルにスコープ、応答停止制御用途
+  - 用途: SessionEnd＝クリーンアップ・ロギング用途、Stop＝停止制御用途（スキル実行が前提）
 
 ---
 

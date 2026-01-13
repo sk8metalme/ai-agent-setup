@@ -8,7 +8,7 @@
       "name": "development-toolkit",
       "source": "./plugins/development-toolkit",
       "description": "Complete development workflow: planning, coding, PR management, and changelog generation",
-      "version": "1.6.1",
+      "version": "1.7.0",
       "skills": [
         "./skills/changelog",
         "./skills/secrets-guard",

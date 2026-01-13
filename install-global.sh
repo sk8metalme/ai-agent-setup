@@ -235,6 +235,8 @@ main() {
   echo "  - $CLAUDE_DIR/hooks/protect-branch.conf"
   echo "  - $CLAUDE_DIR/hooks/protect-secrets.sh (秘密情報保護)"
   echo "  - $CLAUDE_DIR/hooks/protect-secrets.conf"
+  echo "  - $CLAUDE_DIR/hooks/guardrail-builder-hook.sh (SessionEnd)"
+  echo "  - $CLAUDE_DIR/hooks/statusline.sh"
   echo "  - $CLAUDE_DIR/settings.json (共通設定をマージ)"
   echo "  - $CLAUDE_DIR/settings.local.example.json (環境依存設定サンプル)"
   echo "  - $CLAUDE_DIR/templates/ (テンプレート)"

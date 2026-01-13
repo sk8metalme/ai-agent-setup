@@ -249,6 +249,16 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/guardrail-builder-hook.sh"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
