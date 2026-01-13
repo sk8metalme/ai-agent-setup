@@ -9,6 +9,12 @@
   - plugin.json: プラグイン本体の定義
   - marketplace.json: マーケットプレイス経由でのスキル登録（これがないと "Unknown skill" エラー）
 
+- **2026-01-13** guardrail-builderはプラグインhooks.jsonでSessionEndフック実装（v1.8.0）
+  - `plugins/development-toolkit/hooks/hooks.json` で定義
+  - `${CLAUDE_PLUGIN_ROOT}/scripts/guardrail-builder-hook.sh` を実行
+  - plugin.jsonに `"hooks": "./hooks/hooks.json"` を追加で有効化
+  - プラグインインストール時に自動登録、アンインストール時に自動削除
+
 ## エラー対応
 
 - **2026-01-13** Claude Code の skills パスは `/SKILL.md` を含めると「Unknown skill」エラーになる
@@ -38,6 +44,16 @@
   - 特に marketplace.json の更新忘れに注意（これがないとマーケットプレイスで検索できない）
   - 実例: deep-dive プラグインで dd → deep-dive に変更時に発生
 
+- **2026-01-13** スキルStopフックはライフサイクルスコープの制約がある
+  - スキルのフロントマター（SKILL.md）で定義したStopフックは、**スキルがアクティブな時のみ**実行される
+  - 単にプラグインを読み込んだだけでは発火しない（スキルを明示的に呼び出す必要がある）
+  - 完全自動化には**プラグインhooks.json**のSessionEndフックを使用する
+
+- **2026-01-13** AppleScript内のhere-string (`<<<`) は変数展開が不安定
+  - 問題: `claude --resume \"$SESSION_ID\" -p <<<'/guardrail-builder'` がAppleScript do script内で動作しない
+  - 原因: here-stringのエスケープが複雑になり、変数展開が失敗
+  - 解決: `echo '/guardrail-builder' | claude --resume \"$SESSION_ID\" -p` を使用（標準パイプ）
+
 ## コーディング規約
 
 - **2026-01-13** プラグイン関連ファイルを修正したら必ずバージョンを更新する
@@ -49,6 +65,12 @@
 - **2026-01-13** main/master ブランチへの直接 push/commit は禁止
   - 作業は feature/, bugfix/, hotfix/ ブランチで行う
   - force push は厳禁
+
+- **2026-01-13** プラグインhooks.jsonの構造と定義方法
+  - `plugins/<name>/hooks/hooks.json` にフック定義を配置
+  - `plugin.json` に `"hooks": "./hooks/hooks.json"` を追加
+  - `${CLAUDE_PLUGIN_ROOT}` でプラグインルートディレクトリを参照
+  - 注: plugin.json内でのインライン定義は非対応（別ファイルが必須）
 
 ## Tips
 
@@ -75,6 +97,17 @@
 - **2026-01-13** 公式 anthropics/skills リポジトリを参考にする
   - Skills の正しいパス形式、ディレクトリ構造を確認できる
   - URL: https://github.com/anthropics/skills
+
+- **2026-01-13** `claude --plugin-dir` でローカルプラグインを直接読み込んでテスト可能
+  - マーケットプレイス経由不要、開発中の変更を即座にテスト
+  - プラグインキャッシュを気にせず最新版を読み込める
+  - 例: `claude --plugin-dir ./plugins/development-toolkit`
+  - 開発ワークフローとして理想的
+
+- **2026-01-13** SessionEnd vs Stop フックの違い
+  - SessionEnd: セッション終了後に発火、常時有効（プラグインインストール時から）、会話コンテキスト喪失
+  - Stop: 応答終了時に発火、スキルライフサイクルにスコープ、会話コンテキスト利用可能
+  - 用途: 自動化ならSessionEnd、高精度分析ならStop（ただしスキル実行が前提）
 
 ---
 

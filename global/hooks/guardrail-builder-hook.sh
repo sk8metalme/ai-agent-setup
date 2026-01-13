@@ -19,12 +19,21 @@ export GUARDRAIL_BUILDER_RUNNING=1
 # フック入力の読み込み
 # ============================================================================
 HOOK_INPUT=$(cat)
-TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path')
+
+# デバッグ: フック入力全体をログ出力
+mkdir -p "$HOME/.claude/logs"
+DEBUG_LOG="$HOME/.claude/logs/guardrail-builder-debug-$(date +%Y%m%d-%H%M%S).json"
+echo "$HOOK_INPUT" | jq '.' > "$DEBUG_LOG" 2>/dev/null || echo "$HOOK_INPUT" > "$DEBUG_LOG"
+echo "Debug: フック入力を保存しました: $DEBUG_LOG" >&2
+
+TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path // empty')
+SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // empty')
 HOOK_EVENT_NAME=$(echo "$HOOK_INPUT" | jq -r '.hook_event_name // "Unknown"')
 
 # 入力検証
 if [ -z "$TRANSCRIPT_PATH" ] || [ "$TRANSCRIPT_PATH" = "null" ]; then
     echo "Error: transcript_path not found" >&2
+    echo "Debug log: $DEBUG_LOG" >&2
     exit 1
 fi
 
@@ -115,8 +124,11 @@ tell application "Terminal"
         # 環境変数を引き継ぎ
         export GUARDRAIL_BUILDER_RUNNING=1
 
-        # Claude Code でスキルを実行
-        if claude --no-tty --transcript '$TRANSCRIPT_PATH' <<<'/guardrail-builder' >> '$LOG_FILE' 2>&1; then
+        # session_id を使用（Bash側で抽出済み）
+        echo \"Session ID: $SESSION_ID\" | tee -a '$LOG_FILE'
+
+        # Claude Code で --resume を使ってセッション再開し、スキルを実行
+        if echo '/guardrail-builder' | claude --resume \"$SESSION_ID\" -p >> '$LOG_FILE' 2>&1; then
             echo '' | tee -a '$LOG_FILE'
             echo '✅ guardrail-builder: 完了' | tee -a '$LOG_FILE'
 
