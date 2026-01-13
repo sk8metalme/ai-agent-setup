@@ -9,11 +9,11 @@
   - plugin.json: プラグイン本体の定義
   - marketplace.json: マーケットプレイス経由でのスキル登録（これがないと "Unknown skill" エラー）
 
-- **2026-01-13** guardrail-builderはプラグインhooks.jsonでSessionEndフック実装（v1.8.0）
-  - `plugins/development-toolkit/hooks/hooks.json` で定義
-  - `${CLAUDE_PLUGIN_ROOT}/scripts/guardrail-builder-hook.sh` を実行
-  - plugin.jsonに `"hooks": "./hooks/hooks.json"` を追加で有効化
-  - プラグインインストール時に自動登録、アンインストール時に自動削除
+- **2026-01-13** guardrail-builderはグローバルSessionEndフック実装（v1.7.0）
+  - `global/hooks/guardrail-builder-hook.sh` で定義
+  - `install-global.sh` でデフォルト有効化
+  - `~/.claude/settings.json` の hooks.SessionEnd に登録
+  - 注: v1.8.0のプラグインhooks.jsonアプローチは試験後、グローバル配布に置き換え
 
 ## エラー対応
 
@@ -47,7 +47,7 @@
 - **2026-01-13** スキルStopフックはライフサイクルスコープの制約がある
   - スキルのフロントマター（SKILL.md）で定義したStopフックは、**スキルがアクティブな時のみ**実行される
   - 単にプラグインを読み込んだだけでは発火しない（スキルを明示的に呼び出す必要がある）
-  - 完全自動化には**プラグインhooks.json**のSessionEndフックを使用する
+  - 完全自動化には**グローバルSessionEndフック**（`install-global.sh`）を使用する
 
 - **2026-01-13** AppleScript内のhere-string (`<<<`) は変数展開が不安定
   - 問題: `claude --resume \"$SESSION_ID\" -p <<<'/guardrail-builder'` がAppleScript do script内で動作しない
@@ -66,11 +66,11 @@
   - 作業は feature/, bugfix/, hotfix/ ブランチで行う
   - force push は厳禁
 
-- **2026-01-13** プラグインhooks.jsonの構造と定義方法
+- **2026-01-13** プラグインhooks.jsonの構造（Phase 2で試験、v1.8.0→v1.7.0で削除）
   - `plugins/<name>/hooks/hooks.json` にフック定義を配置
   - `plugin.json` に `"hooks": "./hooks/hooks.json"` を追加
   - `${CLAUDE_PLUGIN_ROOT}` でプラグインルートディレクトリを参照
-  - 注: plugin.json内でのインライン定義は非対応（別ファイルが必須）
+  - 注: グローバル配布アプローチ（`~/.claude/hooks/`）に置き換えられた
 
 ## Tips
 
