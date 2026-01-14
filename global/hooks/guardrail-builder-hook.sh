@@ -110,41 +110,46 @@ if [ "$(uname)" != "Darwin" ]; then
     exit 0
 fi
 
+# 変数をシェルエスケープ（スペースや特殊文字対策）
+ESC_PROJECT_ROOT=$(printf '%q' "$PROJECT_ROOT")
+ESC_SESSION_ID=$(printf '%q' "$SESSION_ID")
+ESC_LOG_FILE=$(printf '%q' "$LOG_FILE")
+
 # AppleScript でターミナル起動
 osascript <<EOF
 tell application "Terminal"
     do script "
-        echo '======================================' | tee -a '$LOG_FILE'
-        echo 'guardrail-builder: 会話履歴を分析中...' | tee -a '$LOG_FILE'
-        echo '======================================' | tee -a '$LOG_FILE'
-        echo '' | tee -a '$LOG_FILE'
+        echo '======================================' | tee -a $ESC_LOG_FILE
+        echo 'guardrail-builder: 会話履歴を分析中...' | tee -a $ESC_LOG_FILE
+        echo '======================================' | tee -a $ESC_LOG_FILE
+        echo '' | tee -a $ESC_LOG_FILE
 
-        cd '$PROJECT_ROOT' || exit 1
+        cd $ESC_PROJECT_ROOT || exit 1
 
         # 環境変数を引き継ぎ
         export GUARDRAIL_BUILDER_RUNNING=1
 
         # session_id を使用（Bash側で抽出済み）
-        echo \"Session ID: $SESSION_ID\" | tee -a '$LOG_FILE'
+        echo \"Session ID: $ESC_SESSION_ID\" | tee -a $ESC_LOG_FILE
 
         # Claude Code で --resume を使ってセッション再開し、スキルを実行
-        if echo '/guardrail-builder' | claude --resume \"$SESSION_ID\" -p >> '$LOG_FILE' 2>&1; then
-            echo '' | tee -a '$LOG_FILE'
-            echo '✅ guardrail-builder: 完了' | tee -a '$LOG_FILE'
+        if echo '/guardrail-builder' | claude --resume $ESC_SESSION_ID -p >> $ESC_LOG_FILE 2>&1; then
+            echo '' | tee -a $ESC_LOG_FILE
+            echo '✅ guardrail-builder: 完了' | tee -a $ESC_LOG_FILE
 
             # macOS 通知（成功）
             osascript -e 'display notification \"CLAUDE-guardrail.md を更新しました\" with title \"guardrail-builder\" sound name \"Glass\"'
         else
-            echo '' | tee -a '$LOG_FILE'
-            echo '❌ guardrail-builder: エラー' | tee -a '$LOG_FILE'
+            echo '' | tee -a $ESC_LOG_FILE
+            echo '❌ guardrail-builder: エラー' | tee -a $ESC_LOG_FILE
 
             # macOS 通知（エラー）
             osascript -e 'display notification \"更新に失敗しました。ログを確認してください\" with title \"guardrail-builder\" sound name \"Basso\"'
         fi
 
-        echo '' | tee -a '$LOG_FILE'
-        echo 'ログ: $LOG_FILE' | tee -a '$LOG_FILE'
-        echo '' | tee -a '$LOG_FILE'
+        echo '' | tee -a $ESC_LOG_FILE
+        echo 'ログ: $ESC_LOG_FILE' | tee -a $ESC_LOG_FILE
+        echo '' | tee -a $ESC_LOG_FILE
         echo 'Press Enter to close...'
         read
     "
