@@ -4,16 +4,15 @@
 
 ## プロジェクト仕様
 
-- **2026-01-13** Claude Code プラグインシステムの配布リポジトリ（12個のプラグインを管理）
+- **2026-01-14** Claude Code プラグインシステムの配布リポジトリ（13個のプラグインを管理）
   - plugin.json と marketplace.json の**2箇所**に skills を定義する必要がある
   - plugin.json: プラグイン本体の定義
   - marketplace.json: マーケットプレイス経由でのスキル登録（これがないと "Unknown skill" エラー）
 
-- **2026-01-13** guardrail-builderはグローバルSessionEndフック実装（v1.7.0）
-  - `global/hooks/guardrail-builder-hook.sh` で定義
-  - `install-global.sh` でデフォルト有効化
-  - `~/.claude/settings.json` の hooks.SessionEnd に登録
-  - 注: v1.8.0のプラグインhooks.jsonアプローチは試験後、グローバル配布に置き換え
+- **2026-01-14** guardrail-builder は独立プラグインとして配布（v1.0.0）
+  - development-toolkit から分離（v1.7.0 → v1.8.0）
+  - フック同梱（hooks/ ディレクトリ + README.md）で手動セットアップ可能
+  - SessionEnd フックはグローバル配布（install-global.sh）で引き続き提供
 
 ## エラー対応
 

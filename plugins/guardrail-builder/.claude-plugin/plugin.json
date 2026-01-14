@@ -1,0 +1,20 @@
+{
+  "name": "guardrail-builder",
+  "description": "Automatically extracts learnings from conversation history and appends them to CLAUDE-guardrail.md. Categorizes content into Project Specs, Error Response, Coding Rules, and Tips to prevent repeated mistakes.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": [
+    "guardrail",
+    "learning",
+    "automation",
+    "claude-md",
+    "session-end"
+  ],
+  "skills": [
+    "./skills/guardrail-builder"
+  ]
+}
