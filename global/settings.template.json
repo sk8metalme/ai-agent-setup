@@ -263,7 +263,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/hooks/statusline.sh",
+    "command": "echo \"$(basename \"$(dirname \"$PWD\")\")/$(basename \"$PWD\")| ⎇  $(git branch --show-current 2>/dev/null || echo '-') | $(bun x ccusage statusline)\"",
     "padding": 0
   },
   "git": {
