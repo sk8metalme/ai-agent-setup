@@ -46,9 +46,10 @@ echo "✅ ディレクトリ存在確認完了"
 
 ```
 ai-agent-setup/
-├── plugins/                  # プラグインソース（12個）
+├── plugins/                  # プラグインソース（13個）
 │   ├── development-toolkit/  # 開発ワークフロー（/plan, /dev, /create_pr）
 │   ├── deep-dive/            # 深堀りスキル（ultrathink、要件明確化）
+│   ├── guardrail-builder/    # 会話履歴から自動学習（CLAUDE-guardrail.md）
 │   ├── jujutsu-workflow/     # Jujutsu VCS サポート
 │   ├── lang-java-spring/     # Java + Spring Boot
 │   ├── lang-python/          # Python + FastAPI
@@ -441,6 +442,8 @@ which npm jj gh node jq
 /plugin marketplace add sk8metalme/ai-agent-setup
 
 # 推奨プラグイン
+/plugin install deep-dive@ai-agent-setup
+/plugin install guardrail-builder@ai-agent-setup
 /plugin install development-toolkit@ai-agent-setup
 
 # 言語別プラグイン

@@ -48,6 +48,7 @@ npm install -g @sk8metal/michi-cli
 ### 機能プラグイン
 
 ```
+/plugin install guardrail-builder@ai-agent-setup # 会話履歴自動学習（繰り返しミス防止）
 /plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu (jj) VCS
 /plugin install ci-cd-tools@ai-agent-setup       # CI/CD トラブルシューティング
 /plugin install design-review@ai-agent-setup     # UI/UX デザインレビュー
@@ -204,6 +205,7 @@ michiが無い場合：
 
 | スキル | プラグイン | 用途 |
 |-------|----------|------|
+| `/guardrail-builder` | guardrail-builder | 会話履歴自動学習（CLAUDE-guardrail.md更新） |
 | `/ci-cd` | ci-cd-tools | GitHub Actions/Screwdriver |
 | `/design-review` | design-review | WCAG 2.1, Core Web Vitals |
 | `/e2e-first-planning` | e2e-planning | Walking Skeleton設計 |
