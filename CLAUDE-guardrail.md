@@ -53,6 +53,18 @@
   - 原因: here-stringのエスケープが複雑になり、変数展開が失敗
   - 解決: `echo '/guardrail-builder' | claude --resume \"$SESSION_ID\" -p` を使用（標準パイプ）
 
+- **2026-01-14** AppleScript 内でのシェル変数直接埋め込みは危険
+  - 問題: `cd '$PROJECT_ROOT'` のような形式でスペースや特殊文字を含むパスが壊れる
+  - 影響: コマンド分割、コマンドインジェクションのリスク
+  - 解決: `printf '%q'` でエスケープしてから埋め込む
+    ```bash
+    ESC_PROJECT_ROOT=$(printf '%q' "$PROJECT_ROOT")
+    osascript <<EOF
+    do script "cd $ESC_PROJECT_ROOT"
+    EOF
+    ```
+  - 参考: plugins/guardrail-builder/hooks/guardrail-builder-hook.sh の実装
+
 ## コーディング規約
 
 - **2026-01-13** プラグイン関連ファイルを修正したら必ずバージョンを更新する
@@ -70,6 +82,14 @@
   - `plugin.json` に `"hooks": "./hooks/hooks.json"` を追加
   - `${CLAUDE_PLUGIN_ROOT}` でプラグインルートディレクトリを参照
   - 注: グローバル配布アプローチ（`~/.claude/hooks/`）に置き換えられた
+
+- **2026-01-14** プラグイン独立化時のバージョン戦略
+  - スキル削除は Semantic Versioning では「破壊的変更」に該当する
+  - ただし、独立プラグインで機能が継続利用可能な場合は MINOR でも可
+  - 実例: development-toolkit v1.7.0 → v1.8.0（MINOR）
+    - guardrail-builder を削除したが、独立プラグインとして提供継続
+    - ユーザーは `/plugin install guardrail-builder@ai-agent-setup` で利用可能
+  - 判断基準: 機能の実質的な削除か、単なる配布形態の変更か
 
 ## Tips
 
@@ -108,7 +128,23 @@
   - Stop: 応答終了時に発火、スキルライフサイクルにスコープ、応答停止制御用途
   - 用途: SessionEnd＝クリーンアップ・ロギング用途、Stop＝停止制御用途（スキル実行が前提）
 
+- **2026-01-14** プラグイン独立化の手順
+  - 新規ディレクトリ構造作成: `plugins/<name>/.claude-plugin/plugin.json`
+  - スキル/フックの移動またはコピー
+  - marketplace.json に新規エントリ追加（version 同期注意）
+  - 元のプラグインから削除、バージョン更新（MINOR/MAJOR 判断）
+  - ドキュメント更新（README.md、CLAUDE.md、global/CLAUDE.md）
+  - 検証: `jq` コマンドで一貫性チェック、`claude --plugin-dir` でテスト
+
+- **2026-01-23** guardrail-builder の hooks 機能を完全廃止（v1.1.0）
+  - SessionEnd フック（`global/hooks/guardrail-builder-hook.sh`）を削除
+  - プラグイン内 hooks/（手動セットアップ用）も削除
+  - スキル（`/guardrail-builder`）のみ提供する形に変更
+  - 理由：プラグインの責務を明確化、グローバル設定への依存排除、シンプル化
+  - ユーザーへの影響：手動で `/guardrail-builder` を実行する必要がある
+  - バージョン更新：MINOR（1.0.0 → 1.1.0）- 機能削除だがスキル自体は継続提供
+
 ---
 
-最終更新: 2026-01-13
+最終更新: 2026-01-23
 このファイルは `/guardrail-builder` スキルにより自動更新されます。

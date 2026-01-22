@@ -38,7 +38,7 @@ model: sonnet
    - 現在のブランチをリモートにプッシュ（`-u origin [ブランチ名]`）
 
 7. **PR作成**
-   - `gh pr create` でPR作成（タイトル・本文は自動生成）
+   - `gh pr create` でPR作成（**日本語**でタイトル・本文を自動生成）
    - ブラウザでPRページを自動で開く
 
 ## 実行手順
@@ -96,8 +96,10 @@ git diff main...HEAD --stat
 # ステップ6: リモートにプッシュ
 git push -u origin "$current_branch"
 
-# ステップ7: PR作成 + ブラウザオープン
-gh pr create --base "$target_branch" --title "<コミット履歴の概要>" --body "<サマリー、変更一覧、テストプラン>" --web
+# ステップ7: PR作成 + ブラウザオープン（日本語でタイトル・本文を作成）
+# PRタイトル: 日本語で簡潔に変更内容を要約（例: 「feat: ユーザー認証機能を追加」）
+# PR本文: 日本語で ## Summary, ## 変更内容, ## テスト計画 を記述
+gh pr create --base "$target_branch" --title "<日本語でコミット履歴の概要>" --body "<日本語でサマリー、変更一覧、テストプラン>" --web
 ```
 
 ## 注意事項
@@ -107,6 +109,7 @@ gh pr create --base "$target_branch" --title "<コミット履歴の概要>" --b
 - main/masterブランチからは実行できません
 - 未コミットの変更がある場合は先にコミットしてください
 - PR作成完了後、自動的にブラウザでPRページを開きます
+- PR作成時のタイトル・本文は**日本語**で作成されます
 - ステップ1で事前にターゲットブランチとバージョン更新方針を確認します
 - バージョン管理ファイルが存在しない場合、バージョン更新の質問は表示されません
 - サポートされるバージョンファイル：package.json, pom.xml, build.gradle, pyproject.toml, composer.json, galaxy.yml, *.spec, Cargo.toml, *.gemspec, VERSION, version.txt
