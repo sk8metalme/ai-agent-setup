@@ -36,6 +36,30 @@ allowed-tools: Bash, Read, Grep, Glob
 - **SSPL (Server Side Public License)** - MongoDBなどで使用
 - **CPAL (Common Public Attribution License)** - 帰属表示要求
 
+## 並列監査（複数言語/技術スタック対応）
+
+**複数の言語や技術スタックがあるプロジェクトの場合**、並列でサブエージェントに監査を委譲することで効率的にチェックできます。
+
+**並列監査の実施方法:**
+
+Taskツールで複数のサブエージェントを並列起動し、各言語の依存関係を同時に監査：
+
+1. **Node.js依存関係** - package.json, package-lock.json
+2. **Python依存関係** - requirements.txt, Pipfile, pyproject.toml
+3. **Java依存関係** - pom.xml, build.gradle
+4. **PHP依存関係** - composer.json
+5. **その他** - 言語に応じたツール
+
+各言語の監査結果を統合し、全体のライセンス状況をレポートします。
+
+**メリット:**
+- 複数言語を同時にチェック
+- コンテキスト使用量を削減
+- 抜け漏れのない網羅的監査
+- 言語ごとの専門的なチェック
+
+---
+
 ## ライセンス確認ツール
 
 ### Node.js プロジェクト
