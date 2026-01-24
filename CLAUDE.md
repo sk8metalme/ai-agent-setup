@@ -351,7 +351,3 @@ which npm jj gh node jq
 /plugin install design-review@ai-agent-setup
 /plugin install e2e-planning@ai-agent-setup
 ```
-
-## 学習済みルール
-
-@CLAUDE-guardrail.md

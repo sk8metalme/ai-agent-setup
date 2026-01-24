@@ -205,7 +205,7 @@ michiが無い場合：
 
 | スキル | プラグイン | 用途 |
 |-------|----------|------|
-| `/guardrail-builder` | guardrail-builder | 会話履歴自動学習（CLAUDE-guardrail.md更新） |
+| `/guardrail-builder` | guardrail-builder | 会話履歴自動学習（.claude/rules/guardrail.md更新、自動読み込み） |
 | `/ci-cd` | ci-cd-tools | GitHub Actions/Screwdriver |
 | `/design-review` | design-review | WCAG 2.1, Core Web Vitals |
 | `/e2e-first-planning` | e2e-planning | Walking Skeleton設計 |

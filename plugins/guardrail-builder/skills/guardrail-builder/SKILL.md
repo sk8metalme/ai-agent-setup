@@ -1,27 +1,24 @@
 ---
 name: guardrail-builder
-description: "Automatically extracts learnings from conversation history and appends them to CLAUDE-guardrail.md. Categorizes content into Project Specs, Error Response, Coding Rules, and Tips to prevent repeated mistakes."
-allowed-tools: Read, Write, Edit, Grep, Glob
+description: "Automatically extracts learnings from conversation history and saves to .claude/rules/guardrail.md (auto-loaded as project memory). Categorizes content into Project Specs, Error Response, Coding Rules, and Tips to prevent repeated mistakes."
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
 # guardrail-builder スキル
 
-**あなたの役割**: 会話履歴を分析し、学習内容を自動的に `CLAUDE-guardrail.md` に追記すること。
+**あなたの役割**: 会話履歴を分析し、学習内容を自動的に `.claude/rules/guardrail.md` に追記すること。
 
 ## 目的
 
 プロジェクト固有のルール、エラー対応、コーディング規約、Tipsを自動記録し、同じ間違いを繰り返さないようにする。
 
+**重要**: このファイルは `.claude/rules/` ディレクトリに配置され、Claude Code により**自動的にプロジェクトメモリとして読み込まれます**。CLAUDE.md への `@` インポートは不要です。
+
 ---
 
 ## 実行タイミング
 
-1. **手動実行**: `/guardrail-builder` コマンド
-2. **自動実行**: SessionEnd フック（グローバル設定）
-   - `install-global.sh` でデフォルト有効
-   - `~/.claude/hooks/guardrail-builder-hook.sh` が実行される
-   - セッション終了時に新しいターミナルウィンドウで処理
-   - macOS 通知で結果を表示
+- **手動実行**: `/guardrail-builder` コマンド
 
 ---
 
@@ -75,7 +72,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 ## 重複チェック
 
-**重要**: 既存の CLAUDE-guardrail.md の内容と**セマンティック（意味的）な重複**をチェックし、類似内容は追記しない。
+**重要**: 既存の guardrail.md の内容と**セマンティック（意味的）な重複**をチェックし、類似内容は追記しない。
 
 ### 重複判定基準
 
@@ -96,12 +93,13 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 ## 出力フォーマット
 
-### CLAUDE-guardrail.md の構造
+### guardrail.md の構造
 
 ```markdown
 # Guardrail - 学習済みルール
 
-このファイルは、会話履歴から自動的に学習した内容を蓄積します。
+> このファイルは `.claude/rules/` に配置され、
+> Claude Code により自動的にプロジェクトメモリとして読み込まれます。
 
 ## プロジェクト仕様
 <!-- リポジトリ独自の仕様、開発スタイル、設計方針 -->
@@ -147,36 +145,34 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 ## 実行フロー
 
-### 1. CLAUDE-guardrail.md の存在確認
+### 1. .claude/rules/ ディレクトリの確認
 
 ```bash
-if [ -f "./CLAUDE-guardrail.md" ]; then
+if [ ! -d ".claude/rules" ]; then
+  mkdir -p .claude/rules
+fi
+```
+
+### 2. guardrail.md の存在確認
+
+```bash
+if [ -f "./.claude/rules/guardrail.md" ]; then
   # 既存ファイル → 追記モード
 else
   # 新規作成 → テンプレート生成
 fi
 ```
 
-### 2. 会話履歴の分析
+### 3. 会話履歴の分析
 
 - 現在の会話履歴全体を分析
 - 4カテゴリに分類
-- 重複チェック（既存 CLAUDE-guardrail.md との比較）
+- 重複チェック（既存 guardrail.md との比較）
 
-### 3. CLAUDE-guardrail.md への追記
+### 4. guardrail.md への追記
 
 - 新しい学習内容を該当カテゴリに追記
 - 最終更新日を更新
-
-### 4. CLAUDE.md への自動リンク（初回のみ）
-
-CLAUDE.md に `@CLAUDE-guardrail.md` が含まれていない場合、以下を追記：
-
-```markdown
-## 学習済みルール
-
-@CLAUDE-guardrail.md
-```
 
 ---
 
@@ -188,28 +184,11 @@ CLAUDE.md に `@CLAUDE-guardrail.md` が含まれていない場合、以下を�
 
 > 会話履歴を分析しました。
 >
-> CLAUDE-guardrail.md を更新しました：
+> .claude/rules/guardrail.md を更新しました：
 > - エラー対応: 2件追加
 > - Tips: 1件追加
 >
-> CLAUDE.md に @CLAUDE-guardrail.md を追記しました。
-```
-
-### 自動実行（SessionEnd フック）
-```
-# グローバル設定（install-global.sh）でセットアップ
-# Claude Code 終了時に自動実行
-# 新しいターミナルウィンドウで処理
-# macOS 通知で結果を表示
-
-通知: "guardrail.md を更新しました（エラー対応: 2件、Tips: 1件）"
-```
-
-**セットアップ:**
-```bash
-# グローバル設定をインストール（SessionEnd フック含む）
-cd /path/to/ai-agent-setup
-./install-global.sh
+> このファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
 ```
 
 ---
@@ -219,7 +198,7 @@ cd /path/to/ai-agent-setup
 以下の内容は追記**しない**：
 
 - 一時的な判断や個別ケースの対応
-- 既に CLAUDE-guardrail.md に記載されている内容（重複）
+- 既に guardrail.md に記載されている内容（重複）
 - 個人の好みや一時的な試行
 - 不明確または曖昧な指示
 - プロジェクト外の一般的な知識
@@ -230,24 +209,25 @@ cd /path/to/ai-agent-setup
 
 ### 成功時
 ```
-CLAUDE-guardrail.md を更新しました：
+.claude/rules/guardrail.md を更新しました：
 - プロジェクト仕様: X件追加
 - エラー対応: Y件追加
 - コーディング規約: Z件追加
 - Tips: W件追加
 
 総計: N件の新しい学習内容を記録しました。
+このファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
 ```
 
 ### 重複のみの場合
 ```
 会話履歴を分析しましたが、新しい学習内容は見つかりませんでした。
-既存の CLAUDE-guardrail.md に同様の内容が記録されています。
+既存の guardrail.md に同様の内容が記録されています。
 ```
 
 ### エラー時
 ```
-エラー: CLAUDE-guardrail.md の更新に失敗しました。
+エラー: .claude/rules/guardrail.md の更新に失敗しました。
 詳細: [エラーメッセージ]
 ```
 
@@ -255,7 +235,7 @@ CLAUDE-guardrail.md を更新しました：
 
 ## 注意事項
 
-1. **CLAUDE-guardrail.md は Git 管理対象**
+1. **guardrail.md は Git 管理対象**
    - リポジトリにコミットし、チームで共有
    - .gitignore に追加しない
 
@@ -275,12 +255,12 @@ CLAUDE-guardrail.md を更新しました：
 
 ## トラブルシューティング
 
-### Q: CLAUDE.md に @CLAUDE-guardrail.md が追記されない
+### Q: .claude/rules/ ディレクトリが作成されない
 
 **A**: 以下を確認：
-- CLAUDE.md が存在するか
-- CLAUDE.md が書き込み可能か
-- 既に @CLAUDE-guardrail.md が含まれていないか
+- プロジェクトルートで実行しているか
+- ディレクトリ作成権限があるか
+- Bash ツールが許可されているか
 
 ### Q: 同じ内容が何度も追記される
 
@@ -288,20 +268,12 @@ CLAUDE-guardrail.md を更新しました：
 - 既存ファイルを正しく読み込んでいるか
 - セマンティック類似性の判定が機能しているか
 
-### Q: SessionEnd フックが動作しない
+### Q: guardrail.md が自動読み込みされない
 
-**A**: フック設定を確認：
-- `~/.claude/hooks/guardrail-builder-hook.sh` が存在するか
-- スクリプトに実行権限があるか（`chmod +x`）
-- `~/.claude/settings.json` の `hooks.SessionEnd` に登録されているか
-- ログファイル（`~/.claude/logs/guardrail-builder-*.log`）を確認
-
-**セットアップ:**
-```bash
-# グローバル設定を再インストール
-cd /path/to/ai-agent-setup
-./install-global.sh
-```
+**A**: ファイル配置を確認：
+- `.claude/rules/guardrail.md` に配置されているか（プロジェクトルート直下ではない）
+- ファイル名は正しいか（`CLAUDE-guardrail.md` ではなく `guardrail.md`）
+- `/memory` コマンドで読み込み状況を確認
 
 ---
 

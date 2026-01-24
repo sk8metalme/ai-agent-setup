@@ -18,8 +18,8 @@
     {
       "name": "guardrail-builder",
       "source": "./plugins/guardrail-builder",
-      "description": "Automatically extracts learnings from conversation history and appends them to CLAUDE-guardrail.md",
-      "version": "1.1.0",
+      "description": "Automatically extracts learnings and saves to .claude/rules/guardrail.md (auto-loaded as project memory)",
+      "version": "1.2.0",
       "skills": ["./skills/guardrail-builder"]
     },
     {
