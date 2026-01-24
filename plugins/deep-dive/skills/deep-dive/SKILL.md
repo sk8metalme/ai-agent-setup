@@ -1,7 +1,7 @@
 ---
 name: deep-dive
 description: "再帰的な質問で要件・課題を深堀りし、推測をなくし、品質・信頼性を向上させるスキル。トリガーキーワード: 「深堀り」「検討して」「ultrathink」「よく考えて」「他にはないか」「他の案は？」。使用場面: 新機能設計、問題解決、技術調査、学習用途、機能追加など。"
-allowed-tools: AskUserQuestion, Read, Grep, Glob
+allowed-tools: AskUserQuestion, Read, Grep, Glob, Task
 ---
 
 # deep-dive (Deep Dive) スキル

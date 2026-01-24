@@ -3,7 +3,7 @@ name: stable-version
 description: |
   各言語/フレームワークの安定版バージョン確認ガイド。
   LTSの考え方、EOLチェック、アップグレード判断をサポート。
-allowed-tools: Bash, Read, Grep, Glob, WebFetch
+allowed-tools: Bash, Read, Grep, Glob, WebFetch, Task
 ---
 
 # 安定版バージョン確認スキル

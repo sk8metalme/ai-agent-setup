@@ -3,7 +3,7 @@ name: oss-license
 description: |
   OSSライセンス確認とコンプライアンスガイド。
   許可/禁止ライセンス一覧、確認ツール使用法をガイド。
-allowed-tools: Bash, Read, Grep, Glob
+allowed-tools: Bash, Read, Grep, Glob, Task
 ---
 
 # OSSライセンス確認スキル

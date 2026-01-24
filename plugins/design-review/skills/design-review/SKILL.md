@@ -3,7 +3,7 @@ name: design-review
 description: |
   UIデザインレビューガイド。
   アクセシビリティ、レスポンシブ、UXパターン、パフォーマンスをチェック。
-allowed-tools: Read, Grep, Glob
+allowed-tools: Read, Grep, Glob, Task
 ---
 
 # デザインレビュースキル
