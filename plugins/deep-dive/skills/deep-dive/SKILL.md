@@ -56,7 +56,7 @@ allowed-tools: AskUserQuestion, Read, Grep, Glob, Task
 
 Taskツールでsubagent_type=Exploreを使用し、コードベースを調査：
 
-```
+```text
 「このプロジェクトの[対象領域]について調査してください：
 - 関連するコード・ファイル構造
 - 既存の実装パターン
