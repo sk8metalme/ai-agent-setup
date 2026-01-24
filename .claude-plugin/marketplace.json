@@ -19,7 +19,7 @@
       "name": "guardrail-builder",
       "source": "./plugins/guardrail-builder",
       "description": "Automatically extracts learnings and saves to .claude/rules/ as individual files (auto-loaded as project memory)",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "skills": ["./skills/guardrail-builder"]
     },
     {

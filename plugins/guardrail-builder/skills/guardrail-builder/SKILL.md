@@ -70,6 +70,26 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 - `jq -r '.plugins[] | .name'` でプラグイン一覧を取得
 - GitHub Issue #9817 で skills の問題が報告されている
 
+### パス固有ルールの判断
+
+ルールが特定のファイルタイプやディレクトリに限定されるか判断：
+
+**paths を設定すべきケース**:
+- 「API ファイルでは〜」→ `paths: src/api/**/*`
+- 「テストファイルでは〜」→ `paths: **/*.test.ts`
+- 「React コンポーネントでは〜」→ `paths: **/*.tsx`
+- 「src/ 以下では〜」→ `paths: src/**/*`
+
+**paths を省略すべきケース**:
+- プロジェクト全体に適用されるルール
+- 特定のファイルタイプに限定されないルール
+- 汎用的なコーディング規約
+
+**グロブパターンの活用**:
+- `**/*.{ts,tsx}` - 複数の拡張子
+- `{src,lib}/**/*.ts` - 複数のディレクトリ
+- `tests/**/*.test.ts` - 特定のパターン
+
 ---
 
 ## 重複チェック
@@ -121,9 +141,9 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 
 各ルールは独立したMarkdownファイルとして保存されます：
 
+**汎用ルールの例**（全ファイルに適用）:
 ```markdown
 ---
-category: error-responses
 date: 2026-01-24
 tags:
   - claude-code
@@ -147,13 +167,50 @@ Claude Code の skills パスは `/SKILL.md` を含めると「Unknown skill」�
 - [Issue #49](https://github.com/sk8metalme/ai-agent-setup/issues/49)
 ```
 
+**パス固有ルールの例**（特定のファイルにのみ適用）:
+```markdown
+---
+paths: src/api/**/*.ts
+date: 2026-01-24
+tags:
+  - api
+  - validation
+---
+
+# API エンドポイントには入力バリデーションを実装する
+
+## 概要
+
+すべての API エンドポイントには入力バリデーションを実装すること。
+
+## 詳細
+
+- リクエストパラメータは必ず検証
+- バリデーションエラーは適切なステータスコードで返却（400 Bad Request）
+- 型安全性を保つため、Zodなどのスキーマバリデータを使用
+
+## 参考
+
+- プロジェクトのバリデーションガイドライン
+```
+
 **ファイル名**: slug形式（kebab-case）で、内容を端的に表現
 - 例: `skills-path-format.md`, `config-module-usage.md`
 
 **フロントマター**:
-- `category`: カテゴリ名（英語）
+- `paths`: 適用対象のファイルパターン（オプション、省略時は全ファイルに適用）
 - `date`: 作成日（YYYY-MM-DD）
 - `tags`: 関連タグ（オプション）
+
+**paths の指定例**:
+| パターン | マッチ |
+|---------|-------|
+| `**/*.ts` | すべての TypeScript ファイル |
+| `src/api/**/*` | src/api/ 以下のすべてのファイル |
+| `**/*.{ts,tsx}` | TypeScript と TSX ファイル |
+| `tests/**/*.test.ts` | テストファイル |
+
+`paths` を省略すると、すべてのファイルに適用される汎用ルールになります。
 
 ---
 
