@@ -1,6 +1,6 @@
 ---
 name: guardrail-builder
-description: "Automatically extracts learnings from conversation history and saves to .claude/rules/guardrail.md (auto-loaded as project memory). Categorizes content into Project Specs, Error Response, Coding Rules, and Tips to prevent repeated mistakes."
+description: "会話履歴から学習内容を自動抽出し、.claude/rules/guardrail.md に保存（プロジェクトメモリとして自動読み込み）。プロジェクト仕様、エラー対応、コーディング規約、Tipsに分類し、同じ間違いを防止。"
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
@@ -94,6 +94,10 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ## 出力フォーマット
 
 ### guardrail.md の構造
+
+**用途**: guardrail.md は `.claude/rules/` ディレクトリに配置され、Claude Code により自動的にプロジェクトメモリとして読み込まれます。
+
+**推奨**: プロジェクト全体の学習内容は guardrail.md に記録しますが、特定のルール（セキュリティポリシー、コーディング規約など）は `.claude/rules/` 以下に個別の `.md` ファイルとして作成することも可能です。
 
 ```markdown
 # Guardrail - 学習済みルール
