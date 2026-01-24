@@ -1,7 +1,7 @@
 {
   "name": "oss-compliance",
   "description": "OSS license compliance checking and auditing. Identifies license conflicts, tracks dependencies, and ensures legal compliance.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "sk8metalme"
   },
