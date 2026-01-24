@@ -1,0 +1,12 @@
+{
+  "name": "quizknock",
+  "description": "Interactive quiz generation for learning reinforcement. Uses subagent research and AskUserQuestion for 5-question quiz sets with statistics and review.",
+  "version": "1.0.0",
+  "author": {
+    "name": "sk8metalme"
+  },
+  "repository": "https://github.com/sk8metalme/ai-agent-setup",
+  "license": "MIT",
+  "keywords": ["quiz", "learning", "education", "assessment"],
+  "skills": ["./skills/quizknock"]
+}

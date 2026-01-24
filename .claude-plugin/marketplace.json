@@ -98,6 +98,13 @@
       "description": "E2E-first development planning and Walking Skeleton design",
       "version": "1.0.0",
       "skills": ["./skills/e2e-first-planning"]
+    },
+    {
+      "name": "quizknock",
+      "source": "./plugins/quizknock",
+      "description": "Interactive quiz generation for learning reinforcement",
+      "version": "1.0.0",
+      "skills": ["./skills/quizknock"]
     }
   ]
 }
