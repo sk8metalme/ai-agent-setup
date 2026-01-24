@@ -1,7 +1,7 @@
 {
   "name": "guardrail-builder",
-  "description": "Automatically extracts learnings from conversation history and appends them to CLAUDE-guardrail.md. Categorizes content into Project Specs, Error Response, Coding Rules, and Tips to prevent repeated mistakes.",
-  "version": "1.0.0",
+  "description": "Automatically extracts learnings from conversation history and saves them as individual Markdown files in .claude/rules/ (auto-loaded as project memory). Categorizes into Project Specs, Error Response, Coding Rules, and Tips using 1-rule-1-file structure.",
+  "version": "2.1.0",
   "author": {
     "name": "sk8metalme"
   },
@@ -10,9 +10,8 @@
   "keywords": [
     "guardrail",
     "learning",
-    "automation",
-    "claude-md",
-    "session-end"
+    "rules",
+    "memory"
   ],
   "skills": [
     "./skills/guardrail-builder"
