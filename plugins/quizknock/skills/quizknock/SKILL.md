@@ -1,6 +1,7 @@
 ---
 name: quizknock
 description: "指定トピックの理解を深めるクイズを出題。サブエージェントで詳細調査後、AskUserQuestionで選択式クイズを5問ずつ出題。統計表示と間違った問題の復習支援。トリガー: 「クイズ」「理解度チェック」「テストして」「クイズで確認」。"
+model: haiku
 allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
 ---
 
