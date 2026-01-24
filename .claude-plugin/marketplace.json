@@ -103,7 +103,7 @@
       "name": "quizknock",
       "source": "./plugins/quizknock",
       "description": "Interactive quiz generation for learning reinforcement",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "skills": ["./skills/quizknock"]
     }
   ]
