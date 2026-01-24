@@ -1,18 +1,20 @@
 ---
 name: guardrail-builder
-description: "会話履歴から学習内容を自動抽出し、.claude/rules/guardrail.md に保存（プロジェクトメモリとして自動読み込み）。プロジェクト仕様、エラー対応、コーディング規約、Tipsに分類し、同じ間違いを防止。"
+description: "会話履歴から学習内容を自動抽出し、.claude/rules/ 以下にカテゴリ別の個別Markdownファイルとして保存（プロジェクトメモリとして自動読み込み）。プロジェクト仕様、エラー対応、コーディング規約、Tipsに分類し、同じ間違いを防止。"
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
 # guardrail-builder スキル
 
-**あなたの役割**: 会話履歴を分析し、学習内容を自動的に `.claude/rules/guardrail.md` に追記すること。
+**あなたの役割**: 会話履歴を分析し、学習内容を `.claude/rules/` 以下にカテゴリ別の個別Markdownファイルとして保存すること。
 
 ## 目的
 
-プロジェクト固有のルール、エラー対応、コーディング規約、Tipsを自動記録し、同じ間違いを繰り返さないようにする。
+プロジェクト固有のルール、エラー対応、コーディング規約、Tipsを「1ルール1Markdown」形式で自動記録し、同じ間違いを繰り返さないようにする。
 
-**重要**: このファイルは `.claude/rules/` ディレクトリに配置され、Claude Code により**自動的にプロジェクトメモリとして読み込まれます**。CLAUDE.md への `@` インポートは不要です。
+**重要**: これらのファイルは `.claude/rules/` ディレクトリに配置され、Claude Code により**自動的にプロジェクトメモリとして読み込まれます**。CLAUDE.md への `@` インポートは不要です。
+
+**v2.0.0の変更点**: 単一ファイル（guardrail.md）から、カテゴリ別ディレクトリ構造（1ルール1MD）に移行しました。既存の guardrail.md は引き続き読み込まれます。
 
 ---
 
@@ -68,6 +70,26 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 - `jq -r '.plugins[] | .name'` でプラグイン一覧を取得
 - GitHub Issue #9817 で skills の問題が報告されている
 
+### パス固有ルールの判断
+
+ルールが特定のファイルタイプやディレクトリに限定されるか判断：
+
+**paths を設定すべきケース**:
+- 「API ファイルでは〜」→ `paths: src/api/**/*`
+- 「テストファイルでは〜」→ `paths: **/*.test.ts`
+- 「React コンポーネントでは〜」→ `paths: **/*.tsx`
+- 「src/ 以下では〜」→ `paths: src/**/*`
+
+**paths を省略すべきケース**:
+- プロジェクト全体に適用されるルール
+- 特定のファイルタイプに限定されないルール
+- 汎用的なコーディング規約
+
+**グロブパターンの活用**:
+- `**/*.{ts,tsx}` - 複数の拡張子
+- `{src,lib}/**/*.ts` - 複数のディレクトリ
+- `tests/**/*.test.ts` - 特定のパターン
+
 ---
 
 ## 重複チェック
@@ -93,90 +115,140 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 
 ## 出力フォーマット
 
-### guardrail.md の構造
+### ディレクトリ構造
 
-**用途**: guardrail.md は `.claude/rules/` ディレクトリに配置され、Claude Code により自動的にプロジェクトメモリとして読み込まれます。
+学習内容は以下のディレクトリ構造で保存されます：
 
-**推奨**: プロジェクト全体の学習内容は guardrail.md に記録しますが、特定のルール（セキュリティポリシー、コーディング規約など）は `.claude/rules/` 以下に個別の `.md` ファイルとして作成することも可能です。
+```
+.claude/rules/
+├── project-specs/           # プロジェクト仕様
+│   └── config-module-usage.md
+├── error-responses/         # エラー対応
+│   └── skills-path-format.md
+├── coding-rules/            # コーディング規約
+│   └── test-file-naming.md
+└── tips/                    # Tips
+    └── plugin-local-testing.md
+```
 
+**カテゴリマッピング**:
+- プロジェクト仕様 → `project-specs/`
+- エラー対応 → `error-responses/`
+- コーディング規約 → `coding-rules/`
+- Tips → `tips/`
+
+### 個別ルールファイルの形式
+
+各ルールは独立したMarkdownファイルとして保存されます：
+
+**汎用ルールの例**（全ファイルに適用）:
 ```markdown
-# Guardrail - 学習済みルール
-
-> このファイルは `.claude/rules/` に配置され、
-> Claude Code により自動的にプロジェクトメモリとして読み込まれます。
-
-## プロジェクト仕様
-<!-- リポジトリ独自の仕様、開発スタイル、設計方針 -->
-
-## エラー対応
-<!-- 誤った作業、やり直した作業、ハマったポイント -->
-
-## コーディング規約
-<!-- 指摘されたコーディングルール、スタイルガイド -->
-
-## Tips
-<!-- 調査して得られた知見、覚えておくべき情報 -->
-
+---
+date: 2026-01-24
+tags:
+  - claude-code
+  - skills
 ---
 
-最終更新: YYYY-MM-DD
-このファイルは `/guardrail-builder` スキルにより自動更新されます。
+# Skills パスに /SKILL.md を含めない
+
+## 概要
+
+Claude Code の skills パスは `/SKILL.md` を含めると「Unknown skill」エラーになる。
+
+## 詳細
+
+- **正しい形式**: `"./skills/changelog"` （ディレクトリのみ）
+- **誤った形式**: `"./skills/changelog/SKILL.md"` （ファイル名を含む）
+
+## 参考
+
+- 公式 anthropics/skills リポジトリの形式に準拠
+- [Issue #49](https://github.com/sk8metalme/ai-agent-setup/issues/49)
 ```
 
-### 追記形式
-
-各カテゴリ内に、以下の形式で箇条書きで追記：
-
+**パス固有ルールの例**（特定のファイルにのみ適用）:
 ```markdown
-## カテゴリ名
+---
+paths: src/api/**/*.ts
+date: 2026-01-24
+tags:
+  - api
+  - validation
+---
 
-- **[日付]** 学習内容（簡潔に1-2行）
-  - 詳細や理由（必要に応じて）
-  - 参考: [Issue #XXX](URL) など
+# API エンドポイントには入力バリデーションを実装する
+
+## 概要
+
+すべての API エンドポイントには入力バリデーションを実装すること。
+
+## 詳細
+
+- リクエストパラメータは必ず検証
+- バリデーションエラーは適切なステータスコードで返却（400 Bad Request）
+- 型安全性を保つため、Zodなどのスキーマバリデータを使用
+
+## 参考
+
+- プロジェクトのバリデーションガイドライン
 ```
 
-**例**:
-```markdown
-## エラー対応
+**ファイル名**: slug形式（kebab-case）で、内容を端的に表現
+- 例: `skills-path-format.md`, `config-module-usage.md`
 
-- **2026-01-13** Claude Code の skills パスは `/SKILL.md` を含めると「Unknown skill」エラーになる
-  - 正しい形式: `"./skills/changelog"` （ディレクトリのみ）
-  - 誤った形式: `"./skills/changelog/SKILL.md"` （ファイル名を含む）
-  - 参考: 公式 anthropics/skills リポジトリの形式に準拠
-```
+**フロントマター**:
+- `paths`: 適用対象のファイルパターン（オプション、省略時は全ファイルに適用）
+- `date`: 作成日（YYYY-MM-DD）
+- `tags`: 関連タグ（オプション）
+
+**paths の指定例**:
+| パターン | マッチ |
+|---------|-------|
+| `**/*.ts` | すべての TypeScript ファイル |
+| `src/api/**/*` | src/api/ 以下のすべてのファイル |
+| `**/*.{ts,tsx}` | TypeScript と TSX ファイル |
+| `tests/**/*.test.ts` | テストファイル |
+
+`paths` を省略すると、すべてのファイルに適用される汎用ルールになります。
 
 ---
 
 ## 実行フロー
 
-### 1. .claude/rules/ ディレクトリの確認
+### 1. カテゴリディレクトリの作成
 
 ```bash
-if [ ! -d ".claude/rules" ]; then
-  mkdir -p .claude/rules
-fi
+mkdir -p .claude/rules/project-specs
+mkdir -p .claude/rules/error-responses
+mkdir -p .claude/rules/coding-rules
+mkdir -p .claude/rules/tips
 ```
 
-### 2. guardrail.md の存在確認
-
-```bash
-if [ -f "./.claude/rules/guardrail.md" ]; then
-  # 既存ファイル → 追記モード
-else
-  # 新規作成 → テンプレート生成
-fi
-```
-
-### 3. 会話履歴の分析
+### 2. 会話履歴の分析
 
 - 現在の会話履歴全体を分析
 - 4カテゴリに分類
-- 重複チェック（既存 guardrail.md との比較）
+- 各学習内容にタイトルとslugを生成
 
-### 4. guardrail.md への追記
+### 3. 重複チェック（複数ファイル横断）
 
-- 新しい学習内容を該当カテゴリに追記
-- 最終更新日を更新
+既存の `.claude/rules/` 以下のすべてのMarkdownファイルを確認：
+- 同じカテゴリ内の既存ファイルを読み込み
+- セマンティックな重複をチェック
+- 重複する場合はスキップ
+
+**重複判定基準**:
+- 完全一致: 同じタイトル・内容 → スキップ
+- 意味的類似: 同じ内容を別表現 → スキップ
+- 新しい情報: 既存に追加情報 → 新規ファイル作成
+
+### 4. 個別ファイルの保存
+
+各学習内容を個別のMarkdownファイルとして保存：
+- ファイル名: `{slug}.md`（例: `skills-path-format.md`）
+- 保存先: `.claude/rules/{category}/`
+- フロントマター付きMarkdown形式
 
 ---
 
@@ -188,11 +260,17 @@ fi
 
 > 会話履歴を分析しました。
 >
-> .claude/rules/guardrail.md を更新しました：
-> - エラー対応: 2件追加
-> - Tips: 1件追加
+> .claude/rules/ に新しいルールを保存しました：
 >
-> このファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
+> error-responses/
+>   - skills-path-format.md
+>   - marketplace-version-sync.md
+>
+> tips/
+>   - plugin-local-testing.md
+>
+> 総計: 3件の新しい学習内容を記録しました。
+> これらのファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
 ```
 
 ---
@@ -213,25 +291,31 @@ fi
 
 ### 成功時
 ```
-.claude/rules/guardrail.md を更新しました：
-- プロジェクト仕様: X件追加
-- エラー対応: Y件追加
-- コーディング規約: Z件追加
-- Tips: W件追加
+.claude/rules/ に新しいルールを保存しました：
 
-総計: N件の新しい学習内容を記録しました。
-このファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
+project-specs/
+  - config-module-usage.md
+
+error-responses/
+  - skills-path-format.md
+  - marketplace-version-sync.md
+
+coding-rules/
+  - test-file-naming.md
+
+総計: 4件の新しい学習内容を記録しました。
+これらのファイルは Claude Code により自動的にプロジェクトメモリとして読み込まれます。
 ```
 
 ### 重複のみの場合
 ```
 会話履歴を分析しましたが、新しい学習内容は見つかりませんでした。
-既存の guardrail.md に同様の内容が記録されています。
+既存の .claude/rules/ に同様の内容が記録されています。
 ```
 
 ### エラー時
 ```
-エラー: .claude/rules/guardrail.md の更新に失敗しました。
+エラー: .claude/rules/ へのファイル保存に失敗しました。
 詳細: [エラーメッセージ]
 ```
 
@@ -239,46 +323,59 @@ fi
 
 ## 注意事項
 
-1. **guardrail.md は Git 管理対象**
-   - リポジトリにコミットし、チームで共有
+1. **.claude/rules/ は Git 管理対象**
+   - すべてのルールファイルをリポジトリにコミット
+   - チームで知見を共有
    - .gitignore に追加しない
 
-2. **重複チェックは必須**
-   - 同じ内容が何度も追記されないようにする
+2. **重複チェックは複数ファイル横断**
+   - 同じカテゴリ内の既存ファイルをすべて確認
    - セマンティックな類似性を AI で判断
+   - 重複する場合は新規ファイルを作成しない
 
-3. **カテゴリ分類は厳密に**
-   - 1つの学習内容は1つのカテゴリのみに追記
-   - 複数カテゴリにまたがる場合は、最も適切なカテゴリを選択
+3. **1ルール1ファイル原則**
+   - 1つの学習内容は1つの独立したMarkdownファイル
+   - ファイル名は内容を端的に表現（slug形式）
+   - カテゴリは1つのみ選択
 
-4. **簡潔に記述**
-   - 1つの学習内容は1-2行で簡潔に
-   - 詳細は箇条書きで追記
+4. **既存 guardrail.md との共存**
+   - v1.x で作成した guardrail.md は引き続き読み込まれる
+   - 新規ルールは個別ファイルとして保存
+   - マイグレーションは不要
 
 ---
 
 ## トラブルシューティング
 
-### Q: .claude/rules/ ディレクトリが作成されない
+### Q: カテゴリディレクトリが作成されない
 
 **A**: 以下を確認：
 - プロジェクトルートで実行しているか
 - ディレクトリ作成権限があるか
 - Bash ツールが許可されているか
 
-### Q: 同じ内容が何度も追記される
+### Q: 同じ内容が何度も個別ファイルとして作成される
 
 **A**: 重複チェックのロジックを確認：
-- 既存ファイルを正しく読み込んでいるか
+- 既存の .claude/rules/ 内のファイルを正しく読み込んでいるか
 - セマンティック類似性の判定が機能しているか
+- ファイル名の重複チェックも実施
 
-### Q: guardrail.md が自動読み込みされない
+### Q: 個別ファイルが自動読み込みされない
 
 **A**: ファイル配置を確認：
-- `.claude/rules/guardrail.md` に配置されているか（プロジェクトルート直下ではない）
-- ファイル名は正しいか（`CLAUDE-guardrail.md` ではなく `guardrail.md`）
+- `.claude/rules/{category}/` に配置されているか
+- ファイル拡張子は `.md` か
 - `/memory` コマンドで読み込み状況を確認
+
+### Q: v1.x の guardrail.md はどうなる？
+
+**A**: 既存ファイルは引き続き読み込まれます：
+- `.claude/rules/guardrail.md` は自動読み込み継続
+- 新規ルールは個別ファイルとして保存
+- マイグレーション不要
 
 ---
 
 このスキルは suggest-claude-md コマンドの後継として設計されています。
+v2.0.0 で「1ルール1Markdown」構造に移行しました。
