@@ -46,7 +46,7 @@ echo "✅ ディレクトリ存在確認完了"
 
 ```
 ai-agent-setup/
-├── plugins/                  # プラグインソース（13個）
+├── plugins/                  # プラグインソース（14個）
 │   ├── development-toolkit/  # 開発ワークフロー（/plan, /dev, /create_pr）
 │   ├── deep-dive/            # 深堀りスキル（ultrathink、要件明確化）
 │   ├── guardrail-builder/    # 会話履歴から自動学習（CLAUDE-guardrail.md）
@@ -59,7 +59,8 @@ ai-agent-setup/
 │   ├── oss-compliance/       # OSS ライセンス監査
 │   ├── version-audit/        # バージョン/EOL 監査
 │   ├── design-review/        # UI/UX デザインレビュー
-│   └── e2e-planning/         # E2E 開発計画
+│   ├── e2e-planning/         # E2E 開発計画
+│   └── quizknock/            # インタラクティブクイズ生成
 ├── global/                   # グローバル配布（install-global.sh → ~/.claude/）
 │   ├── CLAUDE.md             # @import + プラグインガイド
 │   ├── base/                 # 基本コーディング原則

@@ -62,6 +62,9 @@ Claude Code のチャットで以下のコマンドを実行：
 # E2E開発計画が必要な場合
 /plugin install e2e-planning@ai-agent-setup
 
+# 学習支援クイズが必要な場合
+/plugin install quizknock@ai-agent-setup
+
 # 言語別プラグイン（該当する言語のみ）
 /plugin install lang-java-spring@ai-agent-setup  # Java + Spring Boot
 /plugin install lang-python@ai-agent-setup       # Python + FastAPI
@@ -101,6 +104,7 @@ ls -la ~/.claude/plugins/cache/ai-agent-setup/
 | `version-audit` | 技術スタックバージョン監査・EOLチェック<br>古い依存関係やセキュリティ脆弱性の特定 | 📚スキル: 1個<br>🤖エージェント: 1個 | version, audit, eol, security, dependencies |
 | `design-review` | UI/UXデザインレビュー・アクセシビリティチェック<br>ユーザビリティ、アクセシビリティ標準の評価 | 📚スキル: 1個<br>🤖エージェント: 1個 | design, ui, ux, accessibility, a11y, review |
 | `e2e-planning` | E2Eファースト開発計画・Walking Skeleton設計<br>エンドツーエンドの実装戦略ガイド | 📚スキル: 1個<br>🤖エージェント: 1個 | e2e, planning, walking-skeleton, architecture |
+| `quizknock` | インタラクティブクイズ生成・学習支援<br>トピック調査、5問セット出題、統計表示、復習機能 | 📚スキル: 1個 | quiz, learning, education, assessment, review |
 
 **低優先度（言語別）:**
 
