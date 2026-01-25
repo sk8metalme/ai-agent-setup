@@ -1,7 +1,7 @@
 {
   "name": "quizknock",
   "description": "Interactive quiz generation for learning reinforcement. Uses subagent research and AskUserQuestion for 4-question quiz sets with statistics and review.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": {
     "name": "sk8metalme"
   },
