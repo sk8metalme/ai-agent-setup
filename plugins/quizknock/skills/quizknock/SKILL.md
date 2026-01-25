@@ -1,7 +1,7 @@
 ---
 name: quizknock
-description: "指定トピックの理解を深めるクイズを出題。サブエージェントで詳細調査後、AskUserQuestionで選択式クイズを5問ずつ出題。統計表示と間違った問題の復習支援。トリガー: 「クイズ」「理解度チェック」「テストして」「クイズで確認」。"
-model: haiku
+description: "指定トピックの理解を深めるクイズを出題。サブエージェントで詳細調査後、AskUserQuestionで選択式クイズを4問ずつ出題。統計表示と間違った問題の復習支援。トリガー: 「クイズ」「理解度チェック」「テストして」「クイズで確認」。"
+model: sonnet
 allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
 ---
 
@@ -14,7 +14,7 @@ allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
 ## 機能
 
 - サブエージェントによる詳細なトピック調査
-- 5問セット形式のクイズ出題（基礎2問、応用2問、発展1問）
+- 4問セット形式のクイズ出題（基礎2問、応用1問、発展1問）
 - 即時フィードバックと解説
 - 統計表示（正答率、出題数）
 - 間違った問題の復習支援
@@ -36,9 +36,9 @@ allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
   - よくある間違い
 
 ### Phase 3: クイズ生成
-以下の構成で5問を生成：
+以下の構成で4問を生成：
 - **基礎問題（2問）**: 基本概念、用語定義
-- **応用問題（2問）**: 実装例、ユースケース
+- **応用問題（1問）**: 実装例、ユースケース
 - **発展問題（1問）**: ベストプラクティス、落とし穴
 
 **問題品質基準**:
@@ -47,7 +47,7 @@ allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
 - 各問題に詳細な解説を用意
 
 ### Phase 4: 出題
-- AskUserQuestion ツールで1問ずつ出題
+- AskUserQuestion ツールで4問まとめて出題
 - 4択形式で提示
 - ユーザーの回答を記録
 
@@ -59,8 +59,8 @@ allowed-tools: AskUserQuestion, Task, Read, Grep, Glob
 - 関連する追加情報
 
 ### Phase 6: 継続確認
-5問完了後、AskUserQuestion で継続意思を確認：
-- 「はい」→ Phase 2に戻り新しい5問を生成
+4問完了後、AskUserQuestion で継続意思を確認：
+- 「はい」→ Phase 2に戻り新しい4問を生成
 - 「いいえ」→ Phase 7へ進む
 
 ### Phase 7: 統計表示
