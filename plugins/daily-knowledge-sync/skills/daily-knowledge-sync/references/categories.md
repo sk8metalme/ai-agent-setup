@@ -1,235 +1,235 @@
-# Knowledge Categories
+# 知識カテゴリ
 
-This document defines the knowledge categorization system.
+このドキュメントは知識カテゴリ分類システムを定義します。
 
-## Category Structure
+## カテゴリ構造
 
-The knowledge repository uses a category-based directory structure with tagged markdown files:
+知識リポジトリはタグ付きmarkdownファイルを持つカテゴリベースのディレクトリ構造を使用します:
 
 ```
 knowledge-repo/
-├── errors/          # Error resolutions and bug fixes
-├── patterns/        # Coding patterns and best practices
-├── commands/        # Useful commands and CLI tools
-├── design/          # Architecture and design decisions
-├── domain/          # Domain-specific knowledge
-└── operations/      # DevOps, maintenance, and operations
+├── errors/          # エラー解決とバグ修正
+├── patterns/        # コーディングパターンとベストプラクティス
+├── commands/        # 便利なコマンドとCLIツール
+├── design/          # アーキテクチャと設計判断
+├── domain/          # ドメイン固有の知識
+└── operations/      # DevOps、メンテナンス、運用
 ```
 
-Each category contains markdown files with frontmatter tags for cross-category searchability.
+各カテゴリには、カテゴリ横断の検索性のためのfrontmatterタグを持つmarkdownファイルが含まれます。
 
-## Category Definitions
+## カテゴリ定義
 
 ### errors/
 
-**Purpose**: Document error resolutions and debugging approaches
+**目的**: エラー解決とデバッグアプローチを文書化
 
-**Content Types**:
-- Error messages and their solutions
-- Bug fix procedures
-- Debugging techniques
-- Common pitfalls and how to avoid them
+**コンテンツタイプ**:
+- エラーメッセージとその解決策
+- バグ修正手順
+- デバッグ技術
+- よくある落とし穴とその回避方法
 
-**Examples**:
+**例**:
 - "Fix ModuleNotFoundError in Python imports"
 - "Resolve CORS error in FastAPI"
 - "Debug memory leak in Node.js application"
 
-**Keywords**: error, exception, bug, fix, resolve, debug, traceback
+**キーワード**: error, exception, bug, fix, resolve, debug, traceback
 
 ---
 
 ### patterns/
 
-**Purpose**: Document coding patterns, best practices, and implementation approaches
+**目的**: コーディングパターン、ベストプラクティス、実装アプローチを文書化
 
-**Content Types**:
-- Design patterns
-- Implementation strategies
-- Code organization techniques
-- Refactoring approaches
-- Architecture patterns
+**コンテンツタイプ**:
+- デザインパターン
+- 実装戦略
+- コード整理技術
+- リファクタリングアプローチ
+- アーキテクチャパターン
 
-**Examples**:
+**例**:
 - "Repository pattern for database access"
 - "Use dependency injection for testability"
 - "Implement circuit breaker for resilience"
 
-**Keywords**: pattern, implementation, approach, best practice, design, architecture, refactor
+**キーワード**: pattern, implementation, approach, best practice, design, architecture, refactor
 
 ---
 
 ### commands/
 
-**Purpose**: Document useful commands, CLI tools, and shell scripts
+**目的**: 便利なコマンド、CLIツール、シェルスクリプトを文書化
 
-**Content Types**:
-- Bash/shell commands
-- Git workflows
-- Docker commands
-- Package manager usage
-- Tool configurations
+**コンテンツタイプ**:
+- Bash/シェルコマンド
+- Gitワークフロー
+- Dockerコマンド
+- パッケージマネージャーの使用法
+- ツール設定
 
-**Examples**:
+**例**:
 - "Use git rebase --onto for branch management"
 - "Find and delete files older than 30 days"
 - "Docker multi-stage build optimization"
 
-**Keywords**: command, cli, bash, shell, terminal, git, npm, docker, script
+**キーワード**: command, cli, bash, shell, terminal, git, npm, docker, script
 
 ---
 
 ### design/
 
-**Purpose**: Document architecture decisions and system design
+**目的**: アーキテクチャ決定とシステム設計を文書化
 
-**Content Types**:
-- Architecture diagrams
-- Design decisions and rationale
-- System design patterns
-- Data modeling
-- API design
+**コンテンツタイプ**:
+- アーキテクチャ図
+- 設計判断とその根拠
+- システム設計パターン
+- データモデリング
+- API設計
 
-**Examples**:
+**例**:
 - "Microservices vs. monolith trade-offs"
 - "Event-driven architecture for async processing"
 - "Database schema design for multi-tenancy"
 
-**Keywords**: design, architecture, diagram, model, system, c4, sequence, mermaid
+**キーワード**: design, architecture, diagram, model, system, c4, sequence, mermaid
 
 ---
 
 ### domain/
 
-**Purpose**: Document domain-specific knowledge and business logic
+**目的**: ドメイン固有の知識とビジネスロジックを文書化
 
-**Content Types**:
-- Business rules
-- Domain workflows
-- Industry-specific knowledge
-- Regulatory requirements
-- Product specifications
+**コンテンツタイプ**:
+- ビジネスルール
+- ドメインワークフロー
+- 業界固有の知識
+- 規制要件
+- 製品仕様
 
-**Examples**:
+**例**:
 - "Payment processing workflow"
 - "User authentication flow"
 - "Compliance requirements for GDPR"
 
-**Keywords**: domain, business, requirement, specification, workflow, process, rule
+**キーワード**: domain, business, requirement, specification, workflow, process, rule
 
 ---
 
 ### operations/
 
-**Purpose**: Document DevOps, maintenance, and operational procedures
+**目的**: DevOps、メンテナンス、運用手順を文書化
 
-**Content Types**:
-- Deployment procedures
-- Monitoring setup
-- Incident response
-- Maintenance tasks
-- CI/CD pipelines
-- Infrastructure management
+**コンテンツタイプ**:
+- デプロイ手順
+- モニタリングセットアップ
+- インシデント対応
+- メンテナンスタスク
+- CI/CDパイプライン
+- インフラストラクチャ管理
 
-**Examples**:
+**例**:
 - "Blue-green deployment strategy"
 - "Set up Prometheus monitoring"
 - "Database backup and restore procedure"
 
-**Keywords**: deploy, deployment, maintenance, operation, monitoring, ci/cd, devops, infrastructure
+**キーワード**: deploy, deployment, maintenance, operation, monitoring, ci/cd, devops, infrastructure
 
-## Categorization Guidelines
+## カテゴリ分類ガイドライン
 
-### Primary Category Selection
+### 主カテゴリの選択
 
-Choose the category that best represents the **primary purpose** of the knowledge:
+知識の**主な目的**を最もよく表すカテゴリを選択:
 
-- If it's primarily about fixing an error → `errors/`
-- If it's primarily about how to implement something → `patterns/`
-- If it's primarily a command or tool usage → `commands/`
-- If it's primarily about system design → `design/`
-- If it's primarily business/domain logic → `domain/`
-- If it's primarily operational/DevOps → `operations/`
+- 主にエラー修正に関するもの → `errors/`
+- 主に実装方法に関するもの → `patterns/`
+- 主にコマンドやツールの使用法に関するもの → `commands/`
+- 主にシステム設計に関するもの → `design/`
+- 主にビジネス/ドメインロジックに関するもの → `domain/`
+- 主に運用/DevOpsに関するもの → `operations/`
 
-### Handling Overlaps
+### オーバーラップの処理
 
-Many knowledge items span multiple categories. Use:
+多くの知識項目は複数のカテゴリにまたがります。以下を使用:
 
-1. **Primary category** for directory placement
-2. **Tags** for cross-category discoverability
+1. **主カテゴリ**: ディレクトリ配置用
+2. **タグ**: カテゴリ横断の発見性のため
 
-Example: "Deploy FastAPI with Docker"
-- Primary category: `operations/` (deployment focus)
-- Tags: `[docker, fastapi, deployment, commands, devops]`
+例: "Deploy FastAPI with Docker"
+- 主カテゴリ: `operations/` (デプロイに焦点)
+- タグ: `[docker, fastapi, deployment, commands, devops]`
 
-This makes it discoverable when searching for Docker commands or FastAPI patterns.
+これにより、DockerコマンドやFastAPIパターンを検索するときに発見可能になります。
 
-### Category Migration
+### カテゴリ移行
 
-Knowledge items may be recategorized if:
-- The original categorization was unclear
-- The knowledge evolved to fit better elsewhere
-- Usage patterns show it's searched for differently
+以下の場合、知識項目を再分類することができます:
+- 元のカテゴリ分類が不明確だった
+- 知識が進化して他の場所により適合するようになった
+- 使用パターンが異なる検索方法を示している
 
-Migration process:
-1. Move file to new category directory
-2. Update frontmatter `category` field
-3. Add redirect or note in original location if needed
+移行プロセス:
+1. ファイルを新しいカテゴリディレクトリに移動
+2. frontmatterの`category`フィールドを更新
+3. 必要に応じて元の場所にリダイレクトまたは注記を追加
 
-## Automatic Categorization
+## 自動カテゴリ分類
 
-The `categorize_knowledge.py` script uses keyword scoring to suggest categories.
+`categorize_knowledge.py`スクリプトは、キーワードスコアリングを使用してカテゴリを提案します。
 
-**How it works**:
-1. Scans text for category keywords
-2. Counts keyword matches per category
-3. Considers tags with higher weight
-4. Selects category with highest score
-5. Falls back to `domain/` if no clear match
+**仕組み**:
+1. テキストをカテゴリキーワードでスキャン
+2. カテゴリごとのキーワードマッチ数をカウント
+3. タグをより高い重みで考慮
+4. 最高スコアのカテゴリを選択
+5. 明確なマッチがない場合は`domain/`にフォールバック
 
-**Override automatic categorization** by manually specifying category in frontmatter.
+**自動カテゴリ分類を上書き**するには、frontmatterでカテゴリを手動で指定します。
 
-## Search Strategy
+## 検索戦略
 
-### Finding Knowledge Across Categories
+### カテゴリ横断で知識を見つける
 
-Use a combination of:
+以下の組み合わせを使用:
 
-1. **Category browsing**: Start with the most relevant category directory
-2. **Tag search**: Search for tags across all categories
-3. **Full-text search**: Use `grep` or repository search for keywords
-4. **Related links**: Follow "Related" sections in knowledge files
+1. **カテゴリブラウジング**: 最も関連性の高いカテゴリディレクトリから開始
+2. **タグ検索**: すべてのカテゴリでタグを検索
+3. **全文検索**: `grep`またはリポジトリ検索でキーワードを検索
+4. **関連リンク**: 知識ファイルの「Related」セクションをフォロー
 
-Example search workflows:
+検索ワークフローの例:
 
-**Finding error solutions**:
+**エラー解決策を見つける**:
 ```bash
-# Browse errors directory
+# errorsディレクトリをブラウズ
 ls errors/
 
-# Search for specific error
+# 特定のエラーを検索
 grep -r "ModuleNotFoundError" errors/
 
-# Search across all categories with tag
+# タグを使用してすべてのカテゴリを検索
 grep -r "tags: \[.*python.*import.*\]" .
 ```
 
-**Finding implementation patterns**:
+**実装パターンを見つける**:
 ```bash
-# Browse patterns directory
+# patternsディレクトリをブラウズ
 ls patterns/
 
-# Search for authentication patterns
+# 認証パターンを検索
 grep -r "authentication" patterns/ design/
 
-# Find by tags
+# タグで検索
 grep -r "tags: \[.*authentication.*security.*\]" .
 ```
 
-## Best Practices
+## ベストプラクティス
 
-1. **Choose one primary category** - Don't duplicate files across categories
-2. **Use tags liberally** - Helps with cross-category discovery
-3. **Link related knowledge** - Build a knowledge graph
-4. **Keep categories balanced** - If one grows too large, consider subcategories
-5. **Review and refactor** - Periodically review categorization accuracy
+1. **1つの主カテゴリを選択** - カテゴリ間でファイルを重複させない
+2. **タグを自由に使用** - カテゴリ横断の発見を助ける
+3. **関連知識をリンク** - 知識グラフを構築
+4. **カテゴリのバランスを保つ** - 1つが大きくなりすぎたら、サブカテゴリを検討
+5. **レビューとリファクタリング** - 定期的にカテゴリ分類の正確性をレビュー

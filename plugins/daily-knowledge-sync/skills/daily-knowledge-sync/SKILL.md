@@ -1,66 +1,66 @@
 ---
 name: daily-knowledge-sync
-description: Automatically extract and sync knowledge from daily Claude Code conversations to a GitHub repository. Analyzes JSONL conversation logs, identifies valuable insights (error resolutions, coding patterns, useful commands, design decisions, domain knowledge, operations), checks for duplicates using 70% similarity threshold, and commits to categorized knowledge base. Triggers once per day on first Claude Code startup or with "おはよう" (good morning) greeting.
+description: 日々のClaude Code会話から知識を自動抽出し、GitHubリポジトリに同期します。JSONL会話ログを分析し、価値ある知見（エラー解決、コーディングパターン、便利なコマンド、設計判断、ドメイン知識、運用）を特定し、70%類似度閾値で重複をチェックし、カテゴリ分類された知識ベースにコミットします。1日1回、Claude Code起動時または「おはよう」の挨拶時にトリガーされます。
 ---
 
 # Daily Knowledge Sync
 
-Automatically harvest knowledge from your Claude Code conversations and build a searchable, categorized knowledge repository.
+Claude Codeの会話から自動的に知識を収集し、検索可能でカテゴリ分類された知識リポジトリを構築します。
 
-## Overview
+## 概要
 
-This skill analyzes your previous day's Claude Code conversation logs (JSONL files in `~/.claude/projects/`), extracts valuable knowledge items, categorizes them, checks for duplicates, and commits them to a GitHub repository. It runs once per day on your first Claude Code session.
+このスキルは、前日のClaude Code会話ログ（`~/.claude/projects/`内のJSONLファイル）を分析し、価値ある知識項目を抽出し、カテゴリ分類し、重複をチェックし、GitHubリポジトリにコミットします。1日1回、最初のClaude Codeセッションで実行されます。
 
-**What it extracts**:
-- Error resolutions and debugging insights
-- Coding patterns and best practices
-- Useful commands and CLI workflows
-- Design decisions and architecture insights
-- Domain-specific knowledge
-- DevOps and operational procedures
+**抽出される内容**:
+- エラー解決とデバッグの知見
+- コーディングパターンとベストプラクティス
+- 便利なコマンドとCLIワークフロー
+- 設計判断とアーキテクチャの知見
+- ドメイン固有の知識
+- DevOpsと運用手順
 
-**Key features**:
-- 🔄 Automatic daily execution
-- 🏷️ Category-based organization + tag metadata
-- 🔍 70% similarity threshold for duplicate detection
-- 📝 Structured markdown format
-- 🔐 Git integration for version control
+**主な機能**:
+- 🔄 自動的な日次実行
+- 🏷️ カテゴリベースの整理 + タグメタデータ
+- 🔍 重複検出のための70%類似度閾値
+- 📝 構造化されたmarkdown形式
+- 🔐 バージョン管理のためのGit統合
 
-## Workflow
+## ワークフロー
 
-### Step 1: Check if Should Run Today
+### Step 1: 今日実行すべきか確認
 
-First, verify if the skill should run (once per day):
+まず、スキルを実行すべきか確認します（1日1回）:
 
 ```bash
 python scripts/manage_daily_trigger.py check
 ```
 
-If exit code is 0, proceed. If exit code is 1, skill already ran today.
+終了コードが0なら続行、1なら今日は既に実行済みです。
 
-### Step 2: Configure Repository (First Time Only)
+### Step 2: リポジトリの設定（初回のみ）
 
-If not already configured, set up the knowledge repository:
+まだ設定していない場合、知識リポジトリをセットアップします:
 
-**Option A: Use existing repository**
+**オプションA: 既存のリポジトリを使用**
 
-1. Clone your knowledge repo locally:
+1. 知識リポジトリをローカルにクローン:
    ```bash
    git clone <your-knowledge-repo-url> ~/knowledge-base
    ```
 
-2. Note the repository path for later use
+2. 後で使用するためにリポジトリパスをメモしておく
 
-**Option B: Create new repository**
+**オプションB: 新しいリポジトリを作成**
 
-1. Create a new GitHub repository (e.g., `my-knowledge-base`)
+1. 新しいGitHubリポジトリを作成（例: `my-knowledge-base`）
 
-2. Clone it locally:
+2. ローカルにクローン:
    ```bash
    git clone <repo-url> ~/knowledge-base
    ```
 
-3. Initialize structure:
+3. 構造を初期化:
    ```bash
    cd ~/knowledge-base
    mkdir -p errors patterns commands design domain operations
@@ -69,57 +69,57 @@ If not already configured, set up the knowledge repository:
    git push origin main
    ```
 
-**Configuration variables** (remember these):
-- `KNOWLEDGE_REPO_PATH`: Local path to knowledge repo (e.g., `~/knowledge-base`)
-- `KNOWLEDGE_REPO_URL`: GitHub repo URL
+**設定変数**（これらを覚えておいてください）:
+- `KNOWLEDGE_REPO_PATH`: 知識リポジトリのローカルパス（例: `~/knowledge-base`）
+- `KNOWLEDGE_REPO_URL`: GitHubリポジトリのURL
 
-### Step 3: Extract Knowledge Candidates
+### Step 3: 知識候補の抽出
 
-Extract potential knowledge items from previous day's JSONL files:
+前日のJSONLファイルから潜在的な知識項目を抽出:
 
 ```bash
-# Extract for yesterday (default)
+# 昨日分を抽出（デフォルト）
 python scripts/extract_knowledge.py
 
-# Or specify date
+# または日付を指定
 python scripts/extract_knowledge.py 2026-01-30
 ```
 
-This outputs to `/tmp/knowledge_candidates_YYYY-MM-DD.json`.
+これは `/tmp/knowledge_candidates_YYYY-MM-DD.json` に出力されます。
 
-**Review the candidates** to understand what was extracted.
+**候補をレビュー**して、何が抽出されたかを理解します。
 
-### Step 4: Analyze and Synthesize Knowledge
+### Step 4: 知識の分析と統合
 
-For each candidate in the extracted JSON:
+抽出されたJSON内の各候補について:
 
-1. **Read the candidate**:
-   - `text`: The conversation content
-   - `role`: user or assistant
-   - `tool_uses`: Tools that were used
-   - `errors`: Any error messages
+1. **候補を読む**:
+   - `text`: 会話の内容
+   - `role`: userまたはassistant
+   - `tool_uses`: 使用されたツール
+   - `errors`: エラーメッセージ
 
-2. **Determine if it's valuable knowledge**:
-   - Is it a reusable insight?
-   - Does it solve a specific problem?
-   - Would you want to reference this in the future?
+2. **価値ある知識かどうか判断**:
+   - 再利用可能な知見か？
+   - 特定の問題を解決するか？
+   - 将来参照したいか？
 
-3. **Synthesize into knowledge format**:
-   - Create a clear title
-   - Write context section
-   - Describe problem/topic
-   - Document solution/insight
-   - Add related links if applicable
+3. **知識形式に統合**:
+   - 明確なタイトルを作成
+   - コンテキストセクションを書く
+   - 問題/トピックを記述
+   - 解決策/知見を文書化
+   - 該当する場合は関連リンクを追加
 
-4. **Assign tags**:
-   - Technology tags (python, docker, git)
-   - Domain tags (api, database, testing)
-   - Type tags (error-fix, best-practice)
-   - See [references/knowledge_format.md](references/knowledge_format.md) for details
+4. **タグを割り当て**:
+   - 技術タグ（python, docker, git）
+   - ドメインタグ（api, database, testing）
+   - タイプタグ（error-fix, best-practice）
+   - 詳細は [references/knowledge_format.md](references/knowledge_format.md) を参照
 
-### Step 5: Categorize Knowledge
+### Step 5: 知識のカテゴリ分類
 
-For each knowledge item, determine category:
+各知識項目について、カテゴリを決定:
 
 ```python
 from scripts.categorize_knowledge import KnowledgeCategorizer
@@ -132,26 +132,26 @@ category = categorizer.categorize(
 )
 ```
 
-Categories:
-- `errors`: Error resolutions
-- `patterns`: Coding patterns and best practices
-- `commands`: CLI commands and tools
-- `design`: Architecture and design decisions
-- `domain`: Business/domain knowledge
-- `operations`: DevOps and maintenance
+カテゴリ:
+- `errors`: エラー解決
+- `patterns`: コーディングパターンとベストプラクティス
+- `commands`: CLIコマンドとツール
+- `design`: アーキテクチャと設計判断
+- `domain`: ビジネス/ドメイン知識
+- `operations`: DevOpsとメンテナンス
 
-See [references/categories.md](references/categories.md) for categorization guidelines.
+カテゴリ分類ガイドラインは [references/categories.md](references/categories.md) を参照してください。
 
-### Step 6: Check for Duplicates
+### Step 6: 重複のチェック
 
-Before creating a new knowledge file, check for duplicates:
+新しい知識ファイルを作成する前に、重複をチェック:
 
 ```python
 from scripts.check_similarity import SimilarityChecker
 
 checker = SimilarityChecker(threshold=0.7)
 
-# Check against existing files in category
+# カテゴリ内の既存ファイルと照合
 category_dir = Path(KNOWLEDGE_REPO_PATH) / category
 for existing_file in category_dir.glob("*.md"):
     duplicates = checker.check_knowledge_file(
@@ -160,18 +160,18 @@ for existing_file in category_dir.glob("*.md"):
     )
 
     if duplicates:
-        # Handle duplicate: skip, merge, or ask user
+        # 重複を処理: スキップ、マージ、またはユーザーに確認
         print(f"Found similar knowledge: {duplicates[0]['section']}")
 ```
 
-**Duplicate handling options**:
-1. **Skip** if very similar (>90%)
-2. **Merge** if complementary (70-90%)
-3. **Create new** if sufficiently different (<70%)
+**重複処理のオプション**:
+1. **スキップ**: 非常に類似している場合（>90%）
+2. **マージ**: 補完的な場合（70-90%）
+3. **新規作成**: 十分に異なる場合（<70%）
 
-### Step 7: Create Knowledge Files
+### Step 7: 知識ファイルの作成
 
-For non-duplicate knowledge:
+重複していない知識について:
 
 ```python
 from datetime import datetime
@@ -200,60 +200,60 @@ file_path = categorizer.create_knowledge_file(
 print(f"Created: {file_path}")
 ```
 
-See [references/knowledge_format.md](references/knowledge_format.md) for format details.
+形式の詳細は [references/knowledge_format.md](references/knowledge_format.md) を参照してください。
 
-### Step 8: Commit and Push to GitHub
+### Step 8: GitHubへのコミットとプッシュ
 
-After creating all knowledge files:
+すべての知識ファイルを作成した後:
 
 ```bash
 cd $KNOWLEDGE_REPO_PATH
 
-# Stage changes
+# 変更をステージング
 git add errors/ patterns/ commands/ design/ domain/ operations/
 
-# Get username for commit message
+# コミットメッセージ用のユーザー名を取得
 USERNAME=$(git config user.name)
 DATE=$(date +%Y-%m-%d)
 
-# Commit with standard format
+# 標準形式でコミット
 git commit -m "docs: $USERNAME $DATE
 
 Daily knowledge sync from Claude Code conversations.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
-# Push to main branch
+# mainブランチにプッシュ
 git push origin main
 ```
 
-### Step 9: Mark as Run Today
+### Step 9: 今日実行済みとしてマーク
 
-After successful completion, mark today as processed:
+正常に完了した後、今日を処理済みとしてマーク:
 
 ```bash
 python scripts/manage_daily_trigger.py mark
 ```
 
-This prevents the skill from running again until tomorrow.
+これにより、明日まで再実行されないようになります。
 
-## Configuration Reference
+## 設定リファレンス
 
-### Environment Variables (Optional)
+### 環境変数（オプション）
 
-You can set these in `~/.bashrc` or `~/.zshrc`:
+`~/.bashrc` または `~/.zshrc` に設定できます:
 
 ```bash
 export KNOWLEDGE_REPO_PATH="$HOME/knowledge-base"
 export KNOWLEDGE_REPO_URL="https://github.com/username/knowledge-base"
-export KNOWLEDGE_SIMILARITY_THRESHOLD="0.7"  # Default: 0.7
+export KNOWLEDGE_SIMILARITY_THRESHOLD="0.7"  # デフォルト: 0.7
 ```
 
-### Skill State Files
+### スキル状態ファイル
 
-- `~/.claude/daily_knowledge/last_run.txt`: Tracks last execution date
+- `~/.claude/daily_knowledge/last_run.txt`: 最終実行日を追跡
 
-### Repository Structure
+### リポジトリ構造
 
 ```
 knowledge-base/
@@ -278,43 +278,43 @@ knowledge-base/
     └── 2026-01-31_docker_deployment.md
 ```
 
-## Customization
+## カスタマイズ
 
-### Adjusting Similarity Threshold
+### 類似度閾値の調整
 
-Edit the threshold when creating the SimilarityChecker:
+SimilarityCheckerを作成する際に閾値を編集:
 
 ```python
-# More strict (fewer duplicates detected)
+# より厳格（検出される重複が少ない）
 checker = SimilarityChecker(threshold=0.8)
 
-# More lenient (more duplicates detected)
+# より寛容（検出される重複が多い）
 checker = SimilarityChecker(threshold=0.6)
 ```
 
-### Custom Categories
+### カスタムカテゴリ
 
-Add custom categories by editing `scripts/categorize_knowledge.py`:
+`scripts/categorize_knowledge.py` を編集してカスタムカテゴリを追加:
 
 ```python
 CATEGORY_KEYWORDS = {
-    # Existing categories...
+    # 既存のカテゴリ...
     "security": ["security", "vulnerability", "auth", "encryption"],
     "performance": ["performance", "optimization", "speed", "memory"],
 }
 ```
 
-Then create the directories in your repository.
+その後、リポジトリにディレクトリを作成してください。
 
-### Filtering Conversations
+### 会話のフィルタリング
 
-To exclude certain projects from extraction, modify `extract_knowledge.py`:
+特定のプロジェクトを抽出から除外するには、`extract_knowledge.py` を変更:
 
 ```python
 def find_jsonl_files(self, target_date: str) -> list[Path]:
     jsonl_files = []
 
-    # Skip certain directories
+    # 特定のディレクトリをスキップ
     exclude_dirs = ["test-project", "scratch"]
 
     for jsonl_file in self.projects_dir.rglob("*.jsonl"):
@@ -325,85 +325,85 @@ def find_jsonl_files(self, target_date: str) -> list[Path]:
     return jsonl_files
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Skill Runs Multiple Times Per Day
+### スキルが1日に複数回実行される
 
-Check trigger state:
+トリガー状態を確認:
 ```bash
 python scripts/manage_daily_trigger.py status
 ```
 
-Reset if needed:
+必要に応じてリセット:
 ```bash
 rm ~/.claude/daily_knowledge/last_run.txt
 ```
 
-### No Candidates Extracted
+### 候補が抽出されない
 
-Verify JSONL files exist:
+JSONLファイルが存在することを確認:
 ```bash
 ls -la ~/.claude/projects/*/
 ```
 
-Check date format:
+日付形式を確認:
 ```bash
 python scripts/extract_knowledge.py 2026-01-31
 ```
 
-### Similarity Check Not Working
+### 類似度チェックが機能しない
 
-If scikit-learn is not installed:
+scikit-learnがインストールされていない場合:
 ```bash
 pip install scikit-learn
 ```
 
-The script falls back to simple word-based similarity if scikit-learn is unavailable.
+scikit-learnが利用できない場合、スクリプトは単純な単語ベースの類似度にフォールバックします。
 
-### Git Push Fails
+### Gitプッシュが失敗する
 
-Ensure you're authenticated:
+認証されていることを確認:
 ```bash
-gh auth status  # For GitHub CLI
-# Or configure SSH keys
+gh auth status  # GitHub CLI用
+# またはSSHキーを設定
 ```
 
-Pull before push if remote has changes:
+リモートに変更がある場合、プッシュ前にプル:
 ```bash
 cd $KNOWLEDGE_REPO_PATH
 git pull origin main --rebase
 git push origin main
 ```
 
-### Categories Not Auto-Detecting
+### カテゴリが自動検出されない
 
-Categories are based on keyword matching. If auto-categorization fails:
+カテゴリはキーワードマッチングに基づいています。自動分類が失敗する場合:
 
-1. Check if keywords are in your content
-2. Manually specify category when creating file
-3. Add custom keywords to `categorize_knowledge.py`
+1. コンテンツにキーワードが含まれているか確認
+2. ファイル作成時に手動でカテゴリを指定
+3. `categorize_knowledge.py` にカスタムキーワードを追加
 
-## Best Practices
+## ベストプラクティス
 
-1. **Review before pushing**: Always review extracted knowledge before committing
-2. **Refine titles**: Make titles specific and searchable
-3. **Add context**: Include why this knowledge matters
-4. **Link related items**: Build connections between knowledge pieces
-5. **Use tags generously**: Better over-tagged than under-tagged
-6. **Clean up duplicates**: Periodically review for near-duplicates to merge
-7. **Update existing knowledge**: Prefer updating existing items over creating duplicates
+1. **プッシュ前にレビュー**: コミット前に抽出された知識を必ずレビュー
+2. **タイトルを洗練**: タイトルを具体的で検索可能にする
+3. **コンテキストを追加**: この知識がなぜ重要かを含める
+4. **関連項目をリンク**: 知識項目間の接続を構築
+5. **タグを豊富に使用**: タグ不足よりタグ過多の方が良い
+6. **重複をクリーンアップ**: 定期的に類似項目をレビューしてマージ
+7. **既存知識を更新**: 重複作成よりも既存項目の更新を優先
 
-## Integration with Other Skills
+## 他スキルとの連携
 
-This skill pairs well with:
+このスキルは以下と相性が良いです:
 
-- **/guardrail-builder**: Auto-create rules from repeated patterns
-- **/michi:dev**: Capture development insights during TDD workflow
-- **Code Review skills**: Extract review learnings
+- **/guardrail-builder**: 繰り返しパターンからルールを自動作成
+- **/michi:dev**: TDDワークフロー中の開発知見をキャプチャ
+- **Code Reviewスキル**: レビューの学びを抽出
 
-## Resources
+## リソース
 
-See the bundled reference files for detailed format specifications:
+詳細な形式仕様については、同梱のリファレンスファイルを参照してください:
 
-- **[references/knowledge_format.md](references/knowledge_format.md)**: Markdown format, frontmatter, tagging strategy
-- **[references/categories.md](references/categories.md)**: Category definitions, classification guidelines, search strategies
+- **[references/knowledge_format.md](references/knowledge_format.md)**: Markdown形式、frontmatter、タグ戦略
+- **[references/categories.md](references/categories.md)**: カテゴリ定義、分類ガイドライン、検索戦略

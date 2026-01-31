@@ -1,10 +1,10 @@
-# Knowledge File Format
+# 知識ファイル形式
 
-This document defines the format for knowledge markdown files.
+このドキュメントは知識markdownファイルの形式を定義します。
 
-## File Structure
+## ファイル構造
 
-Each knowledge file should follow this structure:
+各知識ファイルは以下の構造に従う必要があります:
 
 ```markdown
 ---
@@ -19,99 +19,99 @@ source: conversation|manual|import
 
 ## Context
 
-Brief context about when/why this knowledge was encountered.
+この知識に遭遇したときの簡単なコンテキスト。
 
 ## Problem/Topic
 
-Description of the problem or topic.
+問題またはトピックの説明。
 
 ## Solution/Insight
 
-The actual knowledge content:
-- Key insights
-- Solution steps
-- Code examples
-- Command examples
+実際の知識内容:
+- 主要な知見
+- 解決手順
+- コード例
+- コマンド例
 
 ## Related
 
-- Links to related knowledge items
-- References to documentation
+- 関連する知識項目へのリンク
+- ドキュメントへの参照
 ```
 
-## Frontmatter Fields
+## Frontmatterフィールド
 
-### Required Fields
+### 必須フィールド
 
-- **title**: Clear, descriptive title (50-100 chars)
-- **category**: One of: errors, patterns, commands, design, domain, operations
-- **tags**: Array of relevant tags for searchability
-- **date**: Date of creation (YYYY-MM-DD)
+- **title**: 明確で説明的なタイトル（50-100文字）
+- **category**: 以下のいずれか: errors, patterns, commands, design, domain, operations
+- **tags**: 検索性のための関連タグの配列
+- **date**: 作成日（YYYY-MM-DD）
 
-### Optional Fields
+### オプションフィールド
 
-- **source**: Origin of knowledge (conversation, manual, import)
-- **language**: Programming language if applicable
-- **framework**: Framework/library if applicable
+- **source**: 知識の出所（conversation, manual, import）
+- **language**: 該当する場合はプログラミング言語
+- **framework**: 該当する場合はフレームワーク/ライブラリ
 - **difficulty**: beginner, intermediate, advanced
 - **priority**: low, medium, high, critical
 
-## Content Guidelines
+## コンテンツガイドライン
 
-### Title
+### タイトル
 
-- Be specific and searchable
-- Include key terms (error names, command names, etc.)
-- Examples:
+- 具体的で検索可能にする
+- 主要な用語を含める（エラー名、コマンド名など）
+- 例:
   - ✅ "Fix ModuleNotFoundError when importing local packages"
   - ✅ "Use git rebase --onto for advanced branch management"
   - ❌ "Error fix"
   - ❌ "Git command"
 
-### Context Section
+### コンテキストセクション
 
-- When was this encountered?
-- What was the broader task?
-- Why is this worth documenting?
+- いつこれに遭遇したか？
+- どのようなタスクの一環として発生したか？
+- なぜこれを文書化する価値があるか？
 
-### Problem/Topic Section
+### 問題/トピックセクション
 
-- Clear problem statement or topic description
-- Error messages (if applicable)
-- Environment details (if relevant)
+- 明確な問題文またはトピック説明
+- エラーメッセージ（該当する場合）
+- 環境の詳細（関連する場合）
 
-### Solution/Insight Section
+### 解決策/知見セクション
 
-- Step-by-step solution or explanation
-- Code examples with syntax highlighting
-- Command examples
-- Rationale and trade-offs
+- ステップバイステップの解決策または説明
+- 構文ハイライト付きのコード例
+- コマンド例
+- 根拠とトレードオフ
 
-### Related Section
+### 関連セクション
 
-- Internal links: `[Related knowledge](../errors/2026-01-30_other_error.md)`
-- External links: Documentation, Stack Overflow, etc.
-- Tags for discoverability
+- 内部リンク: `[Related knowledge](../errors/2026-01-30_other_error.md)`
+- 外部リンク: ドキュメント、Stack Overflowなど
+- 発見性のためのタグ
 
-## Tagging Strategy
+## タグ戦略
 
-### Tag Categories
+### タグカテゴリ
 
-1. **Technology**: `python`, `javascript`, `docker`, `git`, etc.
-2. **Domain**: `authentication`, `api`, `database`, `testing`, etc.
-3. **Type**: `error-fix`, `best-practice`, `optimization`, `security`, etc.
-4. **Complexity**: `beginner`, `advanced`, `quick-fix`, `deep-dive`, etc.
+1. **技術**: `python`, `javascript`, `docker`, `git` など
+2. **ドメイン**: `authentication`, `api`, `database`, `testing` など
+3. **タイプ**: `error-fix`, `best-practice`, `optimization`, `security` など
+4. **複雑さ**: `beginner`, `advanced`, `quick-fix`, `deep-dive` など
 
-### Tag Best Practices
+### タグのベストプラクティス
 
-- Use 3-7 tags per item
-- Be consistent with naming (lowercase, hyphenated)
-- Include both specific and general tags
-- Example: `[python, import-error, package-management, pip, beginner]`
+- 項目ごとに3-7個のタグを使用
+- 命名の一貫性を保つ（小文字、ハイフン区切り）
+- 具体的なタグと一般的なタグの両方を含める
+- 例: `[python, import-error, package-management, pip, beginner]`
 
-## Examples
+## 例
 
-### Error Resolution
+### エラー解決
 
 ```markdown
 ---
@@ -126,23 +126,23 @@ source: conversation
 
 ## Context
 
-Encountered when trying to run `docker ps` after fresh Docker installation on Ubuntu.
+UbuntuへのDocker新規インストール後、`docker ps`を実行しようとしたときに遭遇しました。
 
 ## Problem
 
-Error message:
+エラーメッセージ:
 ```
 Got permission denied while trying to connect to the Docker daemon socket
 ```
 
 ## Solution
 
-Add user to docker group:
+ユーザーをdockerグループに追加:
 
 ```bash
 sudo usermod -aG docker $USER
-newgrp docker  # Or logout and login
-docker ps      # Should work now
+newgrp docker  # またはログアウトしてログイン
+docker ps      # これで動作するはず
 ```
 
 ## Related
@@ -151,7 +151,7 @@ docker ps      # Should work now
 - [Linux user groups](../commands/2026-01-15_linux_groups.md)
 ```
 
-### Best Practice
+### ベストプラクティス
 
 ```markdown
 ---
@@ -167,22 +167,22 @@ difficulty: intermediate
 
 ## Context
 
-Building REST APIs with FastAPI requires robust input validation.
+FastAPIでREST APIを構築する際には、堅牢な入力検証が必要です。
 
 ## Topic
 
-FastAPI + Pydantic provides automatic validation and documentation.
+FastAPI + Pydanticは自動検証とドキュメント生成を提供します。
 
 ## Insight
 
-Define request models with Pydantic:
+Pydanticでリクエストモデルを定義:
 
 ```python
 from pydantic import BaseModel, Field
 
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
-    email: str = Field(..., regex=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
     age: int = Field(..., ge=0, le=150)
 
 @app.post("/users/")
@@ -190,11 +190,11 @@ async def create_user(user: UserCreate):
     return {"username": user.username}
 ```
 
-Benefits:
-- Automatic validation
-- Clear error messages
-- Auto-generated API docs
-- Type safety
+メリット:
+- 自動検証
+- 明確なエラーメッセージ
+- 自動生成されたAPIドキュメント
+- 型安全性
 
 ## Related
 
