@@ -20,98 +20,126 @@
       "source": "./plugins/guardrail-builder",
       "description": "Automatically extracts learnings and saves to .claude/rules/ as individual files (auto-loaded as project memory)",
       "version": "2.1.0",
-      "skills": ["./skills/guardrail-builder"]
+      "skills": [
+        "./skills/guardrail-builder"
+      ]
     },
     {
       "name": "deep-dive",
       "source": "./plugins/deep-dive",
       "description": "Deep-dive skill for recursive requirement exploration",
       "version": "1.4.0",
-      "skills": ["./skills/deep-dive"]
+      "skills": [
+        "./skills/deep-dive"
+      ]
     },
     {
       "name": "lang-java-spring",
       "source": "./plugins/lang-java-spring",
       "description": "Java + Spring Boot development support",
       "version": "1.0.0",
-      "skills": ["./skills/java-spring"]
+      "skills": [
+        "./skills/java-spring"
+      ]
     },
     {
       "name": "lang-python",
       "source": "./plugins/lang-python",
       "description": "Python + FastAPI development support",
       "version": "1.0.0",
-      "skills": ["./skills/python"]
+      "skills": [
+        "./skills/python"
+      ]
     },
     {
       "name": "lang-php",
       "source": "./plugins/lang-php",
       "description": "PHP + Slim Framework development support",
       "version": "1.0.0",
-      "skills": ["./skills/php"]
+      "skills": [
+        "./skills/php"
+      ]
     },
     {
       "name": "lang-perl",
       "source": "./plugins/lang-perl",
       "description": "Perl + Mojolicious development support",
       "version": "1.0.0",
-      "skills": ["./skills/perl"]
+      "skills": [
+        "./skills/perl"
+      ]
     },
     {
       "name": "jujutsu-workflow",
       "source": "./plugins/jujutsu-workflow",
       "description": "Jujutsu version control workflow support",
       "version": "1.0.0",
-      "skills": ["./skills/jujutsu"]
+      "skills": [
+        "./skills/jujutsu"
+      ]
     },
     {
       "name": "ci-cd-tools",
       "source": "./plugins/ci-cd-tools",
       "description": "CI/CD troubleshooting and GitHub Actions support",
       "version": "1.0.0",
-      "skills": ["./skills/ci-cd"]
+      "skills": [
+        "./skills/ci-cd"
+      ]
     },
     {
       "name": "oss-compliance",
       "source": "./plugins/oss-compliance",
       "description": "OSS license compliance checking and auditing",
       "version": "1.1.0",
-      "skills": ["./skills/oss-license"]
+      "skills": [
+        "./skills/oss-license"
+      ]
     },
     {
       "name": "version-audit",
       "source": "./plugins/version-audit",
       "description": "Technology stack version auditing and EOL checking",
       "version": "1.1.0",
-      "skills": ["./skills/stable-version"]
+      "skills": [
+        "./skills/stable-version"
+      ]
     },
     {
       "name": "design-review",
       "source": "./plugins/design-review",
       "description": "UI/UX design review and accessibility checking",
       "version": "1.1.0",
-      "skills": ["./skills/design-review"]
+      "skills": [
+        "./skills/design-review"
+      ]
     },
     {
       "name": "e2e-planning",
       "source": "./plugins/e2e-planning",
       "description": "E2E-first development planning and Walking Skeleton design",
       "version": "1.0.0",
-      "skills": ["./skills/e2e-first-planning"]
+      "skills": [
+        "./skills/e2e-first-planning"
+      ]
     },
     {
       "name": "quizknock",
       "source": "./plugins/quizknock",
       "description": "Interactive quiz generation for learning reinforcement",
       "version": "1.2.1",
-      "skills": ["./skills/quizknock"]
+      "skills": [
+        "./skills/quizknock"
+      ]
     },
     {
       "name": "daily-knowledge-sync",
       "source": "./plugins/daily-knowledge-sync",
       "description": "Automatically extract and sync knowledge from daily Claude Code conversations to a GitHub repository.",
-      "version": "1.4.0",
-      "skills": ["./skills/daily-knowledge-sync"]
+      "version": "1.5.0",
+      "skills": [
+        "./skills/daily-knowledge-sync"
+      ]
     }
   ]
 }

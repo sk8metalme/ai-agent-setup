@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from categorize_knowledge import KnowledgeCategorizer
-from check_similarity import calculate_similarity, find_similar_knowledge
+from check_similarity import SimilarityChecker
 from evaluate_knowledge import KnowledgeEvaluator
 
 
@@ -43,6 +43,7 @@ class KnowledgeBatchProcessor:
 
         self.evaluator = KnowledgeEvaluator()
         self.categorizer = KnowledgeCategorizer(str(self.repo_path))
+        self.similarity_checker = SimilarityChecker(threshold=similarity_threshold)
 
     def process_candidates(
         self, candidates_file: Path, date: str | None = None
@@ -95,12 +96,10 @@ class KnowledgeBatchProcessor:
 
             # 2. Check similarity
             text = candidate.get("text", "")
-            similar = find_similar_knowledge(
-                self.repo_path, text, self.similarity_threshold
-            )
+            similar = self._find_similar_knowledge(text)
 
             if similar:
-                print(f"   ⚠️  Similar to: {similar[0]}")
+                print(f"   ⚠️  Similar to: {similar[0]['file']}")
                 stats["duplicates"] += 1
                 continue
 
@@ -200,6 +199,34 @@ class KnowledgeBatchProcessor:
                 tags.append(tag)
 
         return tags[:5]  # Limit to 5 tags
+
+    def _find_similar_knowledge(self, text: str) -> list[dict]:
+        """
+        Find similar knowledge in the repository.
+
+        Args:
+            text: Text to check for similarity
+
+        Returns:
+            list[dict]: List of similar knowledge items (empty if none found)
+        """
+        # Check all categories
+        categories = ["errors", "ops", "domain", "knowledge"]
+        all_duplicates = []
+
+        for category in categories:
+            category_dir = self.repo_path / category
+            if not category_dir.exists():
+                continue
+
+            # Check each markdown file in the category
+            for md_file in category_dir.glob("*.md"):
+                duplicates = self.similarity_checker.check_knowledge_file(text, md_file)
+                if duplicates:
+                    all_duplicates.extend(duplicates)
+
+        # Return sorted by similarity (highest first)
+        return sorted(all_duplicates, key=lambda x: x["similarity"], reverse=True)
 
     def _commit_to_git(self, files: list[Path], date: str):
         """
