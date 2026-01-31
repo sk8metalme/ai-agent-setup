@@ -4,13 +4,14 @@
 
 ## カテゴリ構造
 
-知識リポジトリはタグ付きmarkdownファイルを持つ3つの主要カテゴリで構成されます:
+知識リポジトリはタグ付きmarkdownファイルを持つ4つの主要カテゴリで構成されます:
 
 ```
 knowledge-repo/
 ├── errors/          # エラー解決、デバッグ、バグ修正
 ├── ops/             # 運用、DevOps、インフラ、便利コマンド
-└── domain/          # ドメイン知識、設計判断、ビジネスロジック
+├── domain/          # ドメイン知識、設計判断、ビジネスロジック
+└── knowledge/       # 学んだ概念・用語、調査した内容
 ```
 
 各カテゴリには、カテゴリ横断の検索性のためのfrontmatterタグを持つmarkdownファイルが含まれます。
@@ -109,6 +110,37 @@ knowledge-repo/
 - 一時的な実装アイデア
 - コンテキストのない図
 
+---
+
+### knowledge/
+
+**目的**: 学んだ概念・用語、調査した内容を文書化
+
+**採用基準**:
+- 明確な概念や用語の説明
+- 調査・リサーチの結果
+- 技術的な学習内容とその理解
+
+**コンテンツタイプ**:
+- 技術用語の定義と解説
+- 調査結果とその分析
+- 学習した概念の理解メモ
+- ライブラリやフレームワークの特徴
+- プログラミング言語の仕様や機能
+
+**例**:
+- "Learned about React Server Components: definition and use cases"
+- "Researched OAuth 2.0 flow: authorization code vs implicit grant"
+- "Understanding of CAP theorem: consistency, availability, partition tolerance trade-offs"
+- "Investigation of GraphQL vs REST API: when to use each approach"
+
+**キーワード**: 調べた, 調べて, 調査, リサーチ, 学んだ, 学習, 知った, 理解した, わかった, 概念, 用語, 定義, とは, という, 意味
+
+**除外される例**:
+- 単なる事実の羅列（理解や分析がない）
+- 不完全な調査メモ
+- 学習の意図が明確でない断片的な情報
+
 ## カテゴリ分類ガイドライン
 
 ### 主カテゴリの選択
@@ -116,11 +148,9 @@ knowledge-repo/
 知識の**主な目的**を最もよく表すカテゴリを選択:
 
 - 主にエラー修正に関するもの → `errors/`
-- 主に実装方法に関するもの → `patterns/`
-- 主にコマンドやツールの使用法に関するもの → `commands/`
-- 主にシステム設計に関するもの → `design/`
-- 主にビジネス/ドメインロジックに関するもの → `domain/`
-- 主に運用/DevOpsに関するもの → `operations/`
+- 主にコマンドやツールの使用法に関するもの → `ops/`
+- 主にシステム設計やビジネス/ドメインロジックに関するもの → `domain/`
+- 主に概念理解や調査内容に関するもの → `knowledge/`
 
 ### オーバーラップの処理
 

@@ -59,5 +59,28 @@ categories:
       - "workflow"
       - "process"
 
+  knowledge:
+    name: "knowledge"
+    description: "学んだ概念・用語、調査した内容"
+    keywords:
+      # リサーチ系
+      - "調べた"
+      - "調べて"
+      - "調査"
+      - "リサーチ"
+      # 習得系
+      - "学んだ"
+      - "学習"
+      - "知った"
+      - "理解した"
+      - "わかった"
+      # 学術・技術系
+      - "概念"
+      - "用語"
+      - "定義"
+      - "とは"
+      - "という"
+      - "意味"
+
 # デフォルトカテゴリ（明確なマッチがない場合）
 default_category: "domain"
