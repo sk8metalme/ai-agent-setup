@@ -1,0 +1,102 @@
+# 除外パターン設定
+# 知識として保存すべきでないコンテンツを定義
+
+# 最小文字数（これ以下は除外）
+min_text_length: 80
+
+# 除外パターン（正規表現）
+exclusion_patterns:
+  # 完了報告パターン
+  completion_phrases:
+    - "完了だぜ"
+    - "完了しました"
+    - "終わりました"
+    - "タスク完了"
+    - "作業完了"
+    - "実装完了"
+    - "修正完了"
+    - "対応完了"
+    - "完了です"
+    - "done"
+    - "finished"
+    - "completed"
+    - "✅"
+    - "✔️"
+
+  # 挨拶・相槌パターン
+  greeting_phrases:
+    - "^なるほど$"
+    - "^よし$"
+    - "^了解$"
+    - "^わかりました$"
+    - "^OK$"
+    - "^おはよう"
+    - "^こんにちは"
+    - "^こんばんは"
+    - "^ありがとう"
+    - "^どういたしまして"
+    - "^はい$"
+    - "^いいえ$"
+
+  # 実行ログパターン
+  execution_logs:
+    - "Running.*"
+    - "Executing.*"
+    - "Starting.*"
+    - "Stopping.*"
+    - "Building.*"
+    - "Compiling.*"
+    - "Installing.*"
+    - "\\d+% complete"
+    - "Step \\d+/\\d+"
+    - "\\[INFO\\]"
+    - "\\[DEBUG\\]"
+    - "\\[TRACE\\]"
+
+  # システムメッセージパターン
+  system_messages:
+    - "This session is being continued"
+    - "Session started"
+    - "Session ended"
+    - "<command-message>"
+    - "<system-reminder>"
+    - "^\\[system\\]"
+
+  # 進行中・一時的な内容
+  wip_patterns:
+    - "WIP:"
+    - "TODO:"
+    - "FIXME:"
+    - "作業中"
+    - "実装中"
+    - "調査中"
+    - "確認中"
+    - "検討中"
+    - "in progress"
+    - "working on"
+
+  # 特定参照のみ（説明なし）
+  bare_references:
+    - "^PR #\\d+$"
+    - "^Issue #\\d+$"
+    - "^commit [a-f0-9]{7,40}$"
+    - "^[a-f0-9]{7,40}$"  # ハッシュのみ
+
+  # 単純なステータス報告
+  status_only:
+    - "^ステータス: "
+    - "^状態: "
+    - "^Status: "
+    - "^State: "
+
+# 除外すべきロール
+excluded_roles:
+  - "system"
+
+# 除外すべきツール使用（単純すぎるもの）
+excluded_simple_tools:
+  - "ls"
+  - "cd"
+  - "pwd"
+  - "echo"
+  - "cat"  # 単純なファイル表示のみの場合

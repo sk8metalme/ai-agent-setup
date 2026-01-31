@@ -4,16 +4,13 @@
 
 ## カテゴリ構造
 
-知識リポジトリはタグ付きmarkdownファイルを持つカテゴリベースのディレクトリ構造を使用します:
+知識リポジトリはタグ付きmarkdownファイルを持つ3つの主要カテゴリで構成されます:
 
 ```
 knowledge-repo/
-├── errors/          # エラー解決とバグ修正
-├── patterns/        # コーディングパターンとベストプラクティス
-├── commands/        # 便利なコマンドとCLIツール
-├── design/          # アーキテクチャと設計判断
-├── domain/          # ドメイン固有の知識
-└── operations/      # DevOps、メンテナンス、運用
+├── errors/          # エラー解決、デバッグ、バグ修正
+├── ops/             # 運用、DevOps、インフラ、便利コマンド
+└── domain/          # ドメイン知識、設計判断、ビジネスロジック
 ```
 
 各カテゴリには、カテゴリ横断の検索性のためのfrontmatterタグを持つmarkdownファイルが含まれます。
@@ -22,121 +19,95 @@ knowledge-repo/
 
 ### errors/
 
-**目的**: エラー解決とデバッグアプローチを文書化
+**目的**: エラー解決、デバッグ、バグ修正を文書化
+
+**採用基準**:
+- 実際のスタックトレースを含む
+- エラーメッセージと解決策がセット
+- 再現可能な問題と修正方法が記載されている
 
 **コンテンツタイプ**:
 - エラーメッセージとその解決策
 - バグ修正手順
 - デバッグ技術
-- よくある落とし穴とその回避方法
+- スタックトレース付きのエラー対応
 
 **例**:
-- "Fix ModuleNotFoundError in Python imports"
-- "Resolve CORS error in FastAPI"
-- "Debug memory leak in Node.js application"
+- "Fix ModuleNotFoundError in Python imports with stack trace"
+- "Resolve CORS error in FastAPI: detailed solution"
+- "Debug memory leak in Node.js application with profiling"
 
-**キーワード**: error, exception, bug, fix, resolve, debug, traceback
+**キーワード**: error, exception, bug, fix, resolve, debug, traceback, stack trace
+
+**除外される例**:
+- 単に"error"という単語を含むだけのメッセージ
+- スタックトレースのない曖昧なエラー言及
+- 解決策のないエラー報告
 
 ---
 
-### patterns/
+### ops/
 
-**目的**: コーディングパターン、ベストプラクティス、実装アプローチを文書化
+**目的**: 運用、DevOps、インフラ、便利なコマンドを文書化
 
-**コンテンツタイプ**:
-- デザインパターン
-- 実装戦略
-- コード整理技術
-- リファクタリングアプローチ
-- アーキテクチャパターン
-
-**例**:
-- "Repository pattern for database access"
-- "Use dependency injection for testability"
-- "Implement circuit breaker for resilience"
-
-**キーワード**: pattern, implementation, approach, best practice, design, architecture, refactor
-
----
-
-### commands/
-
-**目的**: 便利なコマンド、CLIツール、シェルスクリプトを文書化
+**採用基準**:
+- 複雑なコマンド操作（単純な`ls`や`cd`は除外）
+- インフラ構築・設定手順
+- CI/CD、デプロイ手順
 
 **コンテンツタイプ**:
-- Bash/シェルコマンド
+- 便利なコマンドとCLIツール
 - Gitワークフロー
 - Dockerコマンド
-- パッケージマネージャーの使用法
-- ツール設定
+- デプロイ手順
+- モニタリングセットアップ
+- CI/CDパイプライン
+- インフラストラクチャ管理
 
 **例**:
 - "Use git rebase --onto for branch management"
-- "Find and delete files older than 30 days"
 - "Docker multi-stage build optimization"
+- "Blue-green deployment strategy"
+- "Set up Prometheus monitoring"
 
-**キーワード**: command, cli, bash, shell, terminal, git, npm, docker, script
+**キーワード**: command, cli, bash, shell, git, docker, deploy, deployment, ci/cd, devops, infrastructure, monitoring, operation
 
----
-
-### design/
-
-**目的**: アーキテクチャ決定とシステム設計を文書化
-
-**コンテンツタイプ**:
-- アーキテクチャ図
-- 設計判断とその根拠
-- システム設計パターン
-- データモデリング
-- API設計
-
-**例**:
-- "Microservices vs. monolith trade-offs"
-- "Event-driven architecture for async processing"
-- "Database schema design for multi-tenancy"
-
-**キーワード**: design, architecture, diagram, model, system, c4, sequence, mermaid
+**除外される例**:
+- 単純なファイル操作コマンド（`ls`, `cd`, `cat`など）
+- 説明のないコマンドの羅列
+- 一時的な実行ログ
 
 ---
 
 ### domain/
 
-**目的**: ドメイン固有の知識とビジネスロジックを文書化
+**目的**: ドメイン知識、設計判断、ビジネスロジックを文書化
+
+**採用基準**:
+- アーキテクチャ決定とその根拠
+- ビジネスロジックの説明
+- 設計パターンの適用理由
 
 **コンテンツタイプ**:
+- アーキテクチャ図と設計判断
+- デザインパターンとベストプラクティス
 - ビジネスルール
 - ドメインワークフロー
 - 業界固有の知識
-- 規制要件
-- 製品仕様
+- API設計とデータモデリング
 
 **例**:
-- "Payment processing workflow"
-- "User authentication flow"
-- "Compliance requirements for GDPR"
+- "Microservices vs. monolith trade-offs for our use case"
+- "Repository pattern for database access: implementation guide"
+- "Payment processing workflow with security considerations"
+- "Event-driven architecture for async processing"
 
-**キーワード**: domain, business, requirement, specification, workflow, process, rule
+**キーワード**: pattern, implementation, approach, best practice, design, architecture, refactor, diagram, model, c4, domain, business, requirement, specification, workflow
 
----
-
-### operations/
-
-**目的**: DevOps、メンテナンス、運用手順を文書化
-
-**コンテンツタイプ**:
-- デプロイ手順
-- モニタリングセットアップ
-- インシデント対応
-- メンテナンスタスク
-- CI/CDパイプライン
-- インフラストラクチャ管理
-
-**例**:
-- "Blue-green deployment strategy"
-- "Set up Prometheus monitoring"
-- "Database backup and restore procedure"
-
-**キーワード**: deploy, deployment, maintenance, operation, monitoring, ci/cd, devops, infrastructure
+**除外される例**:
+- 根拠のない設計メモ
+- 一時的な実装アイデア
+- コンテキストのない図
 
 ## カテゴリ分類ガイドライン
 
