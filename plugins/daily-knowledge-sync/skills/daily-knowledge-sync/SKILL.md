@@ -49,6 +49,30 @@ Claude Codeの会話から自動的に知識を収集し、検索可能でカテ
 - **エラー回復**: エラーが発生しても可能な限り回復して続行。致命的なエラー（リポジトリ未設定など）の場合のみ停止
 - **最終確認**: コーヒー豆紹介を出力して初めて「完了」とする
 
+### 🚨 パス検証の判断基準（AIエージェント向け）
+
+**スクリプト存在確認で誤判断を防ぐため、以下の基準を厳守してください:**
+
+1. **SKILL_BASE の取得方法**:
+   - スキル読み込み時に表示される "Base directory for this skill" の値を使用
+   - **推測でパスを設定しない**（例: プラグインルートパスから推測しない）
+   - 不明な場合は、Read ツールでスキルファイルのパスを確認してから親ディレクトリを取得
+
+2. **スクリプト確認の正しい方法**:
+   - 必須スクリプト6個を**個別に確認**（`ls` でディレクトリを表示するだけでは不十分）
+   - 各スクリプトごとに `✅`/`❌` を表示
+   - 1つでも `❌` があれば「スクリプトが見つからない」と判断
+
+3. **よくある間違い**:
+   - ❌ `ls "$SKILL_BASE/scripts/"` の出力が空 → 「見つからない」と誤判断
+   - ❌ スクリプトパスを `scripts/xxx.py` で指定（相対パス）
+   - ❌ 古いバージョンにフォールバック（指定されたバージョンを優先）
+   - ✅ 各スクリプトを `-f` で個別確認 → 正確な判断
+
+4. **フォールバック不要の原則**:
+   - 指定された SKILL_BASE のバージョンを**必ず使用**
+   - 古いバージョンへのフォールバックは不要（スクリプトが見つからない場合はエラーとして報告）
+
 ### サブエージェント活用（効率化・推奨）
 
 複数のセッションログを参照する際は、サブエージェントを活用して効率化することを検討してください。
@@ -97,18 +121,53 @@ echo "KNOWLEDGE_REPO_URL: ${KNOWLEDGE_REPO_URL:-未設定}"
 
 このスキルのスクリプトは、Base directory からの相対パスで参照します。
 
-```bash
-# Base directory（スキル読み込み時に表示される）
-SKILL_BASE="<Base directory for this skill の値>"
+**SKILL_BASE の取得方法**:
 
-# スクリプトの存在確認
-ls "$SKILL_BASE/scripts/"
+スキル読み込み時に以下のような表示があります:
+```
+Base directory for this skill: /Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.0/skills/daily-knowledge-sync
 ```
 
-**重要**: スクリプトパスは `$SKILL_BASE/scripts/xxx.py` です。
-プラグインルートからの相対パスではありません。
+この値を `SKILL_BASE` として使用します:
 
-#### 1-3. リポジトリの状態確認
+```bash
+# 例: スキル読み込み時の表示から取得
+SKILL_BASE="/Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.0/skills/daily-knowledge-sync"
+```
+
+**重要**:
+- **推測でパスを設定しないこと**（プラグインルートからの推測は不正確）
+- 不明な場合は、Read ツールでこのスキルファイル自体のパスを確認し、親ディレクトリを取得
+
+#### 1-3. スクリプト個別確認
+
+必須スクリプト6個を**個別に確認**します（`ls` でディレクトリを表示するだけでは不十分）:
+
+```bash
+REQUIRED_SCRIPTS=(
+  "extract_knowledge.py"
+  "evaluate_knowledge.py"
+  "process_knowledge_batch.py"
+  "categorize_knowledge.py"
+  "check_similarity.py"
+  "manage_daily_trigger.py"
+)
+
+echo "=== スクリプト確認 ==="
+for script in "${REQUIRED_SCRIPTS[@]}"; do
+  if [ -f "$SKILL_BASE/scripts/$script" ]; then
+    echo "✅ $script"
+  else
+    echo "❌ $script"
+  fi
+done
+```
+
+**判断基準**:
+- すべて `✅` → Step 2 へ進む
+- 1つでも `❌` → エラーとして報告（フォールバック不要）
+
+#### 1-4. リポジトリの状態確認
 
 ```bash
 REPO_PATH="${KNOWLEDGE_REPO_PATH:-$HOME/knowledge-base}"
@@ -125,7 +184,7 @@ fi
 まず、スキルを実行すべきか確認します（1日1回）:
 
 ```bash
-python scripts/manage_daily_trigger.py check
+python "$SKILL_BASE/scripts/manage_daily_trigger.py" check
 ```
 
 終了コードが0なら続行、1なら今日は既に実行済みです。
@@ -171,10 +230,10 @@ python scripts/manage_daily_trigger.py check
 
 ```bash
 # 昨日分を抽出（デフォルト）
-python scripts/extract_knowledge.py
+python "$SKILL_BASE/scripts/extract_knowledge.py"
 
 # または日付を指定
-python scripts/extract_knowledge.py 2026-01-30
+python "$SKILL_BASE/scripts/extract_knowledge.py" 2026-01-30
 ```
 
 これは `/tmp/knowledge_candidates_YYYY-MM-DD.json` に出力されます。
@@ -392,7 +451,7 @@ git push origin main
 正常に完了した後、今日を処理済みとしてマーク:
 
 ```bash
-python scripts/manage_daily_trigger.py mark
+python "$SKILL_BASE/scripts/manage_daily_trigger.py" mark
 ```
 
 これにより、明日まで再実行されないようになります。
@@ -518,7 +577,7 @@ def find_jsonl_files(self, target_date: str) -> list[Path]:
 
 トリガー状態を確認:
 ```bash
-python scripts/manage_daily_trigger.py status
+python "$SKILL_BASE/scripts/manage_daily_trigger.py" status
 ```
 
 必要に応じてリセット:
@@ -535,7 +594,7 @@ ls -la ~/.claude/projects/*/
 
 日付形式を確認:
 ```bash
-python scripts/extract_knowledge.py 2026-01-31
+python "$SKILL_BASE/scripts/extract_knowledge.py" 2026-01-31
 ```
 
 ### 類似度チェックが機能しない
