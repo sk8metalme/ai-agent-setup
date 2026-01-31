@@ -28,6 +28,7 @@ class KnowledgeBatchProcessor:
         repo_path: str,
         similarity_threshold: float = 0.7,
         dry_run: bool = False,
+        verbose: bool = False,
     ):
         """
         Initialize batch processor.
@@ -36,10 +37,12 @@ class KnowledgeBatchProcessor:
             repo_path: Path to knowledge repository
             similarity_threshold: Threshold for similarity checking (0.0-1.0)
             dry_run: If True, don't actually create files or commit
+            verbose: If True, show detailed output for each candidate
         """
         self.repo_path = Path(repo_path).expanduser()
         self.similarity_threshold = similarity_threshold
         self.dry_run = dry_run
+        self.verbose = verbose
 
         self.evaluator = KnowledgeEvaluator()
         self.categorizer = KnowledgeCategorizer(str(self.repo_path))
@@ -66,7 +69,8 @@ class KnowledgeBatchProcessor:
             candidates = json.load(f)
 
         print(f"Processing {len(candidates)} candidates for {date}...")
-        print()
+        if not self.verbose:
+            print()  # Add blank line in quiet mode for cleaner output
 
         stats = {
             "total": len(candidates),
@@ -79,37 +83,49 @@ class KnowledgeBatchProcessor:
         created_files = []
 
         for i, candidate in enumerate(candidates, 1):
-            print(f"[{i}/{len(candidates)}] ", end="")
-
             # 1. Evaluate
             result = self.evaluator.evaluate(candidate)
 
             if result.category != "accept":
-                print(f"❌ Rejected (score: {result.score})")
-                if result.excluded_by:
-                    print(f"   Reason: {result.excluded_by}")
+                if self.verbose:
+                    print(f"[{i}/{len(candidates)}] ❌ Rejected (score: {result.score})")
+                    if result.excluded_by:
+                        print(f"   Reason: {result.excluded_by}")
+                else:
+                    # Show progress every 100 candidates in quiet mode
+                    if i % 100 == 0:
+                        print(f"\rProgress: {i}/{len(candidates)}", end="", flush=True)
                 stats["rejected"] += 1
                 continue
 
             stats["accepted"] += 1
-            print(f"✅ Accepted (score: {result.score})")
+
+            if self.verbose:
+                print(f"[{i}/{len(candidates)}] ✅ Accepted (score: {result.score})")
+            else:
+                # Show progress in quiet mode
+                if i % 100 == 0 or stats["accepted"] <= 10:  # Show first 10 accepted
+                    print(f"\rProgress: {i}/{len(candidates)}", end="", flush=True)
 
             # 2. Check similarity
             text = candidate.get("text", "")
             similar = self._find_similar_knowledge(text)
 
             if similar:
-                print(f"   ⚠️  Similar to: {similar[0]['file']}")
+                if self.verbose:
+                    print(f"   ⚠️  Similar to: {similar[0]['file']}")
                 stats["duplicates"] += 1
                 continue
 
             # 3. Categorize
             category = self.categorizer.categorize(text)
-            print(f"   Category: {category}")
+            if self.verbose:
+                print(f"   Category: {category}")
 
             # 4. Generate title (first line or first 50 chars)
             title = self._generate_title(text)
-            print(f"   Title: {title}")
+            if self.verbose:
+                print(f"   Title: {title}")
 
             # 5. Create file
             if not self.dry_run:
@@ -126,12 +142,20 @@ class KnowledgeBatchProcessor:
                         "source_file": candidate.get("source_file", ""),
                     },
                 )
-                print(f"   📝 Created: {file_path.relative_to(self.repo_path)}")
+                if self.verbose:
+                    print(f"   📝 Created: {file_path.relative_to(self.repo_path)}")
                 created_files.append(file_path)
                 stats["created"] += 1
             else:
-                print("   📝 Would create file (dry run)")
+                if self.verbose:
+                    print("   📝 Would create file (dry run)")
 
+            if self.verbose:
+                print()
+
+        # Clear progress line in quiet mode
+        if not self.verbose:
+            print(f"\rProgress: {len(candidates)}/{len(candidates)} completed")
             print()
 
         # 6. Commit to git
@@ -275,12 +299,20 @@ def main():
     if len(sys.argv) < 3:
         print("Usage:")
         print(
-            "  python process_knowledge_batch.py <candidates_json> <repo_path> [--dry-run] [--date YYYY-MM-DD]"
+            "  python process_knowledge_batch.py <candidates_json> <repo_path> [--dry-run] [--verbose] [--date YYYY-MM-DD]"
         )
+        print()
+        print("Options:")
+        print("  --dry-run, -n     Don't create files or commit")
+        print("  --verbose, -v     Show detailed output for each candidate")
+        print("  --date YYYY-MM-DD Specify the date (default: today)")
         print()
         print("Example:")
         print(
             "  python process_knowledge_batch.py /tmp/knowledge_candidates_2026-01-31.json ~/worklog"
+        )
+        print(
+            "  python process_knowledge_batch.py /tmp/knowledge_candidates_2026-01-31.json ~/worklog --verbose"
         )
         sys.exit(1)
 
@@ -288,7 +320,8 @@ def main():
     repo_path = sys.argv[2]
 
     # Parse optional arguments
-    dry_run = "--dry-run" in sys.argv
+    dry_run = "--dry-run" in sys.argv or "-n" in sys.argv
+    verbose = "--verbose" in sys.argv or "-v" in sys.argv
     date = None
     if "--date" in sys.argv:
         date_idx = sys.argv.index("--date") + 1
@@ -296,7 +329,7 @@ def main():
             date = sys.argv[date_idx]
 
     # Process
-    processor = KnowledgeBatchProcessor(repo_path, dry_run=dry_run)
+    processor = KnowledgeBatchProcessor(repo_path, dry_run=dry_run, verbose=verbose)
     stats = processor.process_candidates(candidates_file, date)
 
     # Print summary
