@@ -51,6 +51,9 @@ class KnowledgeExtractor:
         target_dt = datetime.strptime(target_date, "%Y-%m-%d")
         next_day = target_dt + timedelta(days=1)
 
+        # Get file-level project_path for fallback
+        file_project_path = self._get_file_project_path(jsonl_file)
+
         try:
             with open(jsonl_file) as f:
                 for line_num, line in enumerate(f, 1):
@@ -67,7 +70,9 @@ class KnowledgeExtractor:
                             continue
 
                         # Extract relevant content
-                        candidate = self._extract_candidate(entry, jsonl_file, line_num)
+                        candidate = self._extract_candidate(
+                            entry, jsonl_file, line_num, file_project_path
+                        )
                         if candidate:
                             candidates.append(candidate)
 
@@ -84,8 +89,33 @@ class KnowledgeExtractor:
 
         return candidates
 
+    def _get_file_project_path(self, jsonl_file: Path) -> str:
+        """
+        Get the project path from the first entry with cwd field.
+
+        Args:
+            jsonl_file: Path to JSONL file
+
+        Returns:
+            str: Project path or empty string if not found
+        """
+        try:
+            with open(jsonl_file) as f:
+                for line in f:
+                    try:
+                        entry = json.loads(line)
+                        cwd = entry.get("cwd")
+                        if cwd:
+                            return cwd
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            pass
+        return ""
+
     def _extract_candidate(
-        self, entry: dict[str, Any], source_file: Path, line_num: int
+        self, entry: dict[str, Any], source_file: Path, line_num: int,
+        fallback_project_path: str = ""
     ) -> dict[str, Any] | None:
         """
         Extract a knowledge candidate from a JSONL entry.
@@ -158,6 +188,7 @@ class KnowledgeExtractor:
             "errors": errors,
             "source_file": str(source_file),
             "line_number": line_num,
+            "project_path": entry.get("cwd") or fallback_project_path,
         }
 
     def extract_for_date(self, target_date: str) -> list[dict[str, Any]]:
