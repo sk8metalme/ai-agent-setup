@@ -124,15 +124,15 @@ echo "KNOWLEDGE_REPO_URL: ${KNOWLEDGE_REPO_URL:-未設定}"
 **SKILL_BASE の取得方法**:
 
 スキル読み込み時に以下のような表示があります:
-```
-Base directory for this skill: /Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.0/skills/daily-knowledge-sync
+```text
+Base directory for this skill: /Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.1/skills/daily-knowledge-sync
 ```
 
 この値を `SKILL_BASE` として使用します:
 
 ```bash
 # 例: スキル読み込み時の表示から取得
-SKILL_BASE="/Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.0/skills/daily-knowledge-sync"
+SKILL_BASE="/Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.1/skills/daily-knowledge-sync"
 ```
 
 **重要**:
