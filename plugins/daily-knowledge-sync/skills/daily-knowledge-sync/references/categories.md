@@ -162,7 +162,7 @@ knowledge-repo/
 - 主カテゴリ: `operations/` (デプロイに焦点)
 - タグ: `[docker, fastapi, deployment, commands, devops]`
 
-これにより、DockerコマンドやfastAPIパターンを検索するときに発見可能になります。
+これにより、DockerコマンドやFastAPIパターンを検索するときに発見可能になります。
 
 ### カテゴリ移行
 

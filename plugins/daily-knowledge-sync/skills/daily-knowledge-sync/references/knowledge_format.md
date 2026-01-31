@@ -28,7 +28,7 @@ source: conversation|manual|import
 ## Solution/Insight
 
 実際の知識内容:
-- 主要な洞察
+- 主要な知見
 - 解決手順
 - コード例
 - コマンド例
@@ -71,7 +71,7 @@ source: conversation|manual|import
 ### コンテキストセクション
 
 - いつこれに遭遇したか？
-- より広いタスクは何だったか？
+- どのようなタスクの一環として発生したか？
 - なぜこれを文書化する価値があるか？
 
 ### 問題/トピックセクション
@@ -80,7 +80,7 @@ source: conversation|manual|import
 - エラーメッセージ（該当する場合）
 - 環境の詳細（関連する場合）
 
-### 解決策/洞察セクション
+### 解決策/知見セクション
 
 - ステップバイステップの解決策または説明
 - 構文ハイライト付きのコード例
@@ -182,7 +182,7 @@ from pydantic import BaseModel, Field
 
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
-    email: str = Field(..., regex=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
     age: int = Field(..., ge=0, le=150)
 
 @app.post("/users/")
