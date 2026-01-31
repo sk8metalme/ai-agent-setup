@@ -46,8 +46,9 @@ echo "✅ ディレクトリ存在確認完了"
 
 ```
 ai-agent-setup/
-├── plugins/                  # プラグインソース（14個）
+├── plugins/                  # プラグインソース（15個）
 │   ├── development-toolkit/  # 開発ワークフロー（/plan, /dev, /create_pr）
+│   ├── daily-knowledge-sync/ # 日次会話ログから知識を自動抽出・GitHub同期
 │   ├── deep-dive/            # 深堀りスキル（ultrathink、要件明確化）
 │   ├── guardrail-builder/    # 会話履歴から自動学習（CLAUDE-guardrail.md）
 │   ├── jujutsu-workflow/     # Jujutsu VCS サポート
@@ -336,6 +337,7 @@ which npm jj gh node jq
 # 推奨プラグイン
 /plugin install deep-dive@ai-agent-setup
 /plugin install guardrail-builder@ai-agent-setup
+/plugin install daily-knowledge-sync@ai-agent-setup
 /plugin install development-toolkit@ai-agent-setup
 
 # 言語別プラグイン

@@ -49,6 +49,7 @@ npm install -g @sk8metal/michi-cli
 
 ```
 /plugin install guardrail-builder@ai-agent-setup # 会話履歴自動学習（繰り返しミス防止）
+/plugin install daily-knowledge-sync@ai-agent-setup # 日次会話ログから知識を自動抽出・GitHub同期
 /plugin install jujutsu-workflow@ai-agent-setup  # Jujutsu (jj) VCS
 /plugin install ci-cd-tools@ai-agent-setup       # CI/CD トラブルシューティング
 /plugin install design-review@ai-agent-setup     # UI/UX デザインレビュー
