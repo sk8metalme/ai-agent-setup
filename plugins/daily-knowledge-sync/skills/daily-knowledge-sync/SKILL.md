@@ -32,12 +32,13 @@ Claude Codeの会話から自動的に知識を収集し、検索可能でカテ
 
 ### 🚨 自律的な作業進行（必須）
 
-**このスキル実行中は、ユーザーへの質問・確認を一切行わないでください。**
+**このスキル実行中は、原則としてユーザーへの質問・確認を一切行わないでください。ただし、Step 3の初回設定が未完了の場合のみ、ユーザーへの確認を許容します。**
 
 - **質問・確認禁止**: ユーザーへの質問や確認メッセージを出力しない（AskUserQuestion ツールの使用も不可）
-- **自己判断**: 知識として価値があるかどうかは、**Step 4 の判断基準**に従って自分で判断する
+  - **例外**: Step 3（リポジトリの設定）が未完了の場合、リポジトリURLやパスの確認は許可
+- **自己判断**: 知識として価値があるかどうかは、**Step 5 の判断基準**に従って自分で判断する
   - 迷った場合 → **追加する方向で判断**（除外より追加を優先）
-  - ただし、Step 6 で 90% 以上の類似度が検出された場合はスキップを優先
+  - ただし、Step 7 で 90% 以上の類似度が検出された場合はスキップを優先
 
 ### 🚨 完了までの継続（必須）
 
@@ -78,7 +79,48 @@ Claude Codeの会話から自動的に知識を収集し、検索可能でカテ
 
 準備ができたら、次のステップに進んでください。
 
-### Step 1: 今日実行すべきか確認
+### Step 1: 前提条件の確認
+
+スキル実行前に、必要な設定を確認します。
+
+#### 1-1. 環境変数の確認
+
+```bash
+echo "KNOWLEDGE_REPO_PATH: ${KNOWLEDGE_REPO_PATH:-未設定}"
+echo "KNOWLEDGE_REPO_URL: ${KNOWLEDGE_REPO_URL:-未設定}"
+```
+
+- **設定済み** → その値を使用して続行
+- **未設定** → Step 3（リポジトリの設定）で設定が必要
+
+#### 1-2. Base Directoryの確認
+
+このスキルのスクリプトは、Base directory からの相対パスで参照します。
+
+```bash
+# Base directory（スキル読み込み時に表示される）
+SKILL_BASE="<Base directory for this skill の値>"
+
+# スクリプトの存在確認
+ls "$SKILL_BASE/scripts/"
+```
+
+**重要**: スクリプトパスは `$SKILL_BASE/scripts/xxx.py` です。
+プラグインルートからの相対パスではありません。
+
+#### 1-3. リポジトリの状態確認
+
+```bash
+REPO_PATH="${KNOWLEDGE_REPO_PATH:-$HOME/knowledge-base}"
+if [ -d "$REPO_PATH" ]; then
+  echo "✅ リポジトリ存在: $REPO_PATH"
+  cd "$REPO_PATH" && git status
+else
+  echo "❌ リポジトリ未設定 → Step 3 へ"
+fi
+```
+
+### Step 2: 今日実行すべきか確認
 
 まず、スキルを実行すべきか確認します（1日1回）:
 
@@ -88,7 +130,7 @@ python scripts/manage_daily_trigger.py check
 
 終了コードが0なら続行、1なら今日は既に実行済みです。
 
-### Step 2: リポジトリの設定（初回のみ）
+### Step 3: リポジトリの設定（初回のみ）
 
 まだ設定していない場合、知識リポジトリをセットアップします:
 
@@ -123,7 +165,7 @@ python scripts/manage_daily_trigger.py check
 - `KNOWLEDGE_REPO_PATH`: 知識リポジトリのローカルパス（例: `~/knowledge-base`）
 - `KNOWLEDGE_REPO_URL`: GitHubリポジトリのURL
 
-### Step 3: 知識候補の抽出
+### Step 4: 知識候補の抽出
 
 前日のJSONLファイルから潜在的な知識項目を抽出:
 
@@ -139,7 +181,7 @@ python scripts/extract_knowledge.py 2026-01-30
 
 **候補をレビュー**して、何が抽出されたかを理解します。
 
-### Step 4: 知識の分析と統合
+### Step 5: 知識の分析と統合
 
 抽出されたJSON内の各候補について:
 
@@ -167,7 +209,7 @@ python scripts/extract_knowledge.py 2026-01-30
    - タイプタグ（error-fix, best-practice）
    - 詳細は [references/knowledge_format.md](references/knowledge_format.md) を参照
 
-### Step 5: 知識のカテゴリ分類
+### Step 6: 知識のカテゴリ分類
 
 各知識項目について、カテゴリを決定:
 
@@ -192,7 +234,7 @@ category = categorizer.categorize(
 
 カテゴリ分類ガイドラインは [references/categories.md](references/categories.md) を参照してください。
 
-### Step 6: 重複のチェック
+### Step 7: 重複のチェック
 
 新しい知識ファイルを作成する前に、重複をチェック:
 
@@ -219,7 +261,7 @@ for existing_file in category_dir.glob("*.md"):
 2. **マージ**: 補完的な場合（70-90%）
 3. **新規作成**: 十分に異なる場合（<70%）
 
-### Step 7: 知識ファイルの作成
+### Step 8: 知識ファイルの作成
 
 重複していない知識について:
 
@@ -252,7 +294,7 @@ print(f"Created: {file_path}")
 
 形式の詳細は [references/knowledge_format.md](references/knowledge_format.md) を参照してください。
 
-### Step 8: GitHubへのコミットとプッシュ
+### Step 9: GitHubへのコミットとプッシュ
 
 すべての知識ファイルを作成した後:
 
@@ -277,7 +319,7 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 git push origin main
 ```
 
-### Step 9: 今日実行済みとしてマーク
+### Step 10: 今日実行済みとしてマーク
 
 正常に完了した後、今日を処理済みとしてマーク:
 
@@ -287,7 +329,7 @@ python scripts/manage_daily_trigger.py mark
 
 これにより、明日まで再実行されないようになります。
 
-### Step 10: 今日のコーヒー豆 🌍
+### Step 11: 今日のコーヒー豆 🌍
 
 お疲れさまでした！知識同期が完了しました。
 
