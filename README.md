@@ -65,6 +65,9 @@ Claude Code のチャットで以下のコマンドを実行：
 # 学習支援クイズが必要な場合
 /plugin install quizknock@ai-agent-setup
 
+# 日次知識自動同期が必要な場合
+/plugin install daily-knowledge-sync@ai-agent-setup
+
 # 言語別プラグイン（該当する言語のみ）
 /plugin install lang-java-spring@ai-agent-setup  # Java + Spring Boot
 /plugin install lang-python@ai-agent-setup       # Python + FastAPI
@@ -105,6 +108,7 @@ ls -la ~/.claude/plugins/cache/ai-agent-setup/
 | `design-review` | UI/UXデザインレビュー・アクセシビリティチェック<br>ユーザビリティ、アクセシビリティ標準の評価 | 📚スキル: 1個<br>🤖エージェント: 1個 | design, ui, ux, accessibility, a11y, review |
 | `e2e-planning` | E2Eファースト開発計画・Walking Skeleton設計<br>エンドツーエンドの実装戦略ガイド | 📚スキル: 1個<br>🤖エージェント: 1個 | e2e, planning, walking-skeleton, architecture |
 | `quizknock` | インタラクティブクイズ生成・学習支援<br>トピック調査、5問セット出題、統計表示、復習機能 | 📚スキル: 1個 | quiz, learning, education, assessment, review |
+| `daily-knowledge-sync` | 日次会話ログから知識を自動抽出・同期<br>エラー解決、コーディングパターン、ドメイン知識を自動分類・GitHub同期 | 📚スキル: 1個 | knowledge, learning, automation, daily, sync |
 
 **低優先度（言語別）:**
 
