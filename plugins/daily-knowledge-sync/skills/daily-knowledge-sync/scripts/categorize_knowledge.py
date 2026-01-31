@@ -4,69 +4,29 @@ Categorize knowledge items into appropriate directories.
 """
 
 import re
+import yaml
 from pathlib import Path
 from typing import Any
 
-# Category keywords for automatic classification
-CATEGORY_KEYWORDS = {
-    "errors": [
-        "error",
-        "exception",
-        "failed",
-        "failure",
-        "traceback",
-        "bug",
-        "fix",
-        "resolve",
-    ],
-    "patterns": [
-        "pattern",
-        "implementation",
-        "approach",
-        "design",
-        "architecture",
-        "refactor",
-        "best practice",
-    ],
-    "commands": [
-        "command",
-        "cli",
-        "bash",
-        "script",
-        "terminal",
-        "shell",
-        "git",
-        "npm",
-        "docker",
-    ],
-    "design": [
-        "design",
-        "architecture",
-        "diagram",
-        "model",
-        "uml",
-        "sequence",
-        "c4",
-        "mermaid",
-    ],
-    "domain": [
-        "domain",
-        "business",
-        "requirement",
-        "specification",
-        "workflow",
-        "process",
-    ],
-    "operations": [
-        "deploy",
-        "maintenance",
-        "operation",
-        "monitoring",
-        "ci/cd",
-        "devops",
-        "infrastructure",
-    ],
-}
+
+def _load_category_keywords():
+    """Load category keywords from config file."""
+    script_dir = Path(__file__).parent
+    config_path = script_dir.parent / "config" / "categories.yaml"
+
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+
+    # Convert config to keyword dict
+    keywords = {}
+    for cat_name, cat_config in config["categories"].items():
+        keywords[cat_name] = cat_config["keywords"]
+
+    return keywords, config.get("default_category", "domain")
+
+
+# Category keywords for automatic classification (loaded from config)
+CATEGORY_KEYWORDS, DEFAULT_CATEGORY = _load_category_keywords()
 
 
 class KnowledgeCategorizer:
@@ -123,11 +83,11 @@ class KnowledgeCategorizer:
                     if tag_lower in keywords or category in tag_lower:
                         scores[category] += 5  # Tag matches get higher weight
 
-        # Return category with highest score, or 'domain' as default
+        # Return category with highest score, or default category
         if max(scores.values()) > 0:
             return max(scores, key=scores.get)
         else:
-            return "domain"
+            return DEFAULT_CATEGORY
 
     def generate_filename(self, title: str, date: str) -> str:
         """

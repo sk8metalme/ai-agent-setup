@@ -1,0 +1,90 @@
+# ツール分類設定
+# Claude Codeで使用されるツールの価値分類
+
+# 高価値ツール（これらの使用は知識として価値が高い）
+high_value_tools:
+  # 検索・探索ツール
+  - "Grep"
+  - "Glob"
+  - "Task"
+
+  # ファイル操作ツール
+  - "Edit"
+  - "Write"
+
+  # 実行ツール
+  - "Bash"
+
+  # Web関連
+  - "WebFetch"
+  - "WebSearch"
+
+  # スキル実行
+  - "Skill"
+
+# 中価値ツール（状況によって価値がある）
+medium_value_tools:
+  - "Read"
+  - "TaskCreate"
+  - "TaskUpdate"
+  - "TaskList"
+  - "AskUserQuestion"
+
+# 低価値ツール（単純な操作、知識として保存する価値が低い）
+low_value_tools:
+  - "TaskGet"
+  - "ToolSearch"
+  - "TaskOutput"
+  - "TaskStop"
+
+# 除外すべきツール（情報価値なし）
+excluded_tools:
+  - "EnterPlanMode"
+  - "ExitPlanMode"
+
+# ツールごとのスコア重み
+tool_scores:
+  # 高価値ツール
+  Grep: 15
+  Glob: 10
+  Task: 20
+  Edit: 15
+  Write: 15
+  Bash: 15
+  WebFetch: 10
+  WebSearch: 10
+  Skill: 20
+
+  # 中価値ツール
+  Read: 5
+  TaskCreate: 5
+  TaskUpdate: 5
+  TaskList: 3
+  AskUserQuestion: 3
+
+  # 低価値ツール
+  TaskGet: 0
+  ToolSearch: 0
+  TaskOutput: 0
+  TaskStop: 0
+
+  # 除外すべきツール
+  EnterPlanMode: -10
+  ExitPlanMode: -10
+
+# ツールの組み合わせボーナス
+tool_combinations:
+  # 探索→編集のフロー
+  search_and_edit:
+    tools: ["Grep", "Edit"]
+    bonus: 10
+
+  # 探索→実行のフロー
+  search_and_execute:
+    tools: ["Grep", "Bash"]
+    bonus: 10
+
+  # 複数ツールの複雑な操作
+  complex_workflow:
+    min_tools: 3
+    bonus: 5

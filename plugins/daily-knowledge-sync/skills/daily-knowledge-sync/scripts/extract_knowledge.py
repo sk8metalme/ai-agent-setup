@@ -4,6 +4,7 @@ Extract potential knowledge items from Claude Code JSONL conversation logs.
 """
 
 import json
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -130,9 +131,19 @@ class KnowledgeExtractor:
                 elif isinstance(item, str):
                     text_content += item + "\n"
 
-        # Look for error patterns
-        if "error" in text_content.lower() or "exception" in text_content.lower():
-            errors.append(text_content)
+        # Look for actual error patterns (stack traces, exceptions)
+        # Only include if it looks like a real error with context
+        error_patterns = [
+            r"Traceback \(most recent call last\)",
+            r"Exception in thread",
+            r"at .*:\d+",  # Stack trace line
+            r"Error:.*at line \d+",
+            r"^\s+File \".*\", line \d+",
+        ]
+        for pattern in error_patterns:
+            if re.search(pattern, text_content, re.MULTILINE):
+                errors.append(text_content)
+                break
 
         # Skip if no meaningful content
         text_content = text_content.strip()

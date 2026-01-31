@@ -1,0 +1,63 @@
+# カテゴリ定義
+# 知識抽出システムで使用する3つの主要カテゴリ
+
+categories:
+  errors:
+    name: "errors"
+    description: "エラー解決、デバッグ、バグ修正"
+    keywords:
+      - "error"
+      - "exception"
+      - "failed"
+      - "failure"
+      - "traceback"
+      - "stack trace"
+      - "bug"
+      - "fix"
+      - "resolve"
+      - "debug"
+
+  ops:
+    name: "ops"
+    description: "運用、DevOps、インフラ、便利コマンド"
+    keywords:
+      - "command"
+      - "cli"
+      - "bash"
+      - "script"
+      - "shell"
+      - "git"
+      - "docker"
+      - "deploy"
+      - "deployment"
+      - "ci/cd"
+      - "devops"
+      - "infrastructure"
+      - "monitoring"
+      - "operation"
+      - "maintenance"
+
+  domain:
+    name: "domain"
+    description: "ドメイン知識、設計判断、ビジネスロジック"
+    keywords:
+      - "pattern"
+      - "implementation"
+      - "approach"
+      - "best practice"
+      - "design"
+      - "architecture"
+      - "refactor"
+      - "diagram"
+      - "model"
+      - "c4"
+      - "sequence"
+      - "domain"
+      - "business"
+      - "requirement"
+      - "specification"
+      - "workflow"
+      - "process"
+
+# デフォルトカテゴリ（明確なマッチがない場合）
+default_category: "domain"
