@@ -11,26 +11,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/notify.conf"
 
 # デフォルト設定（設定ファイルがない場合のフォールバック）
-TERM_PROGRAM_MAP=(
-  "ghostty:Ghostty"
-  "iTerm.app:iTerm"
-  "vscode:Visual Studio Code"
-  "Apple_Terminal:Terminal"
-)
-
-PARENT_PROCESS_MAP=(
-  "*ghostty*:Ghostty"
-  "*iTerm*:iTerm"
-  "*Code*:Visual Studio Code"
-  "*code*:Visual Studio Code"
-  "*Terminal*:Terminal"
-)
-
-PGREP_FALLBACK=(
-  "ghostty:Ghostty"
-  "iTerm2:iTerm"
-  "Visual Studio Code:Visual Studio Code"
-  "Code:Visual Studio Code"
+TERMINAL_APPS=(
+  "Ghostty"
+  "iTerm2"
+  "Visual Studio Code"
+  "Terminal"
 )
 
 # 設定ファイルが存在すれば読み込む
@@ -65,60 +50,16 @@ bring_to_front() {
     osascript -e "tell application \"$app_name\" to activate" 2>/dev/null
 }
 
-# 方法1: TERM_PROGRAM 環境変数から検出
-detect_from_term_program() {
-    [[ -z "$TERM_PROGRAM" ]] && return 1
-
-    for mapping in "${TERM_PROGRAM_MAP[@]}"; do
-        local term_value="${mapping%%:*}"
-        local app_name="${mapping##*:}"
-        if [[ "$TERM_PROGRAM" == "$term_value" ]]; then
-            bring_to_front "$app_name"
-            return 0
-        fi
-    done
-    return 1
-}
-
-# 方法2: 親プロセス名から検出（ワイルドカード対応）
-detect_from_parent_process() {
-    local ppid_check=$$
-    for _ in {1..10}; do
-        ppid_check=$(ps -o ppid= -p "$ppid_check" 2>/dev/null | tr -d ' ')
-        [[ -z "$ppid_check" || "$ppid_check" == "1" ]] && break
-
-        local pname=$(ps -o comm= -p "$ppid_check" 2>/dev/null)
-        for mapping in "${PARENT_PROCESS_MAP[@]}"; do
-            local pattern="${mapping%%:*}"
-            local app_name="${mapping##*:}"
-            # ワイルドカードパターンマッチング
-            if [[ "$pname" == $pattern ]]; then
-                bring_to_front "$app_name"
-                return 0
-            fi
-        done
-    done
-    return 1
-}
-
-# 方法3: pgrep フォールバック（設定順に試行）
-detect_from_pgrep() {
-    for mapping in "${PGREP_FALLBACK[@]}"; do
-        local pgrep_pattern="${mapping%%:*}"
-        local app_name="${mapping##*:}"
-        if pgrep -x "$pgrep_pattern" > /dev/null || pgrep -f "$pgrep_pattern" > /dev/null; then
-            bring_to_front "$app_name"
-            return 0
-        fi
-    done
-    return 1
-}
-
-# Claude Codeを実行中のアプリを自動検出
+# ターミナルアプリを検出して最前面にする
 detect_and_activate() {
-    detect_from_term_program && return
-    detect_from_parent_process && return
-    detect_from_pgrep
+    # 設定の順番に pgrep で検索し、最初に見つかったアプリを最前面にする
+    for app in "${TERMINAL_APPS[@]}"; do
+        if pgrep -x "$app" > /dev/null || pgrep -f "$app" > /dev/null; then
+            bring_to_front "$app"
+            return 0
+        fi
+    done
+    return 1
 }
 
 detect_and_activate
