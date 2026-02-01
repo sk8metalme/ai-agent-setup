@@ -89,21 +89,35 @@ class KnowledgeCategorizer:
         else:
             return DEFAULT_CATEGORY
 
-    def generate_filename(self, title: str, date: str) -> str:
+    def generate_filename(
+        self, title: str, date: str, provided_filename: str | None = None
+    ) -> str:
         """
         Generate a filename from title and date.
 
         Args:
             title: Knowledge item title
             date: Date in YYYY-MM-DD format
+            provided_filename: Optional kebab-case English filename (without date/extension)
 
         Returns:
-            str: Filename (e.g., "2026-01-31_fix_import_error.md")
+            str: Filename (e.g., "2026-01-31_fix-import-error.md")
         """
-        # Clean title for filename
-        clean_title = re.sub(r"[^\w\s-]", "", title.lower())
-        clean_title = re.sub(r"[\s_]+", "_", clean_title)
-        clean_title = clean_title[:50]  # Limit length
+        if provided_filename:
+            # 提供されたファイル名を使用（kebab-case、英語）
+            clean_title = re.sub(r"[^a-z0-9-]", "", provided_filename.lower())
+            clean_title = re.sub(r"-+", "-", clean_title).strip("-")
+        else:
+            # フォールバック: ASCII文字のみ + kebab-case
+            clean_title = re.sub(r"[^\x00-\x7F]+", "", title)
+            clean_title = clean_title.lower()
+            clean_title = re.sub(r"[^\w\s-]", "", clean_title)
+            clean_title = re.sub(r"[\s_]+", "-", clean_title)
+            clean_title = re.sub(r"-+", "-", clean_title).strip("-")
+
+        clean_title = clean_title[:50]
+        if not clean_title:
+            clean_title = "untitled"
 
         return f"{date}_{clean_title}.md"
 

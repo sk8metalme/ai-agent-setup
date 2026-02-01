@@ -136,7 +136,7 @@
       "name": "daily-knowledge-sync",
       "source": "./plugins/daily-knowledge-sync",
       "description": "Automatically extract and sync knowledge from daily Claude Code conversations to a GitHub repository.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "skills": [
         "./skills/daily-knowledge-sync"
       ]

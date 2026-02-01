@@ -87,6 +87,7 @@ class KnowledgeFileCreator:
             candidate = candidate_map[index]
             category = evaluation["category"]
             title = evaluation["title"]
+            filename = evaluation.get("filename")
             text = candidate["text"]
 
             # Check similarity with existing knowledge
@@ -102,6 +103,7 @@ class KnowledgeFileCreator:
                 text=text,
                 timestamp=candidate["timestamp"],
                 project_path=candidate.get("project_path", ""),
+                provided_filename=filename,
             )
 
             if file_path:
@@ -152,6 +154,7 @@ class KnowledgeFileCreator:
         text: str,
         timestamp: str,
         project_path: str = "",
+        provided_filename: str | None = None,
     ) -> Path | None:
         """
         Create a knowledge markdown file.
@@ -162,6 +165,7 @@ class KnowledgeFileCreator:
             text: Knowledge content
             timestamp: ISO timestamp
             project_path: Project path (optional)
+            provided_filename: Optional kebab-case English filename (optional)
 
         Returns:
             Path | None: Created file path or None on error
@@ -169,10 +173,10 @@ class KnowledgeFileCreator:
         category_dir = self.repo_path / category
         category_dir.mkdir(parents=True, exist_ok=True)
 
-        # Generate filename using categorizer (YYYY-MM-DD_snake_case.md format)
+        # Generate filename using categorizer (YYYY-MM-DD_kebab-case.md format)
         dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         date = dt.strftime("%Y-%m-%d")
-        filename = self.categorizer.generate_filename(title, date)
+        filename = self.categorizer.generate_filename(title, date, provided_filename)
         file_path = category_dir / filename
 
         # Avoid overwriting existing files
