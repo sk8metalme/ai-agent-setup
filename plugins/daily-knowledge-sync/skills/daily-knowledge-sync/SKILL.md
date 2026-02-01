@@ -434,7 +434,14 @@ Claude Code自身が詳細評価します。
 | decision | "accept" / "reject" |
 | category | "errors" / "ops" / "domain" |
 | title | 知識タイトル（acceptの場合） |
+| filename | ファイル名ベース（kebab-case、英語、50文字以内、日付・拡張子なし） |
 | reason | 判定理由（20文字以内） |
+
+**filename 生成ルール**:
+- 英語で記述（日本語タイトルは意味を保って英訳）
+- kebab-case（ハイフン区切り、小文字）
+- 50文字以内
+- 日付・拡張子は含めない
 
 **採用基準（accept）**:
 - **文字数**: 200文字以上（`_should_exclude`で自動チェック）
