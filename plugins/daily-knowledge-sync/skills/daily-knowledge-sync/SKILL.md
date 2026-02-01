@@ -113,18 +113,8 @@ Claude Codeの会話から自動的に知識を収集し、検索可能でカテ
 - ❌ スコア分布の分析（`Score distribution: ...`）
 - ❌ 高スコア候補の詳細（`Rank 1: Score 30 ===`）
 
-**注意**: `process_knowledge_batch.py` は**必ず `--verbose` フラグなし**で呼び出してください。
-
-```bash
-# ✅ 正しい呼び出し（デフォルト = quiet モード）
-python "$SKILL_BASE/scripts/process_knowledge_batch.py" \
-  "$CANDIDATES_FILE" \
-  "$REPO_PATH" \
-  --date "YYYY-MM-DD"
-
-# ❌ 間違い（詳細出力されてしまう）
-# python ... --verbose
-```
+**注意**: Step 5 では Claude Code 自身がハイブリッド方式で評価を行います。
+スクリプトを直接呼び出す必要はありません。
 
 #### 3. エラー時の出力
 
@@ -223,13 +213,12 @@ SKILL_BASE="/Users/.../skills/daily-knowledge-sync"  # ← この値をそのま
 
 #### 1-3. スクリプト個別確認
 
-必須スクリプト6個を**個別に確認**します（`ls` でディレクトリを表示するだけでは不十分）:
+必須スクリプト5個を**個別に確認**します（`ls` でディレクトリを表示するだけでは不十分）:
 
 ```bash
 REQUIRED_SCRIPTS=(
   "extract_knowledge.py"
-  "evaluate_knowledge.py"
-  "process_knowledge_batch.py"
+  "create_knowledge_files.py"
   "categorize_knowledge.py"
   "check_similarity.py"
   "manage_daily_trigger.py"
@@ -491,33 +480,9 @@ python "$SKILL_BASE/scripts/create_knowledge_files.py" \
 
 ### Step 6: （削除）カテゴリ分類はStep 5で自動実行
 
-**v1.4.0以降、このステップは不要です。** Step 5のバッチ処理で自動的にカテゴリ分類されます。
+**v1.7.0以降、このステップは不要です。** Step 5のハイブリッド方式で自動的にカテゴリ分類されます。
 
-```python
-from scripts.categorize_knowledge import KnowledgeCategorizer
-
-categorizer = KnowledgeCategorizer(KNOWLEDGE_REPO_PATH)
-
-category = categorizer.categorize(
-    text=knowledge_content,
-    tags=knowledge_tags
-)
-```
-
-カテゴリ:
-- `errors`: エラー解決
-- `patterns`: コーディングパターンとベストプラクティス
-- `commands`: CLIコマンドとツール
-- `design`: アーキテクチャと設計判断
-- `domain`: ビジネス/ドメイン知識
-- `operations`: DevOpsとメンテナンス
-
-カテゴリ分類ガイドラインは [references/categories.md](references/categories.md) を参照してください。
-
-**日次まとめ用の記録**:
-以下の情報を記録してください（Step 11-1で使用）:
-- カテゴリ別の件数分布
-- カテゴリごとの主なトピック概要
+参考: カテゴリ分類の詳細は [references/categories.md](references/categories.md) を参照してください。
 
 ### Step 7: 重複のチェック
 
