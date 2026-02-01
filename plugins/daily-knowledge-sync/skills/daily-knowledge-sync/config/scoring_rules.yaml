@@ -3,9 +3,9 @@
 
 # 閾値設定
 thresholds:
-  accept: 60      # この点数以上で採用
-  maybe: 40       # この点数以上でレビュー候補
-  reject: 40      # この点数未満で除外
+  accept: 40      # この点数以上で採用
+  maybe: 20       # この点数以上でレビュー候補
+  reject: 20      # この点数未満で除外
 
 # ポジティブスコア（加点）
 positive_scores:
@@ -109,7 +109,7 @@ negative_scores:
 
   # コンテキスト不足
   lack_of_context:
-    score: -20
+    score: -10
     patterns:
       - "^[^。!?\\n]{1,30}$"  # 短すぎる一行
       - "^\\w+$"  # 単語のみ
@@ -130,7 +130,7 @@ negative_scores:
 # ロール重み
 role_weights:
   assistant: 1.2    # AIの回答は重視
-  user: 0.8         # ユーザーの質問は軽視
+  user: 1.0         # ユーザーの質問も公平に評価
   system: 0.0       # システムメッセージは除外
 
 # 文字数ボーナス

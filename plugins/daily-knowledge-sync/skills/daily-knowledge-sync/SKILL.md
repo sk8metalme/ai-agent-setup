@@ -208,39 +208,18 @@ echo "KNOWLEDGE_REPO_URL: ${KNOWLEDGE_REPO_URL:-未設定}"
 
 **SKILL_BASE の取得方法**:
 
-**方法1: CLAUDE_PLUGIN_ROOT 環境変数を使用（推奨）**
+**SKILL_BASE の取得方法**:
+
+スキル読み込み時に表示される「Base directory for this skill」の値を **そのまま** 使用します:
 
 ```bash
-# CLAUDE_PLUGIN_ROOT が設定されている場合はそれを使用
-if [ -n "${CLAUDE_PLUGIN_ROOT}" ]; then
-  SKILL_BASE="${CLAUDE_PLUGIN_ROOT}"
-  echo "✅ CLAUDE_PLUGIN_ROOT を使用: $SKILL_BASE"
-else
-  echo "⚠️ CLAUDE_PLUGIN_ROOT が未設定です"
-  echo "スキル読み込み時に表示された Base directory の値を使用してください"
-  # フォールバック: Base directory の値を手動設定
-  # SKILL_BASE="<Base directory for this skill の値>"
-fi
+# スキル読み込み時の表示:
+# Base directory for this skill: /Users/.../skills/daily-knowledge-sync
+
+SKILL_BASE="/Users/.../skills/daily-knowledge-sync"  # ← この値をそのまま使用
 ```
 
-**方法2: Base directory の値を直接設定（フォールバック）**
-
-スキル読み込み時に以下のような表示があります:
-```text
-Base directory for this skill: /Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.1/skills/daily-knowledge-sync
-```
-
-この値を `SKILL_BASE` として使用します:
-
-```bash
-# 例: スキル読み込み時の表示から取得
-SKILL_BASE="/Users/username/.claude/plugins/cache/ai-agent-setup/daily-knowledge-sync/1.5.1/skills/daily-knowledge-sync"
-```
-
-**重要**:
-- **CLAUDE_PLUGIN_ROOT を優先的に使用**（ポータブルで自動的に設定される）
-- 未設定の場合のみ、Base directory の値を手動設定
-- 推測でパスを設定しないこと（プラグインルートからの推測は不正確）
+**重要**: パスを推測・短縮しないでください。表示された値をそのままコピーしてください。
 
 #### 1-3. スクリプト個別確認
 
