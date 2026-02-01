@@ -352,64 +352,121 @@ python "$SKILL_BASE/scripts/extract_knowledge.py" 2026-01-30
 - 作業リポジトリ一覧（候補の `project_path` フィールドから取得）
 - 知識候補件数（抽出された候補の総数）
 
-### Step 5: 知識の評価とバッチ処理（スコアリングシステム v1.4.0+）
+### Step 5: 知識の評価とファイル作成（ハイブリッド方式 v1.7.0+）
 
 > **⚠️ 重要**: このステップでは**サマリーのみ**を表示してください。候補内容の分析（JSON解析、スコア分布、高スコア候補の詳細）は**一切出力しない**でください。
 
-**v1.4.0以降では、スコアリングシステムによる自動評価を使用します。**
+**v1.7.0以降では、Claude Code自身による精密判定とサブエージェントによる高速スクリーニングを組み合わせたハイブリッド方式を使用します。**
 
-抽出された候補（`/tmp/knowledge_candidates_YYYY-MM-DD.json`）を、スコアリングエンジンで評価・処理します。
+抽出された候補（`/tmp/knowledge_candidates_YYYY-MM-DD.json`）を、3段階で評価・処理します。
 
-#### 5-1. バッチ処理の実行
+#### 5-1. 一次スクリーニング（サブエージェント並列処理）
+
+候補を50件ずつバッチに分割し、Taskツールで並列評価します。
+
+**サブエージェント起動（Taskツール）**:
+
+```python
+# 候補を50件ずつ分割
+candidates = json.load(open(candidates_file))
+batch_size = 50
+batches = [candidates[i:i+batch_size] for i in range(0, len(candidates), batch_size)]
+
+# 最大5並列で一次スクリーニング
+for batch_id, batch in enumerate(batches[:5]):  # 最大5バッチまで並列
+    Task(
+        subagent_type="general-purpose",
+        model="haiku",
+        description=f"一次スクリーニング バッチ{batch_id+1}",
+        prompt=f"""
+以下の知識候補を一次スクリーニングしてください。
+
+## 判定基準
+- **pass**: 詳細評価の価値あり（解決策、コード例、手順など）
+- **reject**: 明らかに価値なし（断片的、意味不明）
+
+## 候補データ
+{json.dumps(batch, ensure_ascii=False, indent=2)}
+
+## 出力形式
+JSONで以下の形式で出力:
+[
+  {{"index": 0, "decision": "pass"}},
+  {{"index": 1, "decision": "reject", "reason": "断片的"}}
+]
+"""
+    )
+```
+
+**並列実行**:
+- バッチ1（候補0-49）: Task agent 1
+- バッチ2（候補50-99）: Task agent 2
+- バッチ3（候補100-149）: Task agent 3
+- （最大5並列）
+
+**結果集約**:
+pass判定された候補のみを次ステップへ
+
+#### 5-2. 精密評価（Claude Code自身）
+
+一次スクリーニング通過候補（50-100件）を、Claude Code自身が詳細評価します。
+
+**評価プロセス**:
+
+1. 候補JSONを10件ずつ読み込む
+2. 各候補について以下を判定:
+
+| 項目 | 内容 |
+|------|------|
+| decision | "accept" / "reject" |
+| category | "errors" / "ops" / "domain" |
+| title | 知識タイトル（acceptの場合） |
+| reason | 判定理由（20文字以内） |
+
+**採用基準（accept）**:
+- エラー解決の具体的な手順が含まれる
+- コード例と説明が含まれる
+- ベストプラクティスやパターンの説明
+- 複数ステップの手順書
+- 問題の根本原因と解決策の両方が含まれる
+
+**拒否基準（reject）**:
+- 単純な質問のみ（回答なし）
+- コンテキスト不足で理解不能
+- 一時的な作業メモ（WIP, TODO）
+- ツール出力の単純なコピー
+- 会話の断片（前後の文脈が不明）
+
+**カテゴリ判定基準**:
+- **errors**: エラー解決、デバッグ、バグ修正
+- **ops**: コマンド、運用、DevOps、インフラ
+- **domain**: 設計判断、ビジネスロジック、アーキテクチャ
+
+3. 結果を `/tmp/knowledge_evaluated_YYYY-MM-DD.json` に保存
+
+#### 5-3. ファイル作成（create_knowledge_files.py）
+
+評価結果からaccept判定のみを処理し、知識ファイルを作成します。
 
 ```bash
-# バッチ処理スクリプトを実行
 CANDIDATES_FILE="/tmp/knowledge_candidates_$(date -v-1d +%Y-%m-%d).json"
+EVALUATION_FILE="/tmp/knowledge_evaluated_$(date -v-1d +%Y-%m-%d).json"
 REPO_PATH="${KNOWLEDGE_REPO_PATH:-$HOME/knowledge-base}"
 
-python "$SKILL_BASE/scripts/process_knowledge_batch.py" \
+python "$SKILL_BASE/scripts/create_knowledge_files.py" \
   "$CANDIDATES_FILE" \
+  "$EVALUATION_FILE" \
   "$REPO_PATH" \
-  --date "$(date -v-1d +%Y-%m-%d)"
+  "$(date -v-1d +%Y-%m-%d)"
 ```
 
 このスクリプトは以下を自動実行します:
-1. **評価**: スコアリングエンジンで0-100点評価
-2. **除外パターンチェック**: 完了報告、挨拶、実行ログなどを除外
-3. **閾値判定**: 60点以上のみ採用（accept）
-4. **類似度チェック**: 既存知識と70%以上類似していれば重複として除外
-5. **カテゴリ分類**: 3カテゴリ（errors, ops, domain）に自動分類
-6. **ファイル作成**: Markdownファイルを生成
-7. **Git コミット**: 自動的にコミット
+1. **accept判定のみ処理**: evaluation_fileから採用された候補を取得
+2. **類似度チェック**: 既存知識と70%以上類似していれば重複として除外
+3. **ファイル作成**: カテゴリ別にMarkdownファイルを生成
+4. **Git コミット**: 自動的にコミット
 
-#### 5-2. スコアリング基準（詳細は config/ 参照）
-
-**ポジティブスコア（加点）**:
-- エラー解決（スタックトレース含む）: +20点
-- 問題解決（解決策含む）: +25点
-- 便利なツール使用（grep, jq, docker等）: +15点
-- コード例を含む: +15点
-- ベストプラクティス言及: +15点
-- 複数ステップの手順: +10点
-
-**ネガティブスコア（減点）**:
-- 進行中・未完了（WIP, TODO）: -15点
-- コンテキスト不足: -20点
-- 質問のみ（回答なし）: -10点
-
-**除外パターン**:
-- 完了報告（「完了だぜ」「タスク完了」等）
-- 挨拶・相槌（「なるほど」「よし」等）
-- 実行ログ（`Running...`, `Step 1/3`等）
-- システムメッセージ
-- 最小文字数: 80文字未満
-
-**カテゴリ（6→3に削減）**:
-- **errors/**: エラー解決、デバッグ、バグ修正
-- **ops/**: 運用、DevOps、インフラ、便利コマンド（旧 commands + operations）
-- **domain/**: ドメイン知識、設計判断、ビジネスロジック（旧 patterns + design + domain）
-
-#### 5-3. 処理結果の確認
+**処理結果の確認**:
 
 バッチ処理後、**以下の簡潔なサマリーのみ**をユーザーに表示してください:
 
@@ -419,30 +476,18 @@ python "$SKILL_BASE/scripts/process_knowledge_batch.py" \
 ✅ **処理完了**
 - 対象日: 2026-01-31
 - 総候補数: 150件
+- 一次通過: 60件
 - 作成した知識ファイル: 25件
   - 採用: 25件
-  - 拒否: 110件
-  - 重複: 15件
-```
-
-**スクリプトの内部出力（ユーザーには非表示）**:
-
-```
-==================================================
-SUMMARY
-==================================================
-Total candidates: 150
-  ✅ Accepted:  25
-  ❌ Rejected:  110
-  ⚠️  Duplicates: 15
-  📝 Created:   25
+  - 拒否: 35件
+  - 重複: 0件
 ```
 
 **日次まとめ用の記録**:
 以下の情報を記録してください（Step 11-1で使用）:
 - 作成されたファイル数と主なトピック
-- 高スコア（80点以上）の知識項目
-- 除外された候補の主な理由（統計から）
+- 採用された知識項目のカテゴリ分布
+- 除外された候補の主な理由
 
 ### Step 6: （削除）カテゴリ分類はStep 5で自動実行
 

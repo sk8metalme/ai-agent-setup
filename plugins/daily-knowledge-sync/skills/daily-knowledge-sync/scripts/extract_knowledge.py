@@ -9,6 +9,25 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+# Pre-compiled regex patterns for performance
+SYSTEM_MESSAGE_PATTERN = re.compile(r"<system-reminder>|<function_results>")
+COMPLETION_PATTERN = re.compile(
+    r"^(完了しました|done|finished|completed|✅.*完了)", re.IGNORECASE | re.MULTILINE
+)
+GREETING_PATTERN = re.compile(
+    r"^(なるほど|了解|OK|おはよう|ありがとう)[。！]?$", re.IGNORECASE | re.MULTILINE
+)
+EXECUTION_LOG_PATTERN = re.compile(
+    r"^(Running|Executing|\[INFO\]|Step \d+/\d+|\d+%)", re.MULTILINE
+)
+ERROR_PATTERNS = [
+    re.compile(r"Traceback \(most recent call last\)", re.MULTILINE),
+    re.compile(r"Exception in thread", re.MULTILINE),
+    re.compile(r"at .*:\d+", re.MULTILINE),
+    re.compile(r"Error:.*at line \d+", re.MULTILINE),
+    re.compile(r"^\s+File \".*\", line \d+", re.MULTILINE),
+]
+
 
 class KnowledgeExtractor:
     """Extract knowledge candidates from JSONL conversation logs."""
@@ -89,6 +108,39 @@ class KnowledgeExtractor:
 
         return candidates
 
+    def _should_exclude(self, text: str, role: str) -> tuple[bool, str | None]:
+        """
+        Pre-filter to exclude clearly low-value candidates.
+
+        Args:
+            text: Message text
+            role: Message role
+
+        Returns:
+            tuple[bool, str | None]: (should_exclude, reason)
+        """
+        # Minimum character count
+        if len(text) < 80:
+            return True, "Too short"
+
+        # System role
+        if role == "system":
+            return True, "System role"
+
+        # Exclusion patterns (using pre-compiled regex for performance)
+        exclusion_checks = [
+            (SYSTEM_MESSAGE_PATTERN, "System message"),
+            (COMPLETION_PATTERN, "Completion phrase"),
+            (GREETING_PATTERN, "Greeting"),
+            (EXECUTION_LOG_PATTERN, "Execution log"),
+        ]
+
+        for pattern, reason in exclusion_checks:
+            if pattern.search(text):
+                return True, reason
+
+        return False, None
+
     def _get_file_project_path(self, jsonl_file: Path) -> str:
         """
         Get the project path from the first entry with cwd field.
@@ -163,20 +215,16 @@ class KnowledgeExtractor:
 
         # Look for actual error patterns (stack traces, exceptions)
         # Only include if it looks like a real error with context
-        error_patterns = [
-            r"Traceback \(most recent call last\)",
-            r"Exception in thread",
-            r"at .*:\d+",  # Stack trace line
-            r"Error:.*at line \d+",
-            r"^\s+File \".*\", line \d+",
-        ]
-        for pattern in error_patterns:
-            if re.search(pattern, text_content, re.MULTILINE):
+        for pattern in ERROR_PATTERNS:
+            if pattern.search(text_content):
                 errors.append(text_content)
                 break
 
         # Skip if no meaningful content
         text_content = text_content.strip()
+        should_exclude, _ = self._should_exclude(text_content, role)
+        if should_exclude:
+            return None
         if not text_content and not tool_uses and not errors:
             return None
 
