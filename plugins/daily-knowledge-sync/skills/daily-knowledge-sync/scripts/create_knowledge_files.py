@@ -169,16 +169,19 @@ class KnowledgeFileCreator:
         category_dir = self.repo_path / category
         category_dir.mkdir(parents=True, exist_ok=True)
 
-        # Generate filename from title
-        filename = self._sanitize_filename(title) + ".md"
+        # Generate filename using categorizer (YYYY-MM-DD_snake_case.md format)
+        dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        date = dt.strftime("%Y-%m-%d")
+        filename = self.categorizer.generate_filename(title, date)
         file_path = category_dir / filename
 
         # Avoid overwriting existing files
         if file_path.exists():
             # Add timestamp suffix
-            dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
             timestamp_suffix = dt.strftime("%Y%m%d_%H%M%S")
-            filename = f"{self._sanitize_filename(title)}_{timestamp_suffix}.md"
+            # Extract base name (remove .md extension)
+            base = filename[:-3] if filename.endswith(".md") else filename
+            filename = f"{base}_{timestamp_suffix}.md"
             file_path = category_dir / filename
 
         # Create markdown content

@@ -28,6 +28,23 @@ ERROR_PATTERNS = [
     re.compile(r"^\s+File \".*\", line \d+", re.MULTILINE),
 ]
 
+# Value keyword patterns (must contain at least one)
+VALUE_KEYWORDS = [
+    r"エラー", r"error", r"解決", r"fix", r"原因",
+    r"手順", r"step", r"方法", r"how to",
+    r"実装", r"implement", r"コード", r"code",
+    r"設計", r"design", r"アーキテクチャ",
+]
+VALUE_PATTERN = re.compile("|".join(VALUE_KEYWORDS), re.IGNORECASE)
+
+# Self-log patterns (exclude skill's own logs)
+SELF_LOG_PATTERNS = [
+    re.compile(r"知識同期結果", re.MULTILINE),
+    re.compile(r"Step \d+:", re.MULTILINE),
+    re.compile(r"コーヒー豆", re.MULTILINE),
+    re.compile(r"日次知識まとめ", re.MULTILINE),
+]
+
 
 class KnowledgeExtractor:
     """Extract knowledge candidates from JSONL conversation logs."""
@@ -119,9 +136,9 @@ class KnowledgeExtractor:
         Returns:
             tuple[bool, str | None]: (should_exclude, reason)
         """
-        # Minimum character count
-        if len(text) < 80:
-            return True, "Too short"
+        # Minimum character count (increased from 80 to 200)
+        if len(text) < 200:
+            return True, "Too short (min 200 chars)"
 
         # System role
         if role == "system":
@@ -138,6 +155,15 @@ class KnowledgeExtractor:
         for pattern, reason in exclusion_checks:
             if pattern.search(text):
                 return True, reason
+
+        # Exclude skill's own logs
+        for pattern in SELF_LOG_PATTERNS:
+            if pattern.search(text):
+                return True, "Self-log"
+
+        # Require at least one value keyword
+        if not VALUE_PATTERN.search(text):
+            return True, "No value keywords"
 
         return False, None
 
